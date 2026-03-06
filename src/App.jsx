@@ -258,7 +258,6 @@ export default function App() {
         </RequireAdmin>
       } />
 
-      {/* 404 — catches everything else */}
       <Route path="*" element={
         <NotFound onBack={() => { window.location.href = "/"; }} />
       } />
