@@ -9,11 +9,11 @@ import Success        from "./components/Success";
 import AdminDashboard from "./components/AdminDashboard";
 import NotFound       from "./pages/NotFound";
 import Icon           from "./components/Icon";
-import { useAuth }    from "./Context/AuthContext";
-import { submitRecord } from "./Services/api";
+import { useAuth }    from "./context/AuthContext";
+import { submitRecord } from "./services/api";
 import "./App.css";
 
-// ── Protected route wrappers ──────────────────────────────────
+
 function RequireAuth({ children }) {
   const { user, ready } = useAuth();
   if (!ready) return null;
