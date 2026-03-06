@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useState } from "react";
 import LandingPage    from "./components/Home";
-import Home      from "./components/Home";
+import LoginPage      from "./components/LoginPage";
 import Dashboard      from "./components/Dashboard";
 import Step1          from "./components/Step1";
 import Step2          from "./components/Step2";
@@ -13,7 +13,7 @@ import { useAuth }    from "./context/AuthContext";
 import { submitRecord } from "./services/api";
 import "./App.css";
 
-
+// ── Protected route wrappers ──────────────────────────────────
 function RequireAuth({ children }) {
   const { user, ready } = useAuth();
   if (!ready) return null;
