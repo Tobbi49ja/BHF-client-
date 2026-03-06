@@ -1,16 +1,16 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useState } from "react";
-import LandingPage    from "./components/LandingPage";
-import LoginPage      from "./components/LoginPage";
+import LandingPage    from "./components/Home";
+import Home      from "./components/Home";
 import Dashboard      from "./components/Dashboard";
 import Step1          from "./components/Step1";
 import Step2          from "./components/Step2";
 import Success        from "./components/Success";
 import AdminDashboard from "./components/AdminDashboard";
-import NotFound       from "./pages/NotFound";
+import NotFound       from "./Pages/NotFound";
 import Icon           from "./components/Icon";
-import { useAuth }    from "./context/AuthContext";
-import { submitRecord } from "./services/api";
+import { useAuth }    from "./Context/AuthContext";
+import { submitRecord } from "./Services/api";
 import "./App.css";
 
 // ── Protected route wrappers ──────────────────────────────────

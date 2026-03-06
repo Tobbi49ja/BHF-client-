@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Icon from "./Icon";
-import { getAdminRecords, getUsers, deleteUser, updateUserRole, exportRecordsExcel } from "../services/api";
-import { useAuth } from "../context/AuthContext";
+import { getAdminRecords, getUsers, deleteUser, updateUserRole, exportRecordsExcel } from "../Services/api";
+import { useAuth } from "../Context/AuthContext";
 
 const ROLES = ["Field Volunteer", "Health Worker", "Program Manager", "Data Analyst", "Administrator"];
 
