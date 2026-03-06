@@ -7,7 +7,7 @@ import Step1          from "./components/Step1";
 import Step2          from "./components/Step2";
 import Success        from "./components/Success";
 import AdminDashboard from "./components/AdminDashboard";
-import NotFound       from "./Pages/NotFound";
+import NotFound       from "./pages/NotFound";
 import Icon           from "./components/Icon";
 import { useAuth }    from "./Context/AuthContext";
 import { submitRecord } from "./Services/api";
