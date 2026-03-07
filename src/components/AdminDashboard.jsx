@@ -35,13 +35,30 @@ export default function AdminDashboard({ onBack }) {
   // Live user statuses
   const [statuses, setStatuses] = useState({});
 
+  // Stable ref so socket callback always sees latest chatUser
+  const chatUserRef = useRef(chatUser);
+  useEffect(() => { chatUserRef.current = chatUser; }, [chatUser]);
+
   const { pingUser } = useSocket(user?._id, {
     onMessage: (msg) => {
-      setMessages((prev) => prev.find((m) => m._id === msg._id) ? prev : [...prev, msg]);
-      // Update convos unread
+      const senderId   = msg.sender?._id   || msg.sender;
+      const receiverId = msg.receiver?._id || msg.receiver;
+      const activePeer = chatUserRef.current?._id;
+      const myId       = user?._id;
+
+      // Add to messages only if it belongs to the currently open conversation
+      const inActiveChat =
+        (senderId === activePeer && receiverId === myId) ||
+        (senderId === myId       && receiverId === activePeer);
+
+      if (inActiveChat) {
+        setMessages((prev) => prev.find((m) => m._id === msg._id) ? prev : [...prev, msg]);
+      }
+
+      // Update conversation list unread count
       setConvos((prev) => prev.map((c) =>
-        c.user._id === msg.sender?._id
-          ? { ...c, lastMessage: msg, unread: chatUser?._id === msg.sender?._id ? 0 : c.unread + 1 }
+        c.user._id === senderId
+          ? { ...c, lastMessage: msg, unread: activePeer === senderId ? 0 : c.unread + 1 }
           : c
       ));
     },
@@ -98,11 +115,26 @@ export default function AdminDashboard({ onBack }) {
 
   const handleSend = async () => {
     if (!chatInput.trim() || !chatUser) return;
+    const content = chatInput.trim();
+    setChatInput("");
     setSending(true);
     try {
-      await sendMessage(user.token, { receiverId: chatUser._id, content: chatInput.trim() });
-      setChatInput("");
-    } catch {}
+      // Optimistic: admin sees message immediately
+      const optimistic = {
+        _id:        "opt-" + Date.now(),
+        sender:     { _id: user._id },
+        receiver:   { _id: chatUser._id },
+        content,
+        read:       false,
+        createdAt:  new Date().toISOString(),
+        _optimistic: true,
+      };
+      setMessages((prev) => [...prev, optimistic]);
+      const saved = await sendMessage(user.token, { receiverId: chatUser._id, content });
+      setMessages((prev) => prev.map((m) => m._optimistic ? saved : m));
+    } catch {
+      setMessages((prev) => prev.filter((m) => !m._optimistic));
+    }
     setSending(false);
   };
 

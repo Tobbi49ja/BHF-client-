@@ -1,615 +1,901 @@
-// nigeriaAddressData.js
-// Exports: NIGERIA_ADDRESS_DATA, STATES, getLGAs, getCities, getTowns
-// Towns are sample neighbourhoods/areas within each city.
-// Extend the towns arrays as needed for your deployment.
+/**
+ * Nigeria Address Data
+ * Structure: State → LGA → Cities/Towns within that LGA
+ * Based on official Nigeria LGA structure (774 LGAs across 36 states + FCT)
+ */
 
 export const NIGERIA_ADDRESS_DATA = {
+
   "Abia": {
-    lgas: {
-      "Aba North": {
-        cities: ["Aba"],
-        towns: { "Aba": ["Ariaria", "Eziama", "Ngwa Road", "Cemetery Road", "Asa Road"] }
-      },
-      "Aba South": {
-        cities: ["Aba"],
-        towns: { "Aba": ["Obuda", "Igwebuike", "Nkwoagu", "Obohia", "Uratta"] }
-      },
-      "Arochukwu": {
-        cities: ["Arochukwu"],
-        towns: { "Arochukwu": ["Ohafia", "Abam", "Ututu", "Ihechiowa"] }
-      },
-      "Umuahia North": {
-        cities: ["Umuahia"],
-        towns: { "Umuahia": ["Ibeku", "Nkwoagu", "Alaoji", "Ubakala"] }
-      },
-      "Umuahia South": {
-        cities: ["Umuahia"],
-        towns: { "Umuahia": ["Olokoro", "Ikwuano", "Ntigha", "Amuzukwu"] }
-      },
-    }
+    "Aba North":        ["Aba"],
+    "Aba South":        ["Aba", "Opobo"],
+    "Arochukwu":        ["Arochukwu", "Ohafia"],
+    "Bende":            ["Bende", "Uzuakoli"],
+    "Ikwuano":          ["Ikwuano", "Oloko"],
+    "Isiala Ngwa North":["Isiala Ngwa"],
+    "Isiala Ngwa South":["Isiala Ngwa"],
+    "Isuikwuato":       ["Isuikwuato"],
+    "Obi Ngwa":         ["Obi Ngwa"],
+    "Ohafia":           ["Ohafia", "Abiriba"],
+    "Osisioma":         ["Osisioma"],
+    "Ugwunagbo":        ["Ugwunagbo"],
+    "Ukwa East":        ["Ukwa"],
+    "Ukwa West":        ["Ukwa"],
+    "Umuahia North":    ["Umuahia"],
+    "Umuahia South":    ["Umuahia", "Ibeku"],
+    "Umu Nneochi":      ["Umu Nneochi"],
   },
 
   "Adamawa": {
-    lgas: {
-      "Yola North": {
-        cities: ["Yola"],
-        towns: { "Yola": ["Jimeta", "Doubeli", "Jambutu", "Wuro Hausa"] }
-      },
-      "Yola South": {
-        cities: ["Yola"],
-        towns: { "Yola": ["Rumde", "Adarawo", "Gwadabawa", "Karewa"] }
-      },
-      "Mubi North": {
-        cities: ["Mubi"],
-        towns: { "Mubi": ["Uba", "Bazza", "Michika", "Gulak"] }
-      },
-    }
+    "Demsa":            ["Demsa"],
+    "Fufure":           ["Fufure"],
+    "Ganye":            ["Ganye"],
+    "Gayuk":            ["Gayuk"],
+    "Gombi":            ["Gombi"],
+    "Grie":             ["Grie"],
+    "Hong":             ["Hong"],
+    "Jada":             ["Jada"],
+    "Lamurde":          ["Lamurde"],
+    "Madagali":         ["Madagali"],
+    "Maiha":            ["Maiha"],
+    "Mayo Belwa":       ["Mayo Belwa"],
+    "Michika":          ["Michika"],
+    "Mubi North":       ["Mubi"],
+    "Mubi South":       ["Mubi"],
+    "Numan":            ["Numan"],
+    "Shelleng":         ["Shelleng"],
+    "Song":             ["Song"],
+    "Toungo":           ["Toungo"],
+    "Yola North":       ["Yola", "Jimeta"],
+    "Yola South":       ["Yola"],
   },
 
   "Akwa Ibom": {
-    lgas: {
-      "Uyo": {
-        cities: ["Uyo"],
-        towns: { "Uyo": ["Ewet Housing", "Shelter Afrique", "Itam", "Uruan", "Use Offot"] }
-      },
-      "Ikot Ekpene": {
-        cities: ["Ikot Ekpene"],
-        towns: { "Ikot Ekpene": ["Abak", "Ukanafun", "Essien Udim", "Etim Ekpo"] }
-      },
-      "Eket": {
-        cities: ["Eket"],
-        towns: { "Eket": ["Esit Eket", "Ibeno", "Ikot Abasi", "Onna"] }
-      },
-      "Essien Udim": {
-        cities: ["Ukanafun", "Ikot Ekpene"],
-        towns: {
-          "Ukanafun": ["Abak", "Essien Udim", "Etim Ekpo", "Ika"],
-          "Ikot Ekpene": ["Essien Udim", "Abak", "Ini", "Obot Akara"],
-        }
-      },
-    }
+    "Abak":             ["Abak"],
+    "Eastern Obolo":    ["Eastern Obolo"],
+    "Eket":             ["Eket"],
+    "Esit Eket":        ["Esit Eket"],
+    "Essien Udim":      ["Essien Udim"],
+    "Etim Ekpo":        ["Etim Ekpo"],
+    "Etinan":           ["Etinan"],
+    "Ibeno":            ["Ibeno"],
+    "Ibesikpo Asutan":  ["Ibesikpo"],
+    "Ibiono Ibom":      ["Ibiono"],
+    "Ika":              ["Ika"],
+    "Ikono":            ["Ikono"],
+    "Ikot Abasi":       ["Ikot Abasi"],
+    "Ikot Ekpene":      ["Ikot Ekpene"],
+    "Ini":              ["Ini"],
+    "Itu":              ["Itu"],
+    "Mbo":              ["Mbo"],
+    "Mkpat Enin":       ["Mkpat Enin"],
+    "Nsit Atai":        ["Nsit Atai"],
+    "Nsit Ibom":        ["Nsit Ibom"],
+    "Nsit Ubium":       ["Nsit Ubium"],
+    "Obot Akara":       ["Obot Akara"],
+    "Okobo":            ["Okobo"],
+    "Onna":             ["Onna"],
+    "Oron":             ["Oron"],
+    "Oruk Anam":        ["Oruk Anam"],
+    "Udung Uko":        ["Udung Uko"],
+    "Ukanafun":         ["Ukanafun"],
+    "Uruan":            ["Uruan"],
+    "Urue Offong/Oruko":["Urue Offong"],
+    "Uyo":              ["Uyo", "Ewet", "Shelter Afrique"],
   },
 
   "Anambra": {
-    lgas: {
-      "Onitsha North": {
-        cities: ["Onitsha"],
-        towns: { "Onitsha": ["GRA", "Trans-Ekulu", "Odoakpu", "Fegge", "Woliwo"] }
-      },
-      "Awka South": {
-        cities: ["Awka"],
-        towns: { "Awka": ["Amikwo", "Nibo", "Okpuno", "Nnewi Road"] }
-      },
-      "Nnewi North": {
-        cities: ["Nnewi"],
-        towns: { "Nnewi": ["Otolo", "Uruagu", "Umudim", "Nnewi South"] }
-      },
-    }
+    "Aguata":           ["Aguata", "Ekwulobia"],
+    "Anambra East":     ["Anambra East"],
+    "Anambra West":     ["Anambra West"],
+    "Anaocha":          ["Anaocha", "Nnewi"],
+    "Awka North":       ["Awka"],
+    "Awka South":       ["Awka", "Amawbia"],
+    "Ayamelum":         ["Ayamelum"],
+    "Dunukofia":        ["Dunukofia"],
+    "Ekwusigo":         ["Ekwusigo", "Ozubulu"],
+    "Idemili North":    ["Onitsha", "Ogidi"],
+    "Idemili South":    ["Ojoto"],
+    "Ihiala":           ["Ihiala", "Nnewi"],
+    "Njikoka":          ["Njikoka", "Enugwu-Ukwu"],
+    "Nnewi North":      ["Nnewi"],
+    "Nnewi South":      ["Nnewi"],
+    "Ogbaru":           ["Ogbaru", "Atani"],
+    "Onitsha North":    ["Onitsha"],
+    "Onitsha South":    ["Onitsha"],
+    "Orumba North":     ["Orumba"],
+    "Orumba South":     ["Orumba"],
+    "Oyi":              ["Oyi", "Nteje"],
   },
 
   "Bauchi": {
-    lgas: {
-      "Bauchi": {
-        cities: ["Bauchi"],
-        towns: { "Bauchi": ["Wunti", "Birchi", "Miri", "GRA", "Yelwa"] }
-      },
-    }
+    "Alkaleri":         ["Alkaleri"],
+    "Bauchi":           ["Bauchi"],
+    "Bogoro":           ["Bogoro"],
+    "Damban":           ["Damban"],
+    "Darazo":           ["Darazo"],
+    "Dass":             ["Dass"],
+    "Gamawa":           ["Gamawa"],
+    "Ganjuwa":          ["Ganjuwa"],
+    "Giade":            ["Giade"],
+    "Itas/Gadau":       ["Itas", "Gadau"],
+    "Jama'are":         ["Jama'are"],
+    "Katagum":          ["Azare"],
+    "Kirfi":            ["Kirfi"],
+    "Misau":            ["Misau"],
+    "Ningi":            ["Ningi"],
+    "Shira":            ["Shira"],
+    "Tafawa Balewa":    ["Tafawa Balewa", "Bauchi"],
+    "Toro":             ["Toro"],
+    "Warji":            ["Warji"],
+    "Zaki":             ["Zaki"],
   },
 
   "Bayelsa": {
-    lgas: {
-      "Yenagoa": {
-        cities: ["Yenagoa"],
-        towns: { "Yenagoa": ["Amarata", "Opolo", "Kpansia", "Ekeki", "Swali"] }
-      },
-    }
+    "Brass":            ["Brass", "Twon-Brass"],
+    "Ekeremor":         ["Ekeremor"],
+    "Kolokuma/Opokuma": ["Kolokuma"],
+    "Nembe":            ["Nembe"],
+    "Ogbia":            ["Ogbia"],
+    "Sagbama":          ["Sagbama"],
+    "Southern Ijaw":    ["Southern Ijaw"],
+    "Yenagoa":          ["Yenagoa", "Amarata", "Opolo", "Kpansia"],
   },
 
   "Benue": {
-    lgas: {
-      "Makurdi": {
-        cities: ["Makurdi"],
-        towns: { "Makurdi": ["North Bank", "Wadata", "High Level", "Wurukum", "GRA"] }
-      },
-    }
+    "Agatu":            ["Agatu"],
+    "Apa":              ["Apa"],
+    "Ado":              ["Ado"],
+    "Buruku":           ["Buruku"],
+    "Gboko":            ["Gboko"],
+    "Guma":             ["Guma"],
+    "Gwer East":        ["Gwer East"],
+    "Gwer West":        ["Gwer West"],
+    "Katsina-Ala":      ["Katsina-Ala"],
+    "Konshisha":        ["Konshisha"],
+    "Kwande":           ["Kwande"],
+    "Logo":             ["Logo"],
+    "Makurdi":          ["Makurdi", "North Bank", "Wadata"],
+    "Obi":              ["Obi"],
+    "Ogbadibo":         ["Ogbadibo"],
+    "Oju":              ["Oju"],
+    "Okpokwu":          ["Okpokwu"],
+    "Ohimini":          ["Ohimini"],
+    "Oturkpo":          ["Oturkpo"],
+    "Tarka":            ["Tarka"],
+    "Ukum":             ["Ukum"],
+    "Ushongo":          ["Ushongo"],
+    "Vandeikya":        ["Vandeikya"],
   },
 
   "Borno": {
-    lgas: {
-      "Maiduguri": {
-        cities: ["Maiduguri"],
-        towns: { "Maiduguri": ["Bolori", "Gwange", "Old Maiduguri", "GRA", "Wulari"] }
-      },
-      "Jere": {
-        cities: ["Maiduguri"],
-        towns: { "Maiduguri": ["Jere", "Konduga", "Bama Road", "Gamboru"] }
-      },
-    }
+    "Abadam":           ["Abadam"],
+    "Askira/Uba":       ["Askira", "Uba"],
+    "Bama":             ["Bama"],
+    "Bayo":             ["Bayo"],
+    "Biu":              ["Biu"],
+    "Chibok":           ["Chibok"],
+    "Damboa":           ["Damboa"],
+    "Dikwa":            ["Dikwa"],
+    "Gubio":            ["Gubio"],
+    "Guzamala":         ["Guzamala"],
+    "Gwoza":            ["Gwoza"],
+    "Hawul":            ["Hawul"],
+    "Jere":             ["Bama Road", "Gamboru"],
+    "Kaga":             ["Kaga"],
+    "Kala/Balge":       ["Kala"],
+    "Konduga":          ["Konduga"],
+    "Kukawa":           ["Kukawa"],
+    "Kwaya Kusar":      ["Kwaya Kusar"],
+    "Mafa":             ["Mafa"],
+    "Magumeri":         ["Magumeri"],
+    "Maiduguri":        ["Maiduguri", "Bolori", "Gwange", "GRA", "Wulari"],
+    "Marte":            ["Marte"],
+    "Mobbar":           ["Mobbar"],
+    "Monguno":          ["Monguno"],
+    "Ngala":            ["Ngala"],
+    "Nganzai":          ["Nganzai"],
+    "Shani":            ["Shani"],
   },
 
   "Cross River": {
-    lgas: {
-      "Calabar Municipal": {
-        cities: ["Calabar"],
-        towns: { "Calabar": ["Marian", "Nassarawa", "Diamond Hill", "State Housing"] }
-      },
-      "Calabar South": {
-        cities: ["Calabar"],
-        towns: { "Calabar": ["Nsefik", "Ekorinim", "Henshaw Town", "Ikot Ansa"] }
-      },
-    }
+    "Abi":              ["Abi"],
+    "Akamkpa":          ["Akamkpa"],
+    "Akpabuyo":         ["Akpabuyo"],
+    "Bakassi":          ["Bakassi"],
+    "Bekwarra":         ["Bekwarra"],
+    "Biase":            ["Biase"],
+    "Boki":             ["Boki"],
+    "Calabar Municipal":["Calabar", "Marian", "Nassarawa", "Diamond Hill"],
+    "Calabar South":    ["Calabar", "Henshaw Town", "Ikot Ansa"],
+    "Etung":            ["Etung"],
+    "Ikom":             ["Ikom"],
+    "Obanliku":         ["Obanliku"],
+    "Obubra":           ["Obubra"],
+    "Obudu":            ["Obudu"],
+    "Odukpani":         ["Odukpani"],
+    "Ogoja":            ["Ogoja"],
+    "Yakurr":           ["Ugep"],
+    "Yala":             ["Yala"],
   },
 
   "Delta": {
-    lgas: {
-      "Warri South": {
-        cities: ["Warri", "Effurun"],
-        towns: {
-          "Warri":   ["GRA", "Okumagba", "Igbudu", "Pessu", "Okere"],
-          "Effurun": ["Udu", "Agbarho", "Uvwie", "Ekpan"],
-        }
-      },
-      "Sapele": {
-        cities: ["Sapele"],
-        towns: { "Sapele": ["Ogorode", "Amukpe", "Ugboro", "GRA"] }
-      },
-      "Oshimili South": {
-        cities: ["Asaba"],
-        towns: { "Asaba": ["GRA", "Ibusa Road", "Summit", "Cable Point"] }
-      },
-    }
+    "Aniocha North":    ["Aniocha", "Issele-Uku"],
+    "Aniocha South":    ["Aniocha", "Ogwashi-Uku"],
+    "Bomadi":           ["Bomadi"],
+    "Burutu":           ["Burutu"],
+    "Ethiope East":     ["Ethiope", "Ughelli"],
+    "Ethiope West":     ["Oghara"],
+    "Ika North East":   ["Agbor"],
+    "Ika South":        ["Agbor"],
+    "Isoko North":      ["Isoko"],
+    "Isoko South":      ["Oleh"],
+    "Ndokwa East":      ["Ndokwa"],
+    "Ndokwa West":      ["Kwale"],
+    "Okpe":             ["Okpe", "Sapele"],
+    "Oshimili North":   ["Asaba"],
+    "Oshimili South":   ["Asaba", "GRA", "Cable Point"],
+    "Patani":           ["Patani"],
+    "Sapele":           ["Sapele", "Ogorode", "Amukpe"],
+    "Udu":              ["Udu", "Effurun"],
+    "Ughelli North":    ["Ughelli"],
+    "Ughelli South":    ["Ughelli"],
+    "Ukwuani":          ["Ukwuani", "Aboh"],
+    "Uvwie":            ["Uvwie", "Effurun"],
+    "Warri Central":    ["Warri", "Okumagba"],
+    "Warri North":      ["Warri"],
+    "Warri South":      ["Warri", "GRA", "Igbudu", "Pessu"],
+    "Warri South West": ["Warri"],
   },
 
   "Ebonyi": {
-    lgas: {
-      "Abakaliki": {
-        cities: ["Abakaliki"],
-        towns: { "Abakaliki": ["Kpirikpiri", "Nkwagu", "Amasiri", "GRA", "Mile 50"] }
-      },
-    }
+    "Abakaliki":        ["Abakaliki", "GRA", "Kpirikpiri"],
+    "Afikpo North":     ["Afikpo"],
+    "Afikpo South":     ["Afikpo"],
+    "Ebonyi":           ["Ebonyi"],
+    "Ezza North":       ["Ezza"],
+    "Ezza South":       ["Ezza"],
+    "Ikwo":             ["Ikwo"],
+    "Ishielu":          ["Ishielu"],
+    "Ivo":              ["Ivo"],
+    "Izzi":             ["Izzi"],
+    "Ohaozara":         ["Ohaozara"],
+    "Ohaukwu":          ["Ohaukwu"],
+    "Onicha":           ["Onicha"],
   },
 
   "Edo": {
-    lgas: {
-      "Oredo": {
-        cities: ["Benin City"],
-        towns: { "Benin City": ["GRA", "Ring Road", "Sapele Road", "Ugbowo", "New Benin"] }
-      },
-      "Egor": {
-        cities: ["Benin City"],
-        towns: { "Benin City": ["Uselu", "Ugbowo", "Ekehuan Road", "Airport Road"] }
-      },
-      "Ikpoba-Okha": {
-        cities: ["Benin City"],
-        towns: { "Benin City": ["Aduwawa", "Ikpoba Hill", "Lucky Way", "Oregbeni"] }
-      },
-    }
+    "Akoko-Edo":        ["Akoko-Edo", "Igarra"],
+    "Egor":             ["Benin City", "Uselu", "Ugbowo"],
+    "Esan Central":     ["Ekpoma"],
+    "Esan North East":  ["Uromi"],
+    "Esan South East":  ["Ubiaja"],
+    "Esan West":        ["Ekpoma"],
+    "Etsako Central":   ["Fugar"],
+    "Etsako East":      ["Auchi"],
+    "Etsako West":      ["Auchi"],
+    "Igueben":          ["Igueben"],
+    "Ikpoba Okha":      ["Benin City", "Aduwawa", "Ikpoba Hill"],
+    "Oredo":            ["Benin City", "GRA", "Ring Road", "New Benin"],
+    "Orhionmwon":       ["Orhionmwon"],
+    "Ovia North East":  ["Ovia", "Sapele Road"],
+    "Ovia South West":  ["Ovia"],
+    "Owan East":        ["Owan"],
+    "Owan West":        ["Owan"],
+    "Uhunmwonde":       ["Uhunmwonde"],
   },
 
   "Ekiti": {
-    lgas: {
-      "Ado Ekiti": {
-        cities: ["Ado Ekiti"],
-        towns: { "Ado Ekiti": ["Basiri", "Ijigbo", "Oke-Ila", "Shasha", "Federal Housing"] }
-      },
-    }
+    "Ado Ekiti":        ["Ado Ekiti", "Basiri", "GRA", "Ijigbo"],
+    "Efon":             ["Efon-Alaaye"],
+    "Ekiti East":       ["Omuo Ekiti"],
+    "Ekiti South West": ["Ilawe Ekiti"],
+    "Ekiti West":       ["Aramoko Ekiti"],
+    "Emure":            ["Emure Ekiti"],
+    "Gbonyin":          ["Ise Ekiti"],
+    "Ido/Osi":          ["Osi"],
+    "Ijero":            ["Ijero Ekiti"],
+    "Ikere":            ["Ikere Ekiti"],
+    "Ikole":            ["Ikole Ekiti"],
+    "Ilejemeje":        ["Ilejemeje"],
+    "Irepodun/Ifelodun":["Irepodun"],
+    "Ise/Orun":         ["Ise Ekiti"],
+    "Moba":             ["Otun Ekiti"],
+    "Oye":              ["Oye Ekiti"],
   },
 
   "Enugu": {
-    lgas: {
-      "Enugu North": {
-        cities: ["Enugu"],
-        towns: { "Enugu": ["Achara Layout", "Ogui", "Coal Camp", "Abakpa", "Trans-Ekulu"] }
-      },
-      "Enugu South": {
-        cities: ["Enugu"],
-        towns: { "Enugu": ["Asata", "Abakpa", "Nike", "GRA", "New Haven"] }
-      },
-    }
+    "Aninri":           ["Aninri", "Nkerefi"],
+    "Awgu":             ["Awgu"],
+    "Enugu East":       ["Enugu", "Trans-Ekulu", "Abakpa"],
+    "Enugu North":      ["Enugu", "Coal Camp", "Ogui", "Achara Layout"],
+    "Enugu South":      ["Enugu", "New Haven", "GRA", "Asata"],
+    "Ezeagu":           ["Ezeagu"],
+    "Igbo Etiti":       ["Igbo Etiti", "Ogbede"],
+    "Igbo Eze North":   ["Igbo Eze", "Obollo-Afor"],
+    "Igbo Eze South":   ["Igbo Eze"],
+    "Isi Uzo":          ["Isi Uzo"],
+    "Nkanu East":       ["Nkanu", "Mbeeli"],
+    "Nkanu West":       ["Nkanu"],
+    "Nsukka":           ["Nsukka"],
+    "Oji River":        ["Oji River"],
+    "Udenu":            ["Udenu", "Obollo-Afor"],
+    "Udi":              ["Udi"],
+    "Uzo Uwani":        ["Uzo Uwani"],
   },
 
   "FCT": {
-    lgas: {
-      "Municipal Area Council": {
-        cities: ["Abuja", "Garki", "Wuse", "Maitama", "Asokoro", "Gwarinpa", "Kubwa", "Nyanya"],
-        towns: {
-          "Abuja":    ["Central Business District", "Maitama", "Asokoro", "Wuse 2", "Garki"],
-          "Garki":    ["Garki I", "Garki II", "Area 1", "Area 2", "Area 3", "Area 10", "Area 11"],
-          "Wuse":     ["Wuse I", "Wuse II", "Zone 3", "Zone 4", "Zone 5", "Zone 6", "Zone 7"],
-          "Maitama":  ["Maitama I", "Maitama II", "Diplomatic Zone"],
-          "Asokoro":  ["Asokoro I", "Asokoro II"],
-          "Gwarinpa": ["1st Avenue", "2nd Avenue", "3rd Avenue", "Games Village"],
-          "Kubwa":    ["Phase 1", "Phase 2", "Phase 3", "Phase 4", "Byazin", "Gbaruku"],
-          "Nyanya":   ["Nyanya I", "Nyanya II", "Maraba", "Karu"],
-        }
-      },
-      "Gwagwalada": {
-        cities: ["Gwagwalada"],
-        towns: { "Gwagwalada": ["Dobi", "Gwako", "Ibwa", "Ikwa", "Paikon-Kore"] }
-      },
-      "Bwari": {
-        cities: ["Bwari"],
-        towns: { "Bwari": ["Ushafa", "Dutse", "Kawu", "Igu", "Byui"] }
-      },
-      "Kuje": {
-        cities: ["Kuje"],
-        towns: { "Kuje": ["Chibiri", "Rubochi", "Gawu", "Kuje Market"] }
-      },
-      "Abaji": {
-        cities: ["Abaji"],
-        towns: { "Abaji": ["Yaba", "Nuku", "Gawu Babangida", "Rimba"] }
-      },
-      "Kwali": {
-        cities: ["Kwali"],
-        towns: { "Kwali": ["Pai", "Yangoji", "Dafa", "Wako"] }
-      },
-    }
+    "Abaji":            ["Abaji", "Yaba", "Nuku"],
+    "Bwari":            ["Bwari", "Ushafa", "Dutse", "Kawu"],
+    "Gwagwalada":       ["Gwagwalada", "Dobi", "Gwako"],
+    "Kuje":             ["Kuje", "Chibiri", "Rubochi"],
+    "Kwali":            ["Kwali", "Pai", "Yangoji"],
+    "Municipal Area Council": [
+      "Abuja CBD", "Garki", "Wuse", "Wuse 2", "Maitama",
+      "Asokoro", "Gwarinpa", "Kubwa", "Nyanya", "Karu",
+      "Lugbe", "Galadimawa", "Lokogoma", "Apo", "Gudu",
+      "Jabi", "Wuye", "Utako", "Katampe", "Deidei",
+    ],
   },
 
   "Gombe": {
-    lgas: {
-      "Gombe": {
-        cities: ["Gombe"],
-        towns: { "Gombe": ["Deba", "Pantami", "Tumfure", "GRA", "New Market"] }
-      },
-    }
+    "Akko":             ["Gombe", "Kumo"],
+    "Balanga":          ["Balanga"],
+    "Billiri":          ["Billiri"],
+    "Dukku":            ["Dukku"],
+    "Funakaye":         ["Funakaye", "Bajoga"],
+    "Gombe":            ["Gombe", "Pantami", "Tumfure", "GRA"],
+    "Kaltungo":         ["Kaltungo"],
+    "Kwami":            ["Kwami"],
+    "Nafada":           ["Nafada"],
+    "Shongom":          ["Shongom"],
+    "Yamaltu/Deba":     ["Yamaltu"],
   },
 
   "Imo": {
-    lgas: {
-      "Owerri Municipal": {
-        cities: ["Owerri"],
-        towns: { "Owerri": ["Ikenegbu", "Orji", "Aladinma", "World Bank", "GRA"] }
-      },
-    }
+    "Aboh Mbaise":      ["Aboh Mbaise"],
+    "Ahiazu Mbaise":    ["Ahiazu Mbaise"],
+    "Ehime Mbano":      ["Ehime Mbano"],
+    "Ezinihitte":       ["Ezinihitte"],
+    "Ideato North":     ["Ideato"],
+    "Ideato South":     ["Ideato"],
+    "Ihitte/Uboma":     ["Ihitte"],
+    "Ikeduru":          ["Ikeduru", "Iho"],
+    "Isiala Mbano":     ["Isiala Mbano"],
+    "Isu":              ["Isu"],
+    "Mbaitoli":         ["Mbaitoli", "Nwaorieubi"],
+    "Ngor Okpala":      ["Ngor Okpala"],
+    "Njaba":            ["Njaba"],
+    "Nkwerre":          ["Nkwerre"],
+    "Nwangele":         ["Nwangele"],
+    "Obowo":            ["Obowo"],
+    "Oguta":            ["Oguta"],
+    "Ohaji/Egbema":     ["Ohaji"],
+    "Okigwe":           ["Okigwe"],
+    "Onuimo":           ["Onuimo"],
+    "Orlu":             ["Orlu"],
+    "Orsu":             ["Orsu"],
+    "Oru East":         ["Oru East"],
+    "Oru West":         ["Mgbidi"],
+    "Owerri Municipal": ["Owerri", "Aladinma", "GRA", "World Bank"],
+    "Owerri North":     ["Owerri", "Avu"],
+    "Owerri West":      ["Owerri", "Oguta Road"],
   },
 
   "Jigawa": {
-    lgas: {
-      "Dutse": {
-        cities: ["Dutse"],
-        towns: { "Dutse": ["GRA", "New Layout", "Old Town", "Market Area"] }
-      },
-    }
+    "Auyo":             ["Auyo"],
+    "Babura":           ["Babura"],
+    "Biriniwa":         ["Biriniwa"],
+    "Birnin Kudu":      ["Birnin Kudu"],
+    "Buji":             ["Buji"],
+    "Dutse":            ["Dutse", "GRA", "New Layout"],
+    "Gagarawa":         ["Gagarawa"],
+    "Garki":            ["Garki"],
+    "Gumel":            ["Gumel"],
+    "Guri":             ["Guri"],
+    "Gwaram":           ["Gwaram"],
+    "Gwiwa":            ["Gwiwa"],
+    "Hadejia":          ["Hadejia"],
+    "Jahun":            ["Jahun"],
+    "Kafin Hausa":      ["Kafin Hausa"],
+    "Kaugama":          ["Kaugama"],
+    "Kazaure":          ["Kazaure"],
+    "Kiri Kasama":      ["Kiri Kasama"],
+    "Kiyawa":           ["Kiyawa"],
+    "Maigatari":        ["Maigatari"],
+    "Malam Madori":     ["Malam Madori"],
+    "Miga":             ["Miga"],
+    "Ringim":           ["Ringim"],
+    "Roni":             ["Roni"],
+    "Sule Tankarkar":   ["Sule Tankarkar"],
+    "Taura":            ["Taura"],
+    "Yankwashi":        ["Yankwashi"],
   },
 
   "Kaduna": {
-    lgas: {
-      "Kaduna North": {
-        cities: ["Kaduna"],
-        towns: { "Kaduna": ["Rigasa", "Ungwan Rimi", "Badiko", "Kawo", "Malali"] }
-      },
-      "Kaduna South": {
-        cities: ["Kaduna"],
-        towns: { "Kaduna": ["Tudun Wada", "Kabala", "Television", "Barnawa", "Gonin Gora"] }
-      },
-      "Zaria": {
-        cities: ["Zaria"],
-        towns: { "Zaria": ["Sabon Gari", "Tudun Wada", "Kwarbai", "GRA", "Samaru"] }
-      },
-    }
+    "Birnin Gwari":     ["Birnin Gwari"],
+    "Chikun":           ["Chikun", "Kakuri"],
+    "Giwa":             ["Giwa"],
+    "Igabi":            ["Igabi", "Rigasa"],
+    "Ikara":            ["Ikara"],
+    "Jaba":             ["Jaba", "Kwoi"],
+    "Jema'a":           ["Kafanchan"],
+    "Kachia":           ["Kachia"],
+    "Kaduna North":     ["Kaduna", "Rigasa", "Kawo", "Malali", "Ungwan Rimi"],
+    "Kaduna South":     ["Kaduna", "Barnawa", "Television", "Tudun Wada", "Gonin Gora"],
+    "Kagarko":          ["Kagarko"],
+    "Kajuru":           ["Kajuru"],
+    "Kaura":            ["Kaura", "Kagoro"],
+    "Kauru":            ["Kauru"],
+    "Kubau":            ["Kubau"],
+    "Kudan":            ["Kudan"],
+    "Lere":             ["Lere"],
+    "Makarfi":          ["Makarfi"],
+    "Sabon Gari":       ["Sabon Gari", "Zaria Road"],
+    "Sanga":            ["Sanga"],
+    "Soba":             ["Soba"],
+    "Zangon Kataf":     ["Zangon Kataf", "Zonkwa"],
+    "Zaria":            ["Zaria", "Sabon Gari", "Samaru", "Kwarbai", "Tudun Wada"],
   },
 
   "Kano": {
-    lgas: {
-      "Kano Municipal": {
-        cities: ["Kano"],
-        towns: { "Kano": ["Sabon Gari", "Bompai", "Zoo Road", "Fagge", "Gwale", "Nasarawa"] }
-      },
-      "Fagge": {
-        cities: ["Kano"],
-        towns: { "Kano": ["Fagge A", "Fagge B", "Fagge C", "Gobirawa", "Kofar Wambai"] }
-      },
-      "Dala": {
-        cities: ["Kano"],
-        towns: { "Kano": ["Dala Hill", "Gyadi-Gyadi", "Kofar Mazugal"] }
-      },
-    }
+    "Ajingi":           ["Ajingi"],
+    "Albasu":           ["Albasu"],
+    "Bagwai":           ["Bagwai"],
+    "Bebeji":           ["Bebeji"],
+    "Bichi":            ["Bichi"],
+    "Bunkure":          ["Bunkure"],
+    "Dala":             ["Kano", "Dala", "Gyadi-Gyadi"],
+    "Dambatta":         ["Dambatta"],
+    "Dawakin Kudu":     ["Dawakin Kudu"],
+    "Dawakin Tofa":     ["Dawakin Tofa"],
+    "Doguwa":           ["Doguwa"],
+    "Fagge":            ["Kano", "Fagge"],
+    "Gabasawa":         ["Gabasawa"],
+    "Garko":            ["Garko"],
+    "Garun Mallam":     ["Garun Mallam"],
+    "Gaya":             ["Gaya"],
+    "Gezawa":           ["Gezawa"],
+    "Gwale":            ["Kano", "Gwale"],
+    "Gwarzo":           ["Gwarzo"],
+    "Kabo":             ["Kabo"],
+    "Kano Municipal":   ["Kano", "Sabon Gari", "Bompai", "Zoo Road", "Nasarawa"],
+    "Karaye":           ["Karaye"],
+    "Kibiya":           ["Kibiya"],
+    "Kiru":             ["Kiru"],
+    "Kumbotso":         ["Kumbotso"],
+    "Kunchi":           ["Kunchi"],
+    "Kura":             ["Kura"],
+    "Madobi":           ["Madobi"],
+    "Makoda":           ["Makoda"],
+    "Minjibir":         ["Minjibir"],
+    "Nasarawa":         ["Kano", "Nasarawa"],
+    "Rano":             ["Rano"],
+    "Rimin Gado":       ["Rimin Gado"],
+    "Rogo":             ["Rogo"],
+    "Shanono":          ["Shanono"],
+    "Sumaila":          ["Sumaila"],
+    "Takai":            ["Takai"],
+    "Tarauni":          ["Kano", "Tarauni"],
+    "Tofa":             ["Tofa"],
+    "Tsanyawa":         ["Tsanyawa"],
+    "Tudun Wada":       ["Tudun Wada"],
+    "Ungogo":           ["Ungogo"],
+    "Warawa":           ["Warawa"],
+    "Wudil":            ["Wudil"],
   },
 
   "Katsina": {
-    lgas: {
-      "Katsina": {
-        cities: ["Katsina"],
-        towns: { "Katsina": ["GRA", "Kofar Kaura", "Tsohuwar Kasuwa", "Housing Estate"] }
-      },
-      "Funtua": {
-        cities: ["Funtua"],
-        towns: { "Funtua": ["Sabon Gari", "Old Layout", "New Layout"] }
-      },
-    }
+    "Bakori":           ["Bakori"],
+    "Batagarawa":       ["Batagarawa"],
+    "Batsari":          ["Batsari"],
+    "Baure":            ["Baure"],
+    "Bindawa":          ["Bindawa"],
+    "Charanchi":        ["Charanchi"],
+    "Dan Musa":         ["Dan Musa"],
+    "Dandume":          ["Dandume"],
+    "Danja":            ["Danja"],
+    "Daura":            ["Daura"],
+    "Dutsi":            ["Dutsi"],
+    "Dutsin Ma":        ["Dutsin Ma"],
+    "Faskari":          ["Faskari"],
+    "Funtua":           ["Funtua", "Sabon Gari"],
+    "Ingawa":           ["Ingawa"],
+    "Jibia":            ["Jibia"],
+    "Kafur":            ["Kafur"],
+    "Kaita":            ["Kaita"],
+    "Kankara":          ["Kankara"],
+    "Kankia":           ["Kankia"],
+    "Katsina":          ["Katsina", "GRA", "Kofar Kaura", "Housing Estate"],
+    "Kurfi":            ["Kurfi"],
+    "Kusada":           ["Kusada"],
+    "Mai'Adua":         ["Mai'Adua"],
+    "Malumfashi":       ["Malumfashi"],
+    "Mani":             ["Mani"],
+    "Mashi":            ["Mashi"],
+    "Matazu":           ["Matazu"],
+    "Musawa":           ["Musawa"],
+    "Rimi":             ["Rimi"],
+    "Sabuwa":           ["Sabuwa"],
+    "Safana":           ["Safana"],
+    "Sandamu":          ["Sandamu"],
+    "Zango":            ["Zango"],
   },
 
   "Kebbi": {
-    lgas: {
-      "Birnin Kebbi": {
-        cities: ["Birnin Kebbi"],
-        towns: { "Birnin Kebbi": ["GRA", "Tudun Wada", "Nasarawa", "Kalgo Road"] }
-      },
-    }
+    "Aleiro":           ["Aleiro"],
+    "Arewa Dandi":      ["Arewa Dandi"],
+    "Argungu":          ["Argungu"],
+    "Augie":            ["Augie"],
+    "Bagudo":           ["Bagudo"],
+    "Birnin Kebbi":     ["Birnin Kebbi", "GRA", "Tudun Wada", "Nasarawa"],
+    "Bunza":            ["Bunza"],
+    "Dandi":            ["Dandi"],
+    "Fakai":            ["Fakai"],
+    "Gwandu":           ["Gwandu"],
+    "Jega":             ["Jega"],
+    "Kalgo":            ["Kalgo"],
+    "Koko/Besse":       ["Koko"],
+    "Maiyama":          ["Maiyama"],
+    "Ngaski":           ["Ngaski"],
+    "Sakaba":           ["Sakaba"],
+    "Shanga":           ["Shanga"],
+    "Suru":             ["Suru"],
+    "Wasagu/Danko":     ["Wasagu"],
+    "Yauri":            ["Yauri"],
+    "Zuru":             ["Zuru"],
   },
 
   "Kogi": {
-    lgas: {
-      "Lokoja": {
-        cities: ["Lokoja"],
-        towns: { "Lokoja": ["Adankolo", "Gangare", "Old GRA", "New Layout", "Felele"] }
-      },
-    }
+    "Adavi":            ["Adavi", "Okene"],
+    "Ajaokuta":         ["Ajaokuta"],
+    "Ankpa":            ["Ankpa"],
+    "Bassa":            ["Bassa"],
+    "Dekina":           ["Dekina"],
+    "Ibaji":            ["Ibaji"],
+    "Idah":             ["Idah"],
+    "Igalamela Odolu":  ["Igalamela"],
+    "Ijumu":            ["Ijumu"],
+    "Kabba/Bunu":       ["Kabba"],
+    "Kogi":             ["Kogi"],
+    "Lokoja":           ["Lokoja", "Adankolo", "Gangare", "New Layout", "Felele"],
+    "Mopa Muro":        ["Mopa"],
+    "Ofu":              ["Ofu"],
+    "Ogori/Magongo":    ["Ogori"],
+    "Okehi":            ["Okehi"],
+    "Okene":            ["Okene"],
+    "Olamaboro":        ["Olamaboro"],
+    "Omala":            ["Omala"],
+    "Yagba East":       ["Yagba", "Isanlu"],
+    "Yagba West":       ["Yagba", "Ogbe"],
   },
 
   "Kwara": {
-    lgas: {
-      "Ilorin West": {
-        cities: ["Ilorin"],
-        towns: { "Ilorin": ["Oke-Ode", "Surulere", "GRA", "Fate", "Tanke"] }
-      },
-      "Ilorin East": {
-        cities: ["Ilorin"],
-        towns: { "Ilorin": ["Oke-Oyi", "Offa Garage", "Amilegbe", "Kulende"] }
-      },
-      "Ilorin South": {
-        cities: ["Ilorin"],
-        towns: { "Ilorin": ["Agbeyangi", "Coca-Cola", "Muritala", "Taiwo"] }
-      },
-    }
+    "Asa":              ["Asa"],
+    "Baruten":          ["Baruten", "Kaiama"],
+    "Edu":              ["Edu", "Lafiagi"],
+    "Ifelodun":         ["Ifelodun", "Share"],
+    "Ilorin East":      ["Ilorin", "Oke-Oyi", "Offa Garage"],
+    "Ilorin South":     ["Ilorin", "Agbeyangi", "Muritala"],
+    "Ilorin West":      ["Ilorin", "GRA", "Fate", "Tanke", "Surulere"],
+    "Irepodun":         ["Irepodun", "Omu Aran"],
+    "Isin":             ["Isin", "Owu"],
+    "Kaiama":           ["Kaiama"],
+    "Moro":             ["Moro", "Shao"],
+    "Offa":             ["Offa"],
+    "Oke Ero":          ["Oke Ero", "Ijan"],
+    "Oyun":             ["Oyun", "Offa"],
+    "Pategi":           ["Pategi"],
+    "Ilorin":           ["Ilorin", "GRA", "Tanke", "Fate", "Adewole"],
   },
 
   "Lagos": {
-    lgas: {
-      "Ikeja": {
-        cities: ["Ikeja"],
-        towns: { "Ikeja": ["GRA", "Allen Avenue", "Maryland", "Oregun", "Alausa"] }
-      },
-      "Lagos Island": {
-        cities: ["Lagos Island"],
-        towns: { "Lagos Island": ["Isale-Eko", "Marina", "Idumota", "Victoria Island", "Bar Beach"] }
-      },
-      "Eti-Osa": {
-        cities: ["Victoria Island", "Lekki", "Ajah"],
-        towns: {
-          "Victoria Island": ["Ahmadu Bello Way", "Adeola Odeku", "Sanusi Fafunwa", "Bishop Aboyade"],
-          "Lekki":           ["Phase 1", "Phase 2", "Chevron", "Ikota", "Ajah"],
-          "Ajah":            ["Sangotedo", "Abijo", "Awoyaya", "Ogombo"],
-        }
-      },
-      "Alimosho": {
-        cities: ["Alimosho", "Egbeda", "Ipaja", "Agbado"],
-        towns: {
-          "Alimosho": ["Egbeda", "Ikotun", "Ijegun", "Igando"],
-          "Egbeda":   ["Idimu", "Akowonjo", "Shasha", "Dopemu"],
-          "Ipaja":    ["Ayobo", "Ipaja Road", "Command"],
-          "Agbado":   ["Agbado", "Ifako", "Alakuko"],
-        }
-      },
-      "Surulere": {
-        cities: ["Surulere"],
-        towns: { "Surulere": ["Bode Thomas", "Ojuelegba", "Aguda", "Eric Moore", "Itire"] }
-      },
-      "Kosofe": {
-        cities: ["Kosofe"],
-        towns: { "Kosofe": ["Ketu", "Ojota", "Ikosi", "Mile 12", "Oworo"] }
-      },
-      "Mushin": {
-        cities: ["Mushin"],
-        towns: { "Mushin": ["Idi-Araba", "Ojuwoye", "Papa Ajao", "New Garage"] }
-      },
-      "Apapa": {
-        cities: ["Apapa"],
-        towns: { "Apapa": ["GRA", "Olodi", "Iganmu", "Wharf Road"] }
-      },
-      "Amuwo-Odofin": {
-        cities: ["Festac Town", "Mile 2"],
-        towns: {
-          "Festac Town": ["1st Avenue", "2nd Avenue", "21 Road", "22 Road"],
-          "Mile 2":      ["Ago Palace", "Kirikiri", "Apple Junction"],
-        }
-      },
-      "Ikorodu": {
-        cities: ["Ikorodu"],
-        towns: { "Ikorodu": ["Imota", "Ijede", "Igbogbo", "Bayeku", "Odogunyan"] }
-      },
-      "Badagry": {
-        cities: ["Badagry"],
-        towns: { "Badagry": ["Ajara", "Ganyingbo", "Topo", "Awhanjigo"] }
-      },
-      "Lagos Mainland": {
-        cities: ["Ebute Meta", "Yaba", "Surulere"],
-        towns: {
-          "Ebute Meta": ["Ebute Meta East", "Ebute Meta West", "Oyingbo"],
-          "Yaba":       ["Abule Ijesha", "Sabo", "Iwaya", "Onike"],
-          "Surulere":   ["Bode Thomas", "Ojuelegba", "Aguda"],
-        }
-      },
-    }
+    "Agege":            ["Agege", "Orile-Agege", "Ifako"],
+    "Ajeromi/Ifelodun": ["Ajegunle", "Kirikiri"],
+    "Alimosho":         ["Egbeda", "Ikotun", "Ijegun", "Igando", "Ayobo", "Ipaja"],
+    "Amuwo-Odofin":     ["Festac Town", "Mile 2", "Ago Palace", "Apple Junction"],
+    "Apapa":            ["Apapa", "GRA", "Olodi", "Iganmu"],
+    "Badagry":          ["Badagry", "Ajara", "Topo"],
+    "Epe":              ["Epe", "Itoikin"],
+    "Eti-Osa":          ["Victoria Island", "Lekki Phase 1", "Lekki Phase 2", "Ajah", "Chevron"],
+    "Ibeju-Lekki":      ["Ibeju", "Lekki", "Epe Road"],
+    "Ifako-Ijaiye":     ["Ifako", "Ijaiye", "Agbado"],
+    "Ikeja":            ["Ikeja", "Allen Avenue", "GRA", "Maryland", "Oregun", "Alausa"],
+    "Ikorodu":          ["Ikorodu", "Imota", "Ijede", "Igbogbo", "Bayeku"],
+    "Kosofe":           ["Ketu", "Ojota", "Ikosi", "Mile 12", "Oworo"],
+    "Lagos Island":     ["Lagos Island", "Isale-Eko", "Marina", "Idumota"],
+    "Lagos Mainland":   ["Yaba", "Ebute Meta", "Oyingbo", "Sabo", "Iwaya"],
+    "Mushin":           ["Mushin", "Idi-Araba", "Papa Ajao", "New Garage"],
+    "Ojo":              ["Ojo", "Iba", "Ijanikin"],
+    "Oshodi/Isolo":     ["Oshodi", "Isolo", "Ejigbo", "Ilasamaja"],
+    "Shomolu":          ["Shomolu", "Bariga", "Gbagada"],
+    "Surulere":         ["Surulere", "Bode Thomas", "Ojuelegba", "Aguda", "Eric Moore"],
   },
 
   "Nasarawa": {
-    lgas: {
-      "Lafia": {
-        cities: ["Lafia"],
-        towns: { "Lafia": ["GRA", "New Market", "Lafia Road", "Hospital Road"] }
-      },
-      "Keffi": {
-        cities: ["Keffi"],
-        towns: { "Keffi": ["Old Keffi", "New Layout", "Sabon Gari"] }
-      },
-    }
+    "Akwanga":          ["Akwanga"],
+    "Awe":              ["Awe"],
+    "Doma":             ["Doma"],
+    "Karu":             ["Karu", "Mararaba", "Nyanya"],
+    "Keana":            ["Keana"],
+    "Keffi":            ["Keffi", "Sabon Gari", "New Layout"],
+    "Kokona":           ["Kokona"],
+    "Lafia":            ["Lafia", "GRA", "New Market"],
+    "Nasarawa":         ["Nasarawa"],
+    "Nasarawa Egon":    ["Nasarawa Egon"],
+    "Obi":              ["Obi"],
+    "Toto":             ["Toto"],
+    "Wamba":            ["Wamba"],
   },
 
   "Niger": {
-    lgas: {
-      "Chanchaga": {
-        cities: ["Minna"],
-        towns: { "Minna": ["Bosso", "Maitumbi", "Kpakungu", "Tunga", "GRA"] }
-      },
-      "Bosso": {
-        cities: ["Minna"],
-        towns: { "Minna": ["Bosso Estate", "Kampala", "Tayi"] }
-      },
-    }
+    "Agaie":            ["Agaie"],
+    "Agwara":           ["Agwara"],
+    "Bida":             ["Bida"],
+    "Borgu":            ["Borgu", "New Bussa"],
+    "Bosso":            ["Minna", "Bosso Estate"],
+    "Chanchaga":        ["Minna", "GRA", "Kpakungu", "Maitumbi", "Tunga"],
+    "Edati":            ["Edati"],
+    "Gbako":            ["Gbako"],
+    "Gurara":           ["Gurara"],
+    "Katcha":           ["Katcha"],
+    "Kontagora":        ["Kontagora"],
+    "Lapai":            ["Lapai"],
+    "Lavun":            ["Lavun"],
+    "Magama":           ["Magama"],
+    "Mariga":           ["Mariga"],
+    "Mashegu":          ["Mashegu"],
+    "Mokwa":            ["Mokwa"],
+    "Moya":             ["Moya"],
+    "Paikoro":          ["Paikoro"],
+    "Rafi":             ["Rafi"],
+    "Rijau":            ["Rijau"],
+    "Shiroro":          ["Shiroro"],
+    "Suleja":           ["Suleja", "Madala"],
+    "Tafa":             ["Tafa"],
+    "Wushishi":         ["Wushishi"],
   },
 
   "Ogun": {
-    lgas: {
-      "Abeokuta North": {
-        cities: ["Abeokuta"],
-        towns: { "Abeokuta": ["Itoku", "Iberekodo", "Oke-Lantoro", "Lafenwa", "Panseke"] }
-      },
-      "Abeokuta South": {
-        cities: ["Abeokuta"],
-        towns: { "Abeokuta": ["Oke-Ilewo", "Adatan", "Isale-Igbehin", "Asero"] }
-      },
-      "Ado-Odo/Ota": {
-        cities: ["Ota", "Ado-Odo"],
-        towns: {
-          "Ota":     ["Sango-Ota", "Agbara", "Ifo", "Ota Industrial"],
-          "Ado-Odo": ["Ado Market", "Owode", "Agbara Estate"],
-        }
-      },
-      "Ijebu Ode": {
-        cities: ["Ijebu Ode"],
-        towns: { "Ijebu Ode": ["Oke-Agbo", "Ijasi", "Itoro", "Odosenlu"] }
-      },
-    }
+    "Abeokuta North":   ["Abeokuta", "Lafenwa", "Panseke", "Iberekodo"],
+    "Abeokuta South":   ["Abeokuta", "Oke-Ilewo", "Adatan", "Asero"],
+    "Ado-Odo/Ota":      ["Ota", "Sango-Ota", "Agbara", "Ado-Odo"],
+    "Egbado North":     ["Ilaro"],
+    "Egbado South":     ["Ilaro", "Idiroko"],
+    "Ewekoro":          ["Ewekoro"],
+    "Ifo":              ["Ifo", "Sango-Ota"],
+    "Ijebu East":       ["Ijebu East", "Epe"],
+    "Ijebu North":      ["Ijebu North", "Ijebu Igbo"],
+    "Ijebu North East": ["Ijebu North East"],
+    "Ijebu Ode":        ["Ijebu Ode"],
+    "Ikenne":           ["Ikenne", "Sagamu", "Remo North"],
+    "Imeko Afon":       ["Imeko"],
+    "Ipokia":           ["Ipokia"],
+    "Obafemi Owode":    ["Owode", "Sagamu Road"],
+    "Odeda":            ["Odeda"],
+    "Odogbolu":         ["Odogbolu"],
+    "Ogun Waterside":   ["Ogun Waterside"],
+    "Remo North":       ["Remo North", "Sagamu"],
+    "Shagamu":          ["Sagamu", "Makun"],
   },
 
   "Ondo": {
-    lgas: {
-      "Akure South": {
-        cities: ["Akure"],
-        towns: { "Akure": ["Oke-Ijebu", "Alagbaka", "FUTA Road", "Shagari Village", "GRA"] }
-      },
-      "Akure North": {
-        cities: ["Akure"],
-        towns: { "Akure": ["Oba-Ile", "Igoba", "Eleganzz", "Obanla"] }
-      },
-    }
+    "Akoko North East": ["Ikare"],
+    "Akoko North West": ["Okeagbe"],
+    "Akoko South East": ["Isua Akoko"],
+    "Akoko South West": ["Oka Akoko"],
+    "Akure North":      ["Akure", "Oba-Ile", "Igoba"],
+    "Akure South":      ["Akure", "GRA", "Alagbaka", "FUTA Road"],
+    "Ese Odo":          ["Ese Odo"],
+    "Idanre":           ["Idanre"],
+    "Ifedore":          ["Ifedore", "Igbara-Oke"],
+    "Ilaje":            ["Ilaje", "Igbokoda"],
+    "Ile Oluji/Okeigbo":["Ile Oluji"],
+    "Irele":            ["Irele"],
+    "Odigbo":           ["Ore"],
+    "Okitipupa":        ["Okitipupa"],
+    "Ondo East":        ["Ondo"],
+    "Ondo West":        ["Ondo"],
+    "Ose":              ["Ose"],
+    "Owo":              ["Owo"],
   },
 
   "Osun": {
-    lgas: {
-      "Osogbo": {
-        cities: ["Osogbo"],
-        towns: { "Osogbo": ["Oke-Baale", "Station Road", "Alekuwodo", "Ogo-Oluwa", "GRA"] }
-      },
-      "Ife Central": {
-        cities: ["Ile-Ife"],
-        towns: { "Ile-Ife": ["Mayfair", "Lagere", "Eleyele", "Parakin"] }
-      },
-    }
+    "Aiyedade":         ["Aiyedade"],
+    "Aiyedire":         ["Aiyedire"],
+    "Atakumosa East":   ["Atakumosa"],
+    "Atakumosa West":   ["Atakumosa"],
+    "Boluwaduro":       ["Boluwaduro"],
+    "Boripe":           ["Boripe", "Ikirun"],
+    "Ede North":        ["Ede"],
+    "Ede South":        ["Ede"],
+    "Egbedore":         ["Egbedore"],
+    "Ejigbo":           ["Ejigbo"],
+    "Ife Central":      ["Ile-Ife", "Lagere", "Mayfair"],
+    "Ife East":         ["Ile-Ife"],
+    "Ife North":        ["Ile-Ife"],
+    "Ife South":        ["Ile-Ife"],
+    "Ifedayo":          ["Ifedayo"],
+    "Ifelodun":         ["Ifelodun", "Ikirun"],
+    "Ila":              ["Ila Orangun"],
+    "Ilesa East":       ["Ilesa"],
+    "Ilesa West":       ["Ilesa"],
+    "Irepodun":         ["Irepodun"],
+    "Irewole":          ["Ikire"],
+    "Isokan":           ["Isokan"],
+    "Iwo":              ["Iwo"],
+    "Obokun":           ["Obokun"],
+    "Odo Otin":         ["Odo Otin"],
+    "Ola Oluwa":        ["Ola Oluwa"],
+    "Olorunda":         ["Osogbo", "Oke-Baale", "GRA", "Station Road"],
+    "Oriade":           ["Oriade"],
+    "Orolu":            ["Orolu"],
+    "Osogbo":           ["Osogbo", "Alekuwodo", "Ogo-Oluwa"],
   },
 
   "Oyo": {
-    lgas: {
-      "Ibadan North": {
-        cities: ["Ibadan"],
-        towns: { "Ibadan": ["Agodi", "Mokola", "Oke-Ado", "Bodija", "Idi-Ishin"] }
-      },
-      "Ibadan North East": {
-        cities: ["Ibadan"],
-        towns: { "Ibadan": ["Ring Road", "Challenge", "New Ife Road", "Iwo Road"] }
-      },
-      "Ibadan South West": {
-        cities: ["Ibadan"],
-        towns: { "Ibadan": ["Iyaganku", "Ring Road", "Bashorun", "Adamasingba"] }
-      },
-      "Ibadan South East": {
-        cities: ["Ibadan"],
-        towns: { "Ibadan": ["Iyaganku GRA", "Agodi GRA", "Dugbe", "Gbagi"] }
-      },
-      "Oluyole": {
-        cities: ["Ibadan"],
-        towns: { "Ibadan": ["Oluyole Estate", "Idi-Ayunre", "Ologuneru", "Egbeda"] }
-      },
-      "Oyo East": {
-        cities: ["Oyo"],
-        towns: { "Oyo": ["Isale-Oyo", "Awe Road", "Owode", "Surulere"] }
-      },
-    }
+    "Afijio":           ["Afijio"],
+    "Akinyele":         ["Moniya", "Akinyele"],
+    "Atiba":            ["Oyo", "New Oyo"],
+    "Atisbo":           ["Atisbo"],
+    "Egbeda":           ["Egbeda", "Akobo", "Basorun"],
+    "Ibadan North":     ["Ibadan", "Agodi", "Mokola", "Bodija", "Oke-Ado"],
+    "Ibadan North East":["Ibadan", "Challenge", "New Ife Road", "Ring Road"],
+    "Ibadan North West":["Ibadan", "Oke-Are", "Gbaremu"],
+    "Ibadan South East":["Ibadan", "Iyaganku GRA", "Agodi GRA", "Gbagi"],
+    "Ibadan South West":["Ibadan", "Iyaganku", "Ring Road", "Bashorun"],
+    "Ibarapa Central":  ["Igbo-Ora"],
+    "Ibarapa East":     ["Lanlate"],
+    "Ibarapa North":    ["Ibarapa North"],
+    "Ido":              ["Ido"],
+    "Irepo":            ["Kishi"],
+    "Iseyin":           ["Iseyin"],
+    "Itesiwaju":        ["Itesiwaju"],
+    "Iwajowa":          ["Iwere-Ile"],
+    "Kajola":           ["Okeho"],
+    "Lagelu":           ["Lagelu", "Iyana-Church"],
+    "Ogbomosho North":  ["Ogbomoso"],
+    "Ogbomosho South":  ["Ogbomoso"],
+    "Ogo Oluwa":        ["Ogo Oluwa"],
+    "Olorunsogo":       ["Olorunsogo"],
+    "Oluyole":          ["Ibadan", "Oluyole Estate", "Idi-Ayunre"],
+    "Ona Ara":          ["Ona Ara", "Akanran"],
+    "Orelope":          ["Orelope"],
+    "Ori Ire":          ["Ori Ire"],
+    "Oyo East":         ["Oyo"],
+    "Oyo West":         ["Oyo", "Owode"],
+    "Saki East":        ["Saki"],
+    "Saki West":        ["Saki"],
+    "Surulere":         ["Surulere (Oyo)"],
   },
 
   "Plateau": {
-    lgas: {
-      "Jos North": {
-        cities: ["Jos"],
-        towns: { "Jos": ["Bauchi Road", "Terminus", "Farin Gada", "Angwan Rukuba", "GRA"] }
-      },
-      "Jos South": {
-        cities: ["Bukuru", "Jos"],
-        towns: {
-          "Bukuru": ["Rantya", "Gyel", "Kuru", "Angwan Rogo"],
-          "Jos":    ["Rayfield", "Vom Road", "Anglo-Jos"],
-        }
-      },
-    }
+    "Barikin Ladi":     ["Barikin Ladi"],
+    "Bassa":            ["Bassa"],
+    "Bokkos":           ["Bokkos"],
+    "Jos East":         ["Jos", "Barkin Ladi Road"],
+    "Jos North":        ["Jos", "Bauchi Road", "Terminus", "Farin Gada", "GRA"],
+    "Jos South":        ["Bukuru", "Rantya", "Gyel", "Kuru"],
+    "Kanam":            ["Kanam", "Shendam"],
+    "Kanke":            ["Kanke"],
+    "Langtang North":   ["Langtang"],
+    "Langtang South":   ["Langtang"],
+    "Mangu":            ["Mangu"],
+    "Mikang":           ["Mikang"],
+    "Pankshin":         ["Pankshin"],
+    "Qua'an Pan":       ["Shendam"],
+    "Riyom":            ["Riyom"],
+    "Shendam":          ["Shendam"],
+    "Wase":             ["Wase"],
   },
 
   "Rivers": {
-    lgas: {
-      "Port Harcourt": {
-        cities: ["Port Harcourt"],
-        towns: { "Port Harcourt": ["GRA", "Old GRA", "Rumuola", "Mile 3", "Creek Road", "Diobu", "Trans-Amadi"] }
-      },
-      "Obio/Akpor": {
-        cities: ["Rumuola"],
-        towns: { "Rumuola": ["Rumuokoro", "Rumuibekwe", "Rukpokwu", "Rumuola", "Eliozu"] }
-      },
-      "Eleme": {
-        cities: ["Eleme"],
-        towns: { "Eleme": ["Ogale", "Ebubu", "Aleto", "Alesa"] }
-      },
-    }
+    "Abua/Odual":       ["Abua"],
+    "Ahoada East":      ["Ahoada"],
+    "Ahoada West":      ["Ahoada"],
+    "Akuku-Toru":       ["Abonnema"],
+    "Andoni":           ["Andoni"],
+    "Asari-Toru":       ["Buguma"],
+    "Bonny":            ["Bonny"],
+    "Degema":           ["Degema"],
+    "Eleme":            ["Eleme", "Ogale", "Aleto"],
+    "Emuoha":           ["Emuoha"],
+    "Etche":            ["Etche", "Okehi"],
+    "Gokana":           ["Kpor"],
+    "Ikwerre":          ["Ikwerre", "Rumuola"],
+    "Khana":            ["Bori"],
+    "Obio/Akpor":       ["Rumuola", "Rumuokoro", "Rukpokwu", "Eliozu", "Rumuibekwe"],
+    "Ogba/Egbema/Ndoni":["Omoku"],
+    "Ogu/Bolo":         ["Ogu"],
+    "Okrika":           ["Okrika"],
+    "Omuma":            ["Omuma"],
+    "Opobo/Nkoro":      ["Opobo"],
+    "Oyigbo":           ["Oyigbo"],
+    "Port Harcourt":    ["Port Harcourt", "GRA", "Old GRA", "Mile 3", "Trans-Amadi", "Diobu", "Creek Road"],
+    "Tai":              ["Tai"],
   },
 
   "Sokoto": {
-    lgas: {
-      "Sokoto North": {
-        cities: ["Sokoto"],
-        towns: { "Sokoto": ["Gawon Nama", "Mabera", "Runjin Sambo", "GRA", "New Layout"] }
-      },
-      "Sokoto South": {
-        cities: ["Sokoto"],
-        towns: { "Sokoto": ["Arkilla", "Gidan Igwai", "Dundaye", "Kangiwa"] }
-      },
-    }
+    "Binji":            ["Binji"],
+    "Bodinga":          ["Bodinga"],
+    "Dange Shuni":      ["Dange Shuni"],
+    "Gada":             ["Gada"],
+    "Goronyo":          ["Goronyo"],
+    "Gudu":             ["Gudu"],
+    "Gwadabawa":        ["Gwadabawa"],
+    "Illela":           ["Illela"],
+    "Isa":              ["Isa"],
+    "Kebbe":            ["Kebbe"],
+    "Kware":            ["Kware"],
+    "Rabah":            ["Rabah"],
+    "Sabon Birni":      ["Sabon Birni"],
+    "Shagari":          ["Shagari"],
+    "Silame":           ["Silame"],
+    "Sokoto North":     ["Sokoto", "Gawon Nama", "Mabera", "GRA"],
+    "Sokoto South":     ["Sokoto", "Arkilla", "Dundaye"],
+    "Tambuwal":         ["Tambuwal"],
+    "Tangaza":          ["Tangaza"],
+    "Tureta":           ["Tureta"],
+    "Wamako":           ["Wamako"],
+    "Wurno":            ["Wurno"],
+    "Yabo":             ["Yabo"],
   },
 
   "Taraba": {
-    lgas: {
-      "Jalingo": {
-        cities: ["Jalingo"],
-        towns: { "Jalingo": ["GRA", "New Layout", "Barade", "Turaki Estate"] }
-      },
-    }
+    "Ardo Kola":        ["Ardo Kola"],
+    "Bali":             ["Bali"],
+    "Donga":            ["Donga"],
+    "Gashaka":          ["Gashaka"],
+    "Gassol":           ["Gassol"],
+    "Ibi":              ["Ibi"],
+    "Jalingo":          ["Jalingo", "GRA", "New Layout", "Barade"],
+    "Karim Lamido":     ["Karim Lamido"],
+    "Kumi":             ["Kumi"],
+    "Lau":              ["Lau"],
+    "Sardauna":         ["Sardauna", "Gembu"],
+    "Takum":            ["Takum"],
+    "Ussa":             ["Ussa"],
+    "Wukari":           ["Wukari"],
+    "Yorro":            ["Yorro"],
+    "Zing":             ["Zing"],
   },
 
   "Yobe": {
-    lgas: {
-      "Damaturu": {
-        cities: ["Damaturu"],
-        towns: { "Damaturu": ["GRA", "New Layout", "Pompomari", "Federal Housing"] }
-      },
-    }
+    "Bade":             ["Bade", "Gashua"],
+    "Bursari":          ["Bursari"],
+    "Damaturu":         ["Damaturu", "GRA", "Pompomari"],
+    "Fika":             ["Fika"],
+    "Fune":             ["Fune"],
+    "Geidam":           ["Geidam"],
+    "Gujba":            ["Gujba"],
+    "Gulani":           ["Gulani"],
+    "Jakusko":          ["Jakusko"],
+    "Karasuwa":         ["Karasuwa"],
+    "Machina":          ["Machina"],
+    "Nangere":          ["Nangere"],
+    "Nguru":            ["Nguru"],
+    "Potiskum":         ["Potiskum"],
+    "Tarmuwa":          ["Tarmuwa"],
+    "Yunusari":         ["Yunusari"],
+    "Yusufari":         ["Yusufari"],
   },
 
   "Zamfara": {
-    lgas: {
-      "Gusau": {
-        cities: ["Gusau"],
-        towns: { "Gusau": ["GRA", "Sabon Gari", "Tudun Wada", "Yerima"] }
-      },
-    }
-  },
-
-  // ── Remaining states with basic structure ─────────────────
-  "Anambra": {
-    lgas: {
-      "Onitsha North": {
-        cities: ["Onitsha"],
-        towns: { "Onitsha": ["GRA", "Trans-Ekulu", "Odoakpu", "Fegge"] }
-      },
-    }
+    "Anka":             ["Anka"],
+    "Bakura":           ["Bakura"],
+    "Birnin Magaji/Kiyaw":["Birnin Magaji"],
+    "Bukkuyum":         ["Bukkuyum"],
+    "Bungudu":          ["Bungudu"],
+    "Gummi":            ["Gummi"],
+    "Gusau":            ["Gusau", "GRA", "Sabon Gari", "Tudun Wada"],
+    "Kaura Namoda":     ["Kaura Namoda"],
+    "Maradun":          ["Maradun"],
+    "Maru":             ["Maru"],
+    "Shinkafi":         ["Shinkafi"],
+    "Talata Mafara":    ["Talata Mafara"],
+    "Tsafe":            ["Tsafe"],
+    "Wurno":            ["Wurno"],
+    "Zurmi":            ["Zurmi"],
   },
 };
 
@@ -619,15 +905,17 @@ export const STATES = Object.keys(NIGERIA_ADDRESS_DATA).sort();
 
 export function getLGAs(state) {
   if (!state || !NIGERIA_ADDRESS_DATA[state]) return [];
-  return Object.keys(NIGERIA_ADDRESS_DATA[state].lgas).sort();
+  return Object.keys(NIGERIA_ADDRESS_DATA[state]).sort();
 }
 
 export function getCities(state, lga) {
   if (!state || !lga) return [];
-  return NIGERIA_ADDRESS_DATA[state]?.lgas[lga]?.cities || [];
+  return NIGERIA_ADDRESS_DATA[state]?.[lga] || [];
 }
 
+// Towns are same as cities in this structure (cities ARE the towns within the LGA)
+// For street-level granularity the user types it in manually
 export function getTowns(state, lga, city) {
-  if (!state || !lga || !city) return [];
-  return NIGERIA_ADDRESS_DATA[state]?.lgas[lga]?.towns?.[city] || [];
+  // Return empty — towns are already the leaf level (cities within LGAs)
+  return [];
 }

@@ -48,7 +48,6 @@ function Step1({ formData, setFormData, lang }) {
         city:     address.city,
         lga:      address.lga,
         state:    address.state,
-        town:     address.town,
         postcode: address.postcode,
         country:  "Nigeria",
         full:     derived.fullAddress,

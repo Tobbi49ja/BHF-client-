@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Icon from "./Icon";
 import { getMessages, sendMessage, getAdminId } from "../services/api";
 import { useAuth } from "../context/AuthContext";
@@ -6,67 +6,90 @@ import { useSocket } from "../hooks/useSocket";
 
 export default function FloatingChat() {
   const { user } = useAuth();
-  const [open,       setOpen]       = useState(false);
-  const [messages,   setMessages]   = useState([]);
-  const [input,      setInput]      = useState("");
-  const [adminId,    setAdminId]    = useState(null);
-  const [unread,     setUnread]     = useState(0);
-  const [sending,    setSending]    = useState(false);
-  const [ping,       setPing]       = useState(null);
-  const bottomRef = useRef(null);
+  const [open,     setOpen]     = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [input,    setInput]    = useState("");
+  const [adminId,  setAdminId]  = useState(null);
+  const [unread,   setUnread]   = useState(0);
+  const [sending,  setSending]  = useState(false);
+  const [ping,     setPing]     = useState(null);
+  const bottomRef  = useRef(null);
+  const openRef    = useRef(open);
+  const adminIdRef = useRef(adminId);
+
+  useEffect(() => { openRef.current    = open;    }, [open]);
+  useEffect(() => { adminIdRef.current = adminId; }, [adminId]);
 
   const isAdmin = user?.role === "Administrator";
 
-  // Socket for real-time
+  const handleNewMessage = useCallback((msg) => {
+    const myId    = user?._id;
+    const senderId   = msg.sender?._id   || msg.sender;
+    const receiverId = msg.receiver?._id || msg.receiver;
+
+    // Only handle messages in this conversation (user ↔ admin)
+    const relevant =
+      senderId === myId   || receiverId === myId ||
+      senderId === adminIdRef.current || receiverId === adminIdRef.current;
+
+    if (!relevant) return;
+
+    setMessages((prev) => prev.find((m) => m._id === msg._id) ? prev : [...prev, msg]);
+
+    // Increment unread only if chat is closed AND the message is from someone else
+    if (!openRef.current && senderId !== myId) {
+      setUnread((u) => u + 1);
+    }
+  }, [user?._id]);
+
   useSocket(user?._id, {
-    onMessage: (msg) => {
-      setMessages((prev) => {
-        const exists = prev.find((m) => m._id === msg._id);
-        if (exists) return prev;
-        return [...prev, msg];
-      });
-      if (!open) setUnread((u) => u + 1);
-    },
-    onPinged: (data) => {
-      setPing(data);
-      setTimeout(() => setPing(null), 5000);
-    },
+    onMessage: handleNewMessage,
+    onPinged:  (data) => { setPing(data); setTimeout(() => setPing(null), 5000); },
   });
 
-  // Load admin ID for non-admin users
+  // Load admin ID
   useEffect(() => {
     if (!user || isAdmin) return;
-    getAdminId(user.token)
-      .then((a) => setAdminId(a._id))
-      .catch(() => {});
+    getAdminId(user.token).then((a) => setAdminId(a._id)).catch(() => {});
   }, [user]);
 
-  // Load messages when opened
+  // Load history when chat opens
   useEffect(() => {
-    if (!open || !user) return;
-    const target = isAdmin ? null : adminId;
-    if (!target && !isAdmin) return;
+    if (!open || !user || isAdmin || !adminId) return;
     setUnread(0);
-    if (!isAdmin) {
-      getMessages(user.token, target)
-        .then(setMessages)
-        .catch(() => {});
-    }
+    getMessages(user.token, adminId).then(setMessages).catch(() => {});
   }, [open, adminId]);
 
+  // Scroll to bottom on new message
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const handleSend = async () => {
-    if (!input.trim() || !user) return;
-    const target = isAdmin ? messages[messages.length - 1]?.sender?._id : adminId;
-    if (!target) return;
+    if (!input.trim() || !user || !adminId) return;
+    const content = input.trim();
+    setInput("");
     setSending(true);
     try {
-      await sendMessage(user.token, { receiverId: target, content: input.trim() });
-      setInput("");
-    } catch {}
+      // Optimistic: add immediately so sender sees it right away
+      const optimistic = {
+        _id:       "opt-" + Date.now(),
+        sender:    { _id: user._id },
+        receiver:  { _id: adminId },
+        content,
+        read:      false,
+        createdAt: new Date().toISOString(),
+        _optimistic: true,
+      };
+      setMessages((prev) => [...prev, optimistic]);
+
+      const saved = await sendMessage(user.token, { receiverId: adminId, content });
+      // Replace optimistic with real message
+      setMessages((prev) => prev.map((m) => m._optimistic ? saved : m));
+    } catch {
+      // Remove optimistic on failure
+      setMessages((prev) => prev.filter((m) => !m._optimistic));
+    }
     setSending(false);
   };
 
@@ -74,13 +97,10 @@ export default function FloatingChat() {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
   };
 
-  if (!user) return null;
-  // Admins use the full dashboard chat — hide floating chat for them
-  if (isAdmin) return null;
+  if (!user || isAdmin) return null;
 
   return (
     <>
-      {/* Ping popup */}
       {ping && (
         <div className="ping-popup">
           <Icon name="bell" size={14} />
@@ -88,13 +108,11 @@ export default function FloatingChat() {
         </div>
       )}
 
-      {/* Floating button */}
       <button className="chat-fab" onClick={() => setOpen((o) => !o)}>
         <Icon name="message-circle" size={22} />
         {unread > 0 && <span className="chat-fab-badge">{unread}</span>}
       </button>
 
-      {/* Chat window */}
       {open && (
         <div className="chat-window">
           <div className="chat-header">
@@ -118,7 +136,7 @@ export default function FloatingChat() {
               </div>
             )}
             {messages.map((m) => {
-              const mine = m.sender?._id === user._id || m.sender === user._id;
+              const mine = (m.sender?._id || m.sender) === user._id;
               return (
                 <div key={m._id} className={`chat-msg ${mine ? "mine" : "theirs"}`}>
                   <div className="chat-bubble">{m.content}</div>
@@ -133,14 +151,9 @@ export default function FloatingChat() {
           </div>
 
           <div className="chat-input-row">
-            <input
-              className="chat-input"
-              placeholder="Type a message..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKey}
-              maxLength={500}
-            />
+            <input className="chat-input" placeholder="Type a message..."
+              value={input} onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKey} maxLength={500} />
             <button className="chat-send" onClick={handleSend} disabled={sending || !input.trim()}>
               <Icon name="send" size={16} />
             </button>
