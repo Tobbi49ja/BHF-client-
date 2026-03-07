@@ -3,81 +3,80 @@ import Icon from "./Icon";
 import {
   getAdminRecords, getUsers, deleteUser, updateUserRole,
   exportRecordsExcel, exportUsersExcel,
-  getAdminConversations, getMessages, sendMessage,
+  getAdminConversations, getMessages, sendMessage, clearChat,
 } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { useSocket } from "../hooks/useSocket";
 
-const ROLES = ["Field Volunteer", "Health Worker", "Program Manager", "Data Analyst", "Administrator"];
+const ROLES = ["Field Volunteer","Health Worker","Program Manager","Data Analyst","Administrator"];
+const SC = { active:"#10b981", idle:"#f59e0b", offline:"#6b7280" };
+const SL = { active:"Active",  idle:"Idle",    offline:"Offline"  };
 
-const STATUS_COLOR = { active: "#10b981", idle: "#f59e0b", offline: "#6b7280" };
-const STATUS_LABEL = { active: "Active", idle: "Idle", offline: "Offline" };
-
-export default function AdminDashboard({ onBack }) {
+export default function AdminDashboard() {
   const { user, logout } = useAuth();
-  const [tab,        setTab]        = useState("records");
-  const [records,    setRecords]    = useState([]);
-  const [users,      setUsers]      = useState([]);
-  const [loading,    setLoading]    = useState(true);
-  const [error,      setError]      = useState("");
-  const [search,     setSearch]     = useState("");
-  const [exporting,  setExporting]  = useState(false);
 
-  // Chat state
-  const [chatOpen,   setChatOpen]   = useState(false);
-  const [chatUser,   setChatUser]   = useState(null); // { _id, fullName }
-  const [messages,   setMessages]   = useState([]);
-  const [chatInput,  setChatInput]  = useState("");
-  const [convos,     setConvos]     = useState([]);
-  const [sending,    setSending]    = useState(false);
-  const bottomRef = useRef(null);
+  const [tab,       setTab]      = useState("records");
+  const [records,   setRecords]  = useState([]);
+  const [users,     setUsers]    = useState([]);
+  const [loading,   setLoading]  = useState(true);
+  const [error,     setError]    = useState("");
+  const [search,    setSearch]   = useState("");
+  const [exporting, setExport]   = useState(false);
+  const [statuses,  setStatuses] = useState({});
 
-  // Live user statuses
-  const [statuses, setStatuses] = useState({});
+  // unreadMap: userId → count  (drives red dots)
+  const [unreadMap, setUnread]   = useState({});
+  const totalUnread = Object.values(unreadMap).reduce((a,b)=>a+b,0);
 
-  // Stable ref so socket callback always sees latest chatUser
-  const chatUserRef = useRef(chatUser);
+  // Chat
+  const [chatUser,  setChatUser] = useState(null);
+  const [messages,  setMessages] = useState([]);
+  const [chatInput, setChatIn]   = useState("");
+  const [sending,   setSending]  = useState(false);
+  const [clearing,  setClearing] = useState(false);
+  const bottomRef   = useRef(null);
+  const sendingRef  = useRef(false);  // prevents double-send
+
+  // Stable refs for socket callbacks
+  const chatUserRef = useRef(null);
+  const userIdRef   = useRef(null);
   useEffect(() => { chatUserRef.current = chatUser; }, [chatUser]);
+  useEffect(() => { userIdRef.current   = user?._id; }, [user]);
 
+  // ── Socket ────────────────────────────────────────────────
   const { pingUser } = useSocket(user?._id, {
+
     onMessage: (msg) => {
       const senderId   = msg.sender?._id   || msg.sender;
       const receiverId = msg.receiver?._id || msg.receiver;
-      const activePeer = chatUserRef.current?._id;
-      const myId       = user?._id;
+      const myId       = userIdRef.current;
+      const peer       = chatUserRef.current?._id;
 
-      // Add to messages only if it belongs to the currently open conversation
-      const inActiveChat =
-        (senderId === activePeer && receiverId === myId) ||
-        (senderId === myId       && receiverId === activePeer);
+      // Only handle messages to/from this admin
+      if (receiverId !== myId && senderId !== myId) return;
 
-      if (inActiveChat) {
-        setMessages((prev) => prev.find((m) => m._id === msg._id) ? prev : [...prev, msg]);
+      // Who is the other person?
+      const otherId = senderId === myId ? receiverId : senderId;
+
+      if (otherId === peer) {
+        // Active chat — append
+        setMessages((prev) =>
+          prev.find((m) => m._id === msg._id) ? prev : [...prev, msg]
+        );
+      } else if (senderId !== myId) {
+        // Background message from another user — red dot
+        setUnread((prev) => ({ ...prev, [otherId]: (prev[otherId] || 0) + 1 }));
       }
-
-      // Update conversation list unread count
-      setConvos((prev) => prev.map((c) =>
-        c.user._id === senderId
-          ? { ...c, lastMessage: msg, unread: activePeer === senderId ? 0 : c.unread + 1 }
-          : c
-      ));
     },
+
     onStatus: ({ userId, status }) => {
-      setStatuses((prev) => ({ ...prev, [userId]: status }));
-      setUsers((prev) => prev.map((u) => u._id === userId ? { ...u, status } : u));
+      setStatuses((p) => ({ ...p, [userId]: status }));
+      setUsers((p) => p.map((u) => u._id === userId ? { ...u, status } : u));
     },
   });
 
+  // ── Data loading ──────────────────────────────────────────
   useEffect(() => { loadData(); }, [tab]);
-
-  // Load conversations when on users tab
-  useEffect(() => {
-    if (tab === "users") loadConversations();
-  }, [tab]);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
 
   const loadData = async () => {
     setLoading(true); setError("");
@@ -85,126 +84,129 @@ export default function AdminDashboard({ onBack }) {
       if (tab === "records") {
         setRecords(await getAdminRecords(user.token));
       } else {
-        const data = await getUsers(user.token);
-        setUsers(data);
-        const s = {};
-        data.forEach((u) => { s[u._id] = u.status || "offline"; });
+        const [userData, convos] = await Promise.all([
+          getUsers(user.token),
+          getAdminConversations(user.token),
+        ]);
+        setUsers(userData);
+        const s = {}; userData.forEach((u) => { s[u._id] = u.status || "offline"; });
         setStatuses(s);
+        const map = {}; convos.forEach((c) => { if (c.unread > 0) map[c.user._id] = c.unread; });
+        setUnread(map);
       }
     } catch (err) { setError(err.message); }
     finally { setLoading(false); }
   };
 
-  const loadConversations = async () => {
-    try {
-      const data = await getAdminConversations(user.token);
-      setConvos(data);
-    } catch {}
-  };
-
+  // ── Open chat ─────────────────────────────────────────────
   const openChat = async (u) => {
     setChatUser(u);
-    setChatOpen(true);
+    setMessages([]);
+    setUnread((p) => { const n={...p}; delete n[u._id]; return n; });
     try {
       const msgs = await getMessages(user.token, u._id);
       setMessages(msgs);
-      // Mark as read in convos
-      setConvos((prev) => prev.map((c) => c.user._id === u._id ? { ...c, unread: 0 } : c));
     } catch {}
   };
 
+  const closeChat = () => { setChatUser(null); setMessages([]); };
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // ── Send ──────────────────────────────────────────────────
   const handleSend = async () => {
-    if (!chatInput.trim() || !chatUser) return;
+    if (!chatInput.trim() || !chatUser || sendingRef.current) return;
+    sendingRef.current = true;
     const content = chatInput.trim();
-    setChatInput("");
-    setSending(true);
+    setChatIn("");
+    const opt = {
+      _id: "opt-" + Date.now(),
+      sender:   { _id: user._id },
+      receiver: { _id: chatUser._id },
+      content, read: false,
+      createdAt: new Date().toISOString(),
+      _opt: true,
+    };
+    setMessages((p) => [...p, opt]);
     try {
-      // Optimistic: admin sees message immediately
-      const optimistic = {
-        _id:        "opt-" + Date.now(),
-        sender:     { _id: user._id },
-        receiver:   { _id: chatUser._id },
-        content,
-        read:       false,
-        createdAt:  new Date().toISOString(),
-        _optimistic: true,
-      };
-      setMessages((prev) => [...prev, optimistic]);
       const saved = await sendMessage(user.token, { receiverId: chatUser._id, content });
-      setMessages((prev) => prev.map((m) => m._optimistic ? saved : m));
+      setMessages((p) => p.map((m) => m._opt ? saved : m));
     } catch {
-      setMessages((prev) => prev.filter((m) => !m._optimistic));
+      setMessages((p) => p.filter((m) => !m._opt));
+    } finally {
+      sendingRef.current = false;
+      setSending(false);
     }
-    setSending(false);
   };
 
+  // ── Ping ──────────────────────────────────────────────────
   const handlePing = (u) => {
+    console.log("[AdminDashboard] pinging", u._id, u.fullName);
     pingUser(u._id, user.fullName);
   };
 
-  const handleDeleteUser = async (id) => {
-    if (!confirm("Delete this user? This cannot be undone.")) return;
+  // ── Clear chat ────────────────────────────────────────────
+  const handleClear = async () => {
+    if (!chatUser || !confirm(`Clear all messages with ${chatUser.fullName}?`)) return;
+    setClearing(true);
     try {
-      await deleteUser(user.token, id);
-      setUsers((prev) => prev.filter((u) => u._id !== id));
-    } catch (err) { alert(err.message); }
+      await clearChat(user.token, chatUser._id);
+      setMessages([]);
+      setUnread((p) => { const n={...p}; delete n[chatUser._id]; return n; });
+    } catch (e) { alert(e.message); }
+    setClearing(false);
+  };
+
+  // ── User management ───────────────────────────────────────
+  const handleDeleteUser = async (id) => {
+    if (!confirm("Delete this user?")) return;
+    try { await deleteUser(user.token, id); setUsers((p) => p.filter((u)=>u._id!==id)); if(chatUser?._id===id) closeChat(); }
+    catch (e) { alert(e.message); }
   };
 
   const handleRoleChange = async (id, role) => {
-    try {
-      await updateUserRole(user.token, id, role);
-      setUsers((prev) => prev.map((u) => u._id === id ? { ...u, role } : u));
-    } catch (err) { alert(err.message); }
+    try { await updateUserRole(user.token,id,role); setUsers((p)=>p.map((u)=>u._id===id?{...u,role}:u)); }
+    catch (e) { alert(e.message); }
   };
 
-  const handleExport = async () => {
-    setExporting(true);
-    try { await exportRecordsExcel(user.token); }
-    finally { setExporting(false); }
-  };
-
-  const handleExportUsers = async () => {
-    setExporting(true);
-    try { await exportUsersExcel(user.token); }
-    finally { setExporting(false); }
-  };
-
-  const handleLogout = () => { logout(); window.location.href = "/"; };
-
-  const filteredRecords = records.filter((r) => {
-    const q = search.toLowerCase();
-    const addr = r.address?.full || r.address || "";
-    return r.firstName?.toLowerCase().includes(q) || r.lastName?.toLowerCase().includes(q)
-      || addr.toLowerCase().includes(q) || r.submittedBy?.fullName?.toLowerCase().includes(q);
+  // ── Filters ───────────────────────────────────────────────
+  const fRec = records.filter((r) => {
+    const q=search.toLowerCase();
+    return r.firstName?.toLowerCase().includes(q)||r.lastName?.toLowerCase().includes(q)
+      ||(r.address?.full||"").toLowerCase().includes(q);
   });
 
-  const filteredUsers = users.filter((u) => {
-    const q = search.toLowerCase();
-    return u.fullName?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q);
+  const fUsr = users.filter((u) => {
+    const q=search.toLowerCase();
+    return u.fullName?.toLowerCase().includes(q)||u.email?.toLowerCase().includes(q);
   });
 
-  const bmiColor = (bmi) => {
-    if (!bmi) return "var(--text-3)";
-    const b = parseFloat(bmi);
-    if (b < 18.5) return "#f59e0b";
-    if (b < 25)   return "#10b981";
-    if (b < 30)   return "#f59e0b";
-    return "#ef4444";
+  const bmiColor = (v) => {
+    if(!v) return "var(--text-3)";
+    const b=parseFloat(v);
+    return b<18.5?"#f59e0b":b<25?"#10b981":b<30?"#f59e0b":"#ef4444";
   };
 
-  // Status counts
-  const activeCt  = Object.values(statuses).filter((s) => s === "active").length;
-  const idleCt    = Object.values(statuses).filter((s) => s === "idle").length;
-  const offlineCt = Object.values(statuses).filter((s) => s === "offline").length;
+  const thisMo = records.filter((r)=>{
+    const d=new Date(r.createdAt),n=new Date();
+    return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear();
+  }).length;
 
+  const actCt  = Object.values(statuses).filter(s=>s==="active").length;
+  const idleCt = Object.values(statuses).filter(s=>s==="idle").length;
+  const offCt  = Object.values(statuses).filter(s=>s==="offline").length;
+
+  // ── JSX ───────────────────────────────────────────────────
   return (
     <div className="admin-page">
-      <div className="admin-bg-grid" />
+      <div className="admin-bg-grid"/>
 
-      {/* ── Header ── */}
+      {/* Header */}
       <div className="admin-header">
         <div className="admin-header-left">
-          <div className="landing-logo-icon"><Icon name="shield-plus" size={18} /></div>
+          <div className="landing-logo-icon"><Icon name="shield-plus" size={18}/></div>
           <div className="admin-title-block">
             <h1 className="admin-title">Admin Dashboard</h1>
             <p className="admin-sub">Logged in as <strong>{user.fullName}</strong> · Administrator</p>
@@ -217,182 +219,194 @@ export default function AdminDashboard({ onBack }) {
               <span className="user-chip-name">{user.fullName}</span>
               <span className="user-chip-role">Administrator</span>
             </div>
-            <button className="user-chip-logout" onClick={handleLogout} title="Logout">
-              <Icon name="log-out" size={15} />
+            <button className="user-chip-logout" onClick={() => { logout(); window.location.href="/"; }} title="Logout">
+              <Icon name="log-out" size={15}/>
             </button>
           </div>
-          {tab === "records" && (
-            <button className="btn btn-success" onClick={handleExport} disabled={exporting || records.length === 0}>
-              {exporting ? <><span className="login-spinner" />Exporting...</> : <><Icon name="file-text" size={16} />Export Records</>}
+          {tab==="records" && (
+            <button className="btn btn-success" disabled={exporting||records.length===0}
+              onClick={()=>{setExport(true);exportRecordsExcel(user.token).finally(()=>setExport(false));}}>
+              {exporting?<><span className="login-spinner"/>Exporting...</>:<><Icon name="file-text" size={16}/>Export Records</>}
             </button>
           )}
-          {tab === "users" && (
-            <button className="btn btn-secondary" onClick={handleExportUsers} disabled={exporting || users.length === 0}>
-              {exporting ? <><span className="login-spinner" />Exporting...</> : <><Icon name="file-text" size={16} />Export Users</>}
+          {tab==="users" && (
+            <button className="btn btn-secondary" disabled={exporting||users.length===0}
+              onClick={()=>{setExport(true);exportUsersExcel(user.token).finally(()=>setExport(false));}}>
+              {exporting?<><span className="login-spinner"/>Exporting...</>:<><Icon name="file-text" size={16}/>Export Users</>}
             </button>
           )}
         </div>
       </div>
 
-      {/* ── Stats bar ── */}
+      {/* Stats */}
       <div className="admin-stats-bar">
-        <div className="admin-stat">
-          <span className="admin-stat-val">{records.length}</span>
-          <span className="admin-stat-label">Total Records</span>
-        </div>
-        <div className="admin-stat">
-          <span className="admin-stat-val">{users.length}</span>
-          <span className="admin-stat-label">Registered Users</span>
-        </div>
-        <div className="admin-stat">
-          <span className="admin-stat-val" style={{ color: "#10b981" }}>{activeCt}</span>
-          <span className="admin-stat-label">🟢 Active</span>
-        </div>
-        <div className="admin-stat">
-          <span className="admin-stat-val" style={{ color: "#f59e0b" }}>{idleCt}</span>
-          <span className="admin-stat-label">🟡 Idle</span>
-        </div>
-        <div className="admin-stat">
-          <span className="admin-stat-val" style={{ color: "#6b7280" }}>{offlineCt}</span>
-          <span className="admin-stat-label">⚫ Offline</span>
-        </div>
-        <div className="admin-stat">
-          <span className="admin-stat-val">
-            {records.filter((r) => {
-              const d = new Date(r.createdAt); const now = new Date();
-              return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-            }).length}
-          </span>
-          <span className="admin-stat-label">This Month</span>
-        </div>
+        {[
+          {val:records.length,  label:"Total Records"},
+          {val:users.length,    label:"Registered Users"},
+          {val:actCt,           label:"🟢 Active",  color:"#10b981"},
+          {val:idleCt,          label:"🟡 Idle",    color:"#f59e0b"},
+          {val:offCt,           label:"⚫ Offline", color:"#6b7280"},
+          {val:thisMo,          label:"This Month"},
+        ].map(({val,label,color})=>(
+          <div className="admin-stat" key={label}>
+            <span className="admin-stat-val" style={color?{color}:{}}>{val}</span>
+            <span className="admin-stat-label">{label}</span>
+          </div>
+        ))}
       </div>
 
-      {/* ── Toolbar ── */}
+      {/* Toolbar */}
       <div className="admin-toolbar">
         <div className="admin-tabs">
-          <button className={`admin-tab${tab === "records" ? " active" : ""}`} onClick={() => { setTab("records"); setSearch(""); }}>
-            <Icon name="clipboard-list" size={15} />Beneficiary Records
+          <button className={`admin-tab${tab==="records"?" active":""}`}
+            onClick={()=>{setTab("records");setSearch("");}}>
+            <Icon name="clipboard-list" size={15}/>Beneficiary Records
           </button>
-          <button className={`admin-tab${tab === "users" ? " active" : ""}`} onClick={() => { setTab("users"); setSearch(""); }}>
-            <Icon name="users" size={15} />Manage Users
+          <button className={`admin-tab${tab==="users"?" active":""}`} style={{position:"relative"}}
+            onClick={()=>{setTab("users");setSearch("");}}>
+            <Icon name="users" size={15}/>Manage Users
+            {totalUnread>0&&(
+              <span style={{position:"absolute",top:-5,right:-5,background:"#ef4444",color:"white",
+                borderRadius:"999px",fontSize:"0.6rem",fontWeight:800,padding:"0.1rem 0.35rem",
+                border:"2px solid var(--bg)",minWidth:16,textAlign:"center"}}>
+                {totalUnread}
+              </span>
+            )}
           </button>
         </div>
-        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", flex: 1, justifyContent: "flex-end" }}>
-          <div className="input-wrapper" style={{ maxWidth: 340, width: "100%" }}>
-            <Icon name="search" size={16} className="input-icon" />
+        <div style={{display:"flex",gap:"0.75rem",alignItems:"center",flex:1,justifyContent:"flex-end"}}>
+          <div className="input-wrapper" style={{maxWidth:340,width:"100%"}}>
+            <Icon name="search" size={16} className="input-icon"/>
             <input type="text"
-              placeholder={tab === "records" ? "Search by name, address, volunteer…" : "Search by name or email…"}
-              value={search} onChange={(e) => setSearch(e.target.value)}
-              style={{ width: "100%", padding: "0.6rem 1rem 0.6rem 2.5rem", background: "var(--input)", border: "1px solid var(--border)", borderRadius: "0.5rem", color: "var(--text)", fontSize: "0.875rem", fontFamily: "inherit" }}
-            />
+              placeholder={tab==="records"?"Search records…":"Search users…"}
+              value={search} onChange={(e)=>setSearch(e.target.value)}
+              style={{width:"100%",padding:"0.6rem 1rem 0.6rem 2.5rem",background:"var(--input)",
+                border:"1px solid var(--border)",borderRadius:"0.5rem",
+                color:"var(--text)",fontSize:"0.875rem",fontFamily:"inherit"}}/>
           </div>
-          <button className="btn btn-secondary" onClick={loadData} style={{ flexShrink: 0 }}>
-            <Icon name="refresh-cw" size={15} />Refresh
+          <button className="btn btn-secondary" onClick={loadData} style={{flexShrink:0}}>
+            <Icon name="refresh-cw" size={15}/>Refresh
           </button>
         </div>
       </div>
 
-      {error  && <div className="submit-error"><Icon name="x" size={14} />{error}</div>}
-      {loading && <div className="admin-loading"><span className="login-spinner" style={{ width: 20, height: 20 }} />Loading...</div>}
+      {error   && <div className="submit-error"><Icon name="x" size={14}/>{error}</div>}
+      {loading && <div className="admin-loading"><span className="login-spinner" style={{width:20,height:20}}/>Loading...</div>}
 
-      {/* ── Records table ── */}
-      {!loading && tab === "records" && (
+      {/* Records table */}
+      {!loading&&tab==="records"&&(
         <div className="admin-table-wrap">
-          {filteredRecords.length === 0
-            ? <div className="admin-loading"><Icon name="clipboard-list" size={32} />No records found</div>
-            : (
-              <table className="admin-table">
+          {fRec.length===0
+            ? <div className="admin-loading"><Icon name="clipboard-list" size={32}/>No records found</div>
+            : <table className="admin-table">
                 <thead><tr>
                   <th>Name</th><th>Gender</th><th>Age</th><th>Phone</th><th>Address</th>
                   <th>BP</th><th>Blood Sugar</th><th>BMI</th><th>Conditions</th><th>Volunteer</th><th>Date</th>
                 </tr></thead>
                 <tbody>
-                  {filteredRecords.map((r) => (
+                  {fRec.map((r)=>(
                     <tr key={r._id}>
                       <td className="td-name">{r.firstName} {r.lastName}</td>
-                      <td className="td-muted" style={{ textTransform: "capitalize" }}>{r.gender || "—"}</td>
-                      <td className="td-muted">{r.age || "—"}</td>
-                      <td className="td-muted">{r.phone || "—"}</td>
-                      <td className="td-muted">{r.address?.full || r.address || "—"}</td>
-                      <td className="td-muted">{r.bloodPressureSystolic && r.bloodPressureDiastolic ? `${r.bloodPressureSystolic}/${r.bloodPressureDiastolic}` : "—"}</td>
-                      <td className="td-muted">{r.bloodSugar ? `${r.bloodSugar} mg/dL` : "—"}</td>
-                      <td>{r.bmi ? <span style={{ color: bmiColor(r.bmi), fontWeight: 700 }}>{r.bmi}</span> : "—"}</td>
-                      <td>{r.conditions?.length ? r.conditions.map((c) => <span key={c} className="tag" style={{ fontSize: "0.68rem", padding: "0.15rem 0.5rem", marginRight: 2 }}>{c}</span>) : "—"}</td>
-                      <td className="td-muted">{r.submittedBy?.fullName || r.volunteerName || "—"}</td>
-                      <td className="td-muted" style={{ whiteSpace: "nowrap", fontSize: "0.78rem" }}>{new Date(r.submittedAt || r.createdAt).toLocaleDateString()}</td>
+                      <td className="td-muted" style={{textTransform:"capitalize"}}>{r.gender||"—"}</td>
+                      <td className="td-muted">{r.age||"—"}</td>
+                      <td className="td-muted">{r.phone||"—"}</td>
+                      <td className="td-muted">{r.address?.full||r.address||"—"}</td>
+                      <td className="td-muted">{r.bloodPressureSystolic&&r.bloodPressureDiastolic?`${r.bloodPressureSystolic}/${r.bloodPressureDiastolic}`:"—"}</td>
+                      <td className="td-muted">{r.bloodSugar?`${r.bloodSugar} mg/dL`:"—"}</td>
+                      <td>{r.bmi?<span style={{color:bmiColor(r.bmi),fontWeight:700}}>{r.bmi}</span>:"—"}</td>
+                      <td>{r.conditions?.length?r.conditions.map((c)=><span key={c} className="tag" style={{fontSize:"0.68rem",padding:"0.15rem 0.5rem",marginRight:2}}>{c}</span>):"—"}</td>
+                      <td className="td-muted">{r.submittedBy?.fullName||r.volunteerName||"—"}</td>
+                      <td className="td-muted" style={{whiteSpace:"nowrap",fontSize:"0.78rem"}}>{new Date(r.submittedAt||r.createdAt).toLocaleDateString()}</td>
                     </tr>
                   ))}
                 </tbody>
-              </table>
-            )}
+              </table>}
         </div>
       )}
 
-      {/* ── Users table ── */}
-      {!loading && tab === "users" && (
-        <div style={{ display: "flex", gap: "1.25rem", alignItems: "flex-start" }}>
-          {/* Users table */}
-          <div className="admin-table-wrap" style={{ flex: 1 }}>
-            {filteredUsers.length === 0
-              ? <div className="admin-loading"><Icon name="users" size={32} />No users found</div>
-              : (
-                <table className="admin-table">
+      {/* Users tab */}
+      {!loading&&tab==="users"&&(
+        <div style={{display:"flex",gap:"1.25rem",alignItems:"flex-start"}}>
+
+          {/* Table */}
+          <div className="admin-table-wrap" style={{flex:1,minWidth:0}}>
+            {fUsr.length===0
+              ? <div className="admin-loading"><Icon name="users" size={32}/>No users found</div>
+              : <table className="admin-table">
                   <thead><tr>
                     <th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Last Seen</th><th>Joined</th><th>Actions</th>
                   </tr></thead>
                   <tbody>
-                    {filteredUsers.map((u) => {
-                      const st = statuses[u._id] || u.status || "offline";
-                      const convo = convos.find((c) => c.user._id === u._id);
+                    {fUsr.map((u)=>{
+                      const st     = statuses[u._id]||u.status||"offline";
+                      const unread = unreadMap[u._id]||0;
+                      const active = chatUser?._id===u._id;
                       return (
-                        <tr key={u._id} style={{ cursor: "pointer" }}>
+                        <tr key={u._id}
+                          style={{background:active?"rgba(37,99,235,0.08)":undefined}}>
                           <td>
-                            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                              <div style={{ position: "relative" }}>
-                                <div className="user-chip-avatar" style={{ width: 28, height: 28, fontSize: "0.72rem" }}>
+                            <div style={{display:"flex",alignItems:"center",gap:"0.5rem"}}>
+                              <div style={{position:"relative",flexShrink:0}}>
+                                <div className="user-chip-avatar" style={{width:28,height:28,fontSize:"0.72rem"}}>
                                   {u.fullName?.charAt(0).toUpperCase()}
                                 </div>
-                                <span style={{ position: "absolute", bottom: 0, right: 0, width: 8, height: 8, borderRadius: "50%", background: STATUS_COLOR[st], border: "1.5px solid var(--card)" }} />
+                                <span style={{position:"absolute",bottom:0,right:0,width:8,height:8,
+                                  borderRadius:"50%",background:SC[st],border:"1.5px solid var(--card)"}}/>
                               </div>
                               <span className="td-name">{u.fullName}</span>
-                              {convo?.unread > 0 && (
-                                <span style={{ background: "#ef4444", color: "white", borderRadius: "999px", fontSize: "0.62rem", fontWeight: 800, padding: "0.1rem 0.4rem" }}>
-                                  {convo.unread}
+                              {/* RED DOT unread badge */}
+                              {unread>0&&(
+                                <span style={{background:"#ef4444",color:"white",borderRadius:"999px",
+                                  fontSize:"0.62rem",fontWeight:800,padding:"0.1rem 0.45rem",
+                                  animation:"pulse 1.4s ease-in-out infinite"}}>
+                                  {unread} new
                                 </span>
                               )}
                             </div>
                           </td>
                           <td className="td-muted">{u.email}</td>
                           <td>
-                            <select value={u.role} onChange={(e) => handleRoleChange(u._id, e.target.value)}
-                              className="role-select" disabled={u._id === user._id}>
-                              {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+                            <select value={u.role}
+                              onChange={(e)=>handleRoleChange(u._id,e.target.value)}
+                              className="role-select" disabled={u._id===user._id}
+                              onClick={(e)=>e.stopPropagation()}>
+                              {ROLES.map((r)=><option key={r} value={r}>{r}</option>)}
                             </select>
                           </td>
                           <td>
-                            <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", fontSize: "0.78rem", color: STATUS_COLOR[st], fontWeight: 600 }}>
-                              <span style={{ width: 7, height: 7, borderRadius: "50%", background: STATUS_COLOR[st], display: "inline-block" }} />
-                              {STATUS_LABEL[st]}
+                            <span style={{display:"inline-flex",alignItems:"center",gap:"0.35rem",
+                              fontSize:"0.78rem",color:SC[st],fontWeight:600}}>
+                              <span style={{width:7,height:7,borderRadius:"50%",background:SC[st],display:"inline-block"}}/>
+                              {SL[st]}
                             </span>
                           </td>
-                          <td className="td-muted" style={{ fontSize: "0.75rem" }}>
-                            {u.lastSeen ? new Date(u.lastSeen).toLocaleString() : "—"}
+                          <td className="td-muted" style={{fontSize:"0.75rem"}}>
+                            {u.lastSeen?new Date(u.lastSeen).toLocaleString():"—"}
                           </td>
-                          <td className="td-muted" style={{ fontSize: "0.78rem" }}>
+                          <td className="td-muted" style={{fontSize:"0.78rem"}}>
                             {new Date(u.createdAt).toLocaleDateString()}
                           </td>
                           <td>
-                            <div style={{ display: "flex", gap: "0.35rem" }}>
-                              <button className="icon-btn green" onClick={() => openChat(u)} title="Chat">
-                                <Icon name="message-circle" size={14} />
+                            <div style={{display:"flex",gap:"0.35rem"}}>
+                              {/* Chat icon — red when unread */}
+                              <button className="icon-btn" title="Open chat"
+                                onClick={()=>openChat(u)}
+                                style={{color:unread>0?"#ef4444":"#10b981",position:"relative"}}>
+                                <Icon name="message-circle" size={14}/>
+                                {unread>0&&(
+                                  <span style={{position:"absolute",top:-3,right:-3,width:7,height:7,
+                                    borderRadius:"50%",background:"#ef4444",border:"1px solid var(--card)"}}/>
+                                )}
                               </button>
-                              <button className="icon-btn" onClick={() => handlePing(u)} title="Ping user"
-                                style={{ color: "#f59e0b" }}>
-                                <Icon name="bell" size={14} />
+                              {/* Ping */}
+                              <button className="icon-btn" title="Ping user"
+                                style={{color:"#f59e0b"}} onClick={()=>handlePing(u)}>
+                                <Icon name="bell" size={14}/>
                               </button>
-                              {u._id !== user._id && (
-                                <button className="icon-btn red" onClick={() => handleDeleteUser(u._id)} title="Delete user">
-                                  <Icon name="trash-2" size={14} />
+                              {u._id!==user._id&&(
+                                <button className="icon-btn red" title="Delete user"
+                                  onClick={()=>handleDeleteUser(u._id)}>
+                                  <Icon name="trash-2" size={14}/>
                                 </button>
                               )}
                             </div>
@@ -401,59 +415,86 @@ export default function AdminDashboard({ onBack }) {
                       );
                     })}
                   </tbody>
-                </table>
-              )}
+                </table>}
           </div>
 
           {/* Chat panel */}
-          {chatOpen && chatUser && (
+          {chatUser&&(
             <div className="admin-chat-panel">
+              {/* Header */}
               <div className="admin-chat-header">
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  <div className="user-chip-avatar" style={{ width: 30, height: 30, fontSize: "0.75rem" }}>
-                    {chatUser.fullName?.charAt(0).toUpperCase()}
+                <div style={{display:"flex",alignItems:"center",gap:"0.6rem",flex:1,minWidth:0}}>
+                  <div style={{position:"relative",flexShrink:0}}>
+                    <div className="user-chip-avatar" style={{width:32,height:32,fontSize:"0.78rem"}}>
+                      {chatUser.fullName?.charAt(0).toUpperCase()}
+                    </div>
+                    <span style={{position:"absolute",bottom:0,right:0,width:9,height:9,
+                      borderRadius:"50%",background:SC[statuses[chatUser._id]||"offline"],
+                      border:"2px solid var(--card)"}}/>
                   </div>
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: "0.875rem" }}>{chatUser.fullName}</div>
-                    <div style={{ fontSize: "0.7rem", color: STATUS_COLOR[statuses[chatUser._id] || "offline"] }}>
-                      {STATUS_LABEL[statuses[chatUser._id] || "offline"]}
+                  <div style={{minWidth:0}}>
+                    <div style={{fontWeight:700,fontSize:"0.875rem",
+                      whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
+                      {chatUser.fullName}
+                    </div>
+                    <div style={{fontSize:"0.7rem",color:SC[statuses[chatUser._id]||"offline"]}}>
+                      {SL[statuses[chatUser._id]||"offline"]} · {chatUser.role}
                     </div>
                   </div>
                 </div>
-                <button className="icon-btn" onClick={() => setChatOpen(false)}>
-                  <Icon name="x" size={14} />
-                </button>
+                <div style={{display:"flex",gap:"0.35rem",flexShrink:0}}>
+                  <button className="icon-btn" title="Ping user"
+                    style={{color:"#f59e0b"}} onClick={()=>handlePing(chatUser)}>
+                    <Icon name="bell" size={14}/>
+                  </button>
+                  <button className="icon-btn red" title="Clear all messages"
+                    disabled={clearing||messages.length===0}
+                    style={{opacity:messages.length===0?0.4:1}}
+                    onClick={handleClear}>
+                    {clearing
+                      ? <span className="login-spinner" style={{width:12,height:12}}/>
+                      : <Icon name="trash-2" size={14}/>}
+                  </button>
+                  <button className="icon-btn" title="Close" onClick={closeChat}>
+                    <Icon name="x" size={14}/>
+                  </button>
+                </div>
               </div>
 
+              {/* Messages */}
               <div className="admin-chat-messages">
-                {messages.length === 0 && (
+                {messages.length===0&&(
                   <div className="chat-empty">
-                    <Icon name="message-circle" size={24} />
+                    <Icon name="message-circle" size={24}/>
                     <p>No messages yet</p>
                   </div>
                 )}
-                {messages.map((m) => {
-                  const mine = m.sender?._id === user._id || m.sender === user._id;
+                {messages.map((m)=>{
+                  const mine=(m.sender?._id||m.sender)===user._id;
                   return (
-                    <div key={m._id} className={`chat-msg ${mine ? "mine" : "theirs"}`}>
+                    <div key={m._id} className={`chat-msg ${mine?"mine":"theirs"}`}>
                       <div className="chat-bubble">{m.content}</div>
                       <div className="chat-time">
-                        {new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                        {mine && <span className="chat-read">{m.read ? " ✓✓" : " ✓"}</span>}
+                        {new Date(m.createdAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}
+                        {mine&&<span className="chat-read">{m.read?" ✓✓":" ✓"}</span>}
                       </div>
                     </div>
                   );
                 })}
-                <div ref={bottomRef} />
+                <div ref={bottomRef}/>
               </div>
 
+              {/* Input */}
               <div className="chat-input-row">
-                <input className="chat-input" placeholder="Type a message..."
-                  value={chatInput} onChange={(e) => setChatInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-                  maxLength={500} />
-                <button className="chat-send" onClick={handleSend} disabled={sending || !chatInput.trim()}>
-                  <Icon name="send" size={16} />
+                <input className="chat-input"
+                  placeholder={`Message ${chatUser.fullName}…`}
+                  value={chatInput}
+                  onChange={(e)=>setChatIn(e.target.value)}
+                  onKeyDown={(e)=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();handleSend();}}}
+                  maxLength={500} autoFocus/>
+                <button className="chat-send" onClick={handleSend}
+                  disabled={sending||!chatInput.trim()}>
+                  <Icon name="send" size={16}/>
                 </button>
               </div>
             </div>

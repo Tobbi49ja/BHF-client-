@@ -100,6 +100,11 @@ export const getAdminConversations = async (token) =>
 export const getAdminId = async (token) =>
   handleResponse(await fetch(`${BASE_URL}/api/chat/admin/id`, { headers: authHeaders(token) }));
 
+export const clearChat = async (token, userId) =>
+  handleResponse(await fetch(`${BASE_URL}/api/chat/messages/clear/${userId}`, {
+    method: "DELETE", headers: authHeaders(token),
+  }));
+
 export const updateStatus = async (token, status) =>
   handleResponse(await fetch(`${BASE_URL}/api/chat/status`, {
     method: "PUT", headers: authHeaders(token),

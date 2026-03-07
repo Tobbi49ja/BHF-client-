@@ -1,9 +1,3 @@
-/**
- * Nigeria Address Data
- * Structure: State → LGA → Cities/Towns within that LGA
- * Based on official Nigeria LGA structure (774 LGAs across 36 states + FCT)
- */
-
 export const NIGERIA_ADDRESS_DATA = {
 
   "Abia": {

@@ -2,61 +2,69 @@ import { useEffect, useRef, useCallback } from "react";
 import { io } from "socket.io-client";
 
 const SOCKET_URL = import.meta.env.VITE_API_URL;
-
-// One socket per app, listeners fan-out per event
 let _socket = null;
-const _listeners = {};
 
 function getSocket() {
-  if (!_socket || _socket.disconnected) {
+  if (!_socket) {
     _socket = io(SOCKET_URL, {
-      transports: ["websocket"],
-      reconnectionAttempts: 10,
-      reconnectionDelay: 1000,
+      transports: ["websocket", "polling"],
+      reconnectionAttempts: 20,
+      reconnectionDelay: 1500,
+      timeout: 10000,
     });
+    _socket.on("connect",       () => console.log("[socket] connected:", _socket.id));
+    _socket.on("disconnect",    (r) => console.log("[socket] disconnected:", r));
+    _socket.on("connect_error", (e) => console.warn("[socket] connect_error:", e.message));
   }
   return _socket;
 }
 
-function addListener(event, handler) {
-  if (!_listeners[event]) {
-    _listeners[event] = new Set();
-    getSocket().on(event, (...args) => {
-      _listeners[event]?.forEach((h) => h(...args));
-    });
-  }
-  _listeners[event].add(handler);
-}
+export function useSocket(userId, callbacks = {}) {
+  const cbRef     = useRef(callbacks);
+  const idleTimer = useRef(null);
 
-function removeListener(event, handler) {
-  _listeners[event]?.delete(handler);
-}
-
-export function useSocket(userId, { onMessage, onStatus, onPinged } = {}) {
-  const socketRef    = useRef(null);
-  const idleTimer    = useRef(null);
-  const onMessageRef = useRef(onMessage);
-  const onStatusRef  = useRef(onStatus);
-  const onPingedRef  = useRef(onPinged);
-
-  useEffect(() => { onMessageRef.current = onMessage; }, [onMessage]);
-  useEffect(() => { onStatusRef.current  = onStatus;  }, [onStatus]);
-  useEffect(() => { onPingedRef.current  = onPinged;  }, [onPinged]);
-
-  const msgHandler    = useCallback((msg)  => onMessageRef.current?.(msg),  []);
-  const statusHandler = useCallback((data) => onStatusRef.current?.(data),  []);
-  const pingHandler   = useCallback((data) => onPingedRef.current?.(data),  []);
+  // Always keep latest callbacks — no stale closures ever
+  useEffect(() => { cbRef.current = callbacks; });
 
   useEffect(() => {
     if (!userId) return;
+
     const socket = getSocket();
-    socketRef.current = socket;
-    socket.emit("join", userId);
 
-    if (onMessage) addListener("newMessage", msgHandler);
-    if (onStatus)  addListener("userStatus",  statusHandler);
-    if (onPinged)  addListener("pinged",       pingHandler);
+    // ── Join room exactly once per mount ────────────────────
+    // "connect" fires once on first connection.
+    // "reconnect" (manager event) fires on subsequent reconnections.
+    const doJoin = () => {
+      socket.emit("join", userId);
+      console.log("[socket] join →", userId);
+    };
 
+    if (socket.connected) {
+      doJoin();                          // already connected — join immediately
+    } else {
+      socket.once("connect", doJoin);    // wait for first connection
+    }
+
+    // Re-join only on REconnects (not the first connect — handled above)
+    const onReconnect = () => {
+      console.log("[socket] reconnect — re-joining:", userId);
+      doJoin();
+    };
+    socket.io.on("reconnect", onReconnect);   // manager-level event, fires only on re-connects
+
+    // ── Event handlers ──────────────────────────────────────
+    const onMessage = (msg)  => cbRef.current.onMessage?.(msg);
+    const onStatus  = (data) => cbRef.current.onStatus?.(data);
+    const onPinged  = (data) => {
+      console.log("[socket] pinged:", data);
+      cbRef.current.onPinged?.(data);
+    };
+
+    socket.on("newMessage", onMessage);
+    socket.on("userStatus", onStatus);
+    socket.on("pinged",     onPinged);
+
+    // ── Idle detection ──────────────────────────────────────
     const resetIdle = () => {
       clearTimeout(idleTimer.current);
       idleTimer.current = setTimeout(() => socket.emit("idle", userId), 3 * 60 * 1000);
@@ -65,18 +73,22 @@ export function useSocket(userId, { onMessage, onStatus, onPinged } = {}) {
     window.addEventListener("keydown",   resetIdle);
     resetIdle();
 
+    // ── Cleanup ─────────────────────────────────────────────
     return () => {
-      if (onMessage) removeListener("newMessage", msgHandler);
-      if (onStatus)  removeListener("userStatus",  statusHandler);
-      if (onPinged)  removeListener("pinged",       pingHandler);
+      socket.off("connect",    doJoin);      // remove if it never fired
+      socket.io.off("reconnect", onReconnect);
+      socket.off("newMessage", onMessage);
+      socket.off("userStatus", onStatus);
+      socket.off("pinged",     onPinged);
       clearTimeout(idleTimer.current);
       window.removeEventListener("mousemove", resetIdle);
       window.removeEventListener("keydown",   resetIdle);
     };
-  }, [userId]); // eslint-disable-line
+  }, [userId]);
 
   const pingUser = useCallback((targetId, adminName) => {
-    socketRef.current?.emit("ping_user", { targetId, adminName });
+    console.log("[socket] ping_user → targetId:", targetId);
+    getSocket().emit("ping_user", { targetId, adminName });
   }, []);
 
   return { pingUser };
