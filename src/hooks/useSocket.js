@@ -53,16 +53,15 @@ export function useSocket(userId, callbacks = {}) {
     socket.io.on("reconnect", onReconnect);   // manager-level event, fires only on re-connects
 
     // ── Event handlers ──────────────────────────────────────
-    const onMessage = (msg)  => cbRef.current.onMessage?.(msg);
-    const onStatus  = (data) => cbRef.current.onStatus?.(data);
-    const onPinged  = (data) => {
-      console.log("[socket] pinged:", data);
-      cbRef.current.onPinged?.(data);
-    };
+    const onMessage   = (msg)  => cbRef.current.onMessage?.(msg);
+    const onStatus    = (data) => cbRef.current.onStatus?.(data);
+    const onPinged    = (data) => { console.log("[socket] pinged:", data); cbRef.current.onPinged?.(data); };
+    const onCleared   = ()     => cbRef.current.onChatCleared?.();
 
-    socket.on("newMessage", onMessage);
-    socket.on("userStatus", onStatus);
-    socket.on("pinged",     onPinged);
+    socket.on("newMessage",  onMessage);
+    socket.on("userStatus",  onStatus);
+    socket.on("pinged",      onPinged);
+    socket.on("chatCleared", onCleared);
 
     // ── Idle detection ──────────────────────────────────────
     const resetIdle = () => {
@@ -75,11 +74,12 @@ export function useSocket(userId, callbacks = {}) {
 
     // ── Cleanup ─────────────────────────────────────────────
     return () => {
-      socket.off("connect",    doJoin);      // remove if it never fired
+      socket.off("connect",     doJoin);
       socket.io.off("reconnect", onReconnect);
-      socket.off("newMessage", onMessage);
-      socket.off("userStatus", onStatus);
-      socket.off("pinged",     onPinged);
+      socket.off("newMessage",  onMessage);
+      socket.off("userStatus",  onStatus);
+      socket.off("pinged",      onPinged);
+      socket.off("chatCleared", onCleared);
       clearTimeout(idleTimer.current);
       window.removeEventListener("mousemove", resetIdle);
       window.removeEventListener("keydown",   resetIdle);

@@ -47,31 +47,39 @@ export default function AdminDashboard() {
   const { pingUser } = useSocket(user?._id, {
 
     onMessage: (msg) => {
-      const senderId   = msg.sender?._id   || msg.sender;
-      const receiverId = msg.receiver?._id || msg.receiver;
-      const myId       = userIdRef.current;
-      const peer       = chatUserRef.current?._id;
+      const senderId   = String(msg.sender?._id   || msg.sender   || "");
+      const receiverId = String(msg.receiver?._id || msg.receiver || "");
+      const myId       = String(userIdRef.current || "");
+      const peer       = String(chatUserRef.current?._id || "");
 
-      // Only handle messages to/from this admin
-      if (receiverId !== myId && senderId !== myId) return;
+      console.log("[AdminDashboard] newMessage", { senderId, receiverId, myId, peer,
+        isMine: senderId===myId, involvesMe: senderId===myId||receiverId===myId });
 
-      // Who is the other person?
+      if (senderId !== myId && receiverId !== myId) return;
+
       const otherId = senderId === myId ? receiverId : senderId;
 
       if (otherId === peer) {
-        // Active chat — append
-        setMessages((prev) =>
-          prev.find((m) => m._id === msg._id) ? prev : [...prev, msg]
-        );
+        setMessages((prev) => {
+          // Replace my own optimistic
+          const optIdx = prev.findIndex(
+            (m) => m._opt && String(m.sender?._id || m.sender) === myId && m.content === msg.content
+          );
+          if (optIdx !== -1) {
+            const next = [...prev]; next[optIdx] = msg; return next;
+          }
+          if (prev.find((m) => m._id === msg._id)) return prev;
+          return [...prev, msg];
+        });
       } else if (senderId !== myId) {
-        // Background message from another user — red dot
+        console.log("[AdminDashboard] red dot for", otherId);
         setUnread((prev) => ({ ...prev, [otherId]: (prev[otherId] || 0) + 1 }));
       }
     },
 
     onStatus: ({ userId, status }) => {
-      setStatuses((p) => ({ ...p, [userId]: status }));
-      setUsers((p) => p.map((u) => u._id === userId ? { ...u, status } : u));
+      setStatuses((p) => ({ ...p, [String(userId)]: status }));
+      setUsers((p) => p.map((u) => String(u._id) === String(userId) ? { ...u, status } : u));
     },
   });
 
@@ -100,16 +108,24 @@ export default function AdminDashboard() {
 
   // ── Open chat ─────────────────────────────────────────────
   const openChat = async (u) => {
+    // Update ref SYNCHRONOUSLY so socket messages arriving during the async fetch
+    // are routed to this panel, not to the red-dot counter
+    chatUserRef.current = u;
     setChatUser(u);
     setMessages([]);
-    setUnread((p) => { const n={...p}; delete n[u._id]; return n; });
+    setUnread((p) => { const n = {...p}; delete n[String(u._id)]; return n; });
     try {
-      const msgs = await getMessages(user.token, u._id);
-      setMessages(msgs);
+      const fetched = await getMessages(user.token, u._id);
+      // Merge: fetched is ground truth, but keep any socket msgs that arrived during fetch
+      setMessages((prev) => {
+        const ids   = new Set(fetched.map((m) => m._id));
+        const extra = prev.filter((m) => !m._opt && !ids.has(m._id));
+        return [...fetched, ...extra].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      });
     } catch {}
   };
 
-  const closeChat = () => { setChatUser(null); setMessages([]); };
+  const closeChat = () => { chatUserRef.current = null; setChatUser(null); setMessages([]); };
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -152,9 +168,10 @@ export default function AdminDashboard() {
     if (!chatUser || !confirm(`Clear all messages with ${chatUser.fullName}?`)) return;
     setClearing(true);
     try {
-      await clearChat(user.token, chatUser._id);
+      const result = await clearChat(user.token, chatUser._id);
+      console.log("[admin] clearChat result:", result);
       setMessages([]);
-      setUnread((p) => { const n={...p}; delete n[chatUser._id]; return n; });
+      setUnread((p) => { const n = {...p}; delete n[String(chatUser._id)]; return n; });
     } catch (e) { alert(e.message); }
     setClearing(false);
   };
@@ -178,10 +195,19 @@ export default function AdminDashboard() {
       ||(r.address?.full||"").toLowerCase().includes(q);
   });
 
-  const fUsr = users.filter((u) => {
-    const q=search.toLowerCase();
-    return u.fullName?.toLowerCase().includes(q)||u.email?.toLowerCase().includes(q);
-  });
+  const STATUS_ORDER = { active: 0, idle: 1, offline: 2 };
+  const fUsr = users
+    .filter((u) => {
+      const q = search.toLowerCase();
+      return u.fullName?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q);
+    })
+    .sort((a, b) => {
+      const sa = STATUS_ORDER[statuses[a._id] || a.status || "offline"] ?? 2;
+      const sb = STATUS_ORDER[statuses[b._id] || b.status || "offline"] ?? 2;
+      if (sa !== sb) return sa - sb;
+      // Within same status: unread float to top
+      return (unreadMap[b._id] || 0) - (unreadMap[a._id] || 0);
+    });
 
   const bmiColor = (v) => {
     if(!v) return "var(--text-3)";
@@ -470,7 +496,7 @@ export default function AdminDashboard() {
                   </div>
                 )}
                 {messages.map((m)=>{
-                  const mine=(m.sender?._id||m.sender)===user._id;
+                  const mine = String(m.sender?._id || m.sender) === String(user._id);
                   return (
                     <div key={m._id} className={`chat-msg ${mine?"mine":"theirs"}`}>
                       <div className="chat-bubble">{m.content}</div>
