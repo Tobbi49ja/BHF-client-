@@ -1,178 +1,143 @@
-
-
-import { MapPin, ChevronDown, Navigation, Home, Landmark } from 'lucide-react';
-import { getLGAs, getCities, STATES } from '../../data/nigeriaAddressData';
+ import { MapPin, ChevronDown, Navigation, Home, Building2, Hash, Globe, Landmark } from 'lucide-react';
 
 export function AddressFields({ address, handlers, derived, errors = {}, disabled = false }) {
   const { states, lgas, cities } = derived;
   const {
-    handleStateChange,
-    handleLGAChange,
-    handleCityChange,
-    handleStreetChange,
-    handleLandmarkChange,
+    handleStateChange, handleLGAChange, handleCityChange,
+    handleStreetChange, handleStreet2Change,
+    handleLandmarkChange, handlePostcodeChange,
   } = handlers;
 
   return (
     <>
-      {/* ── State ── */}
-      <div className={`input-group ${errors.state ? 'has-error' : ''}`}>
+      {/* Country – fixed */}
+      <div className="input-group">
+        <label><Globe size={12} /> Country</label>
+        <div className="input-wrapper">
+          <Globe className="input-icon" size={16} />
+          <input type="text" value="Nigeria" readOnly
+            style={{ paddingLeft: "2.75rem", opacity: 0.7, cursor: "default" }} />
+        </div>
+      </div>
+
+      {/* State */}
+      <div className={`input-group ${errors.state ? "has-error" : ""}`}>
         <label htmlFor="addr-state">
-          <MapPin size={12} />
-          State <span style={{ color: 'var(--error)' }}>*</span>
+          <MapPin size={12} /> State <span style={{ color:"var(--error)" }}>*</span>
         </label>
         <div className="input-wrapper">
-          <MapPin className="input-icon" />
-          <select
-            id="addr-state"
-            value={address.state}
-            onChange={handleStateChange}
-            disabled={disabled}
-            aria-describedby={errors.state ? 'addr-state-err' : undefined}
-          >
+          <MapPin className="input-icon" size={16} />
+          <select id="addr-state" value={address.state} onChange={handleStateChange} disabled={disabled}>
             <option value="">— Select State —</option>
-            {states.map(s => (
-              <option key={s} value={s}>{s}</option>
-            ))}
+            {states.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
           <ChevronDown className="select-arrow" />
         </div>
-        {errors.state && (
-          <span id="addr-state-err" className="field-error" role="alert">
-            {errors.state}
-          </span>
-        )}
+        {errors.state && <span className="field-error">{errors.state}</span>}
       </div>
 
-      {/* ── LGA ── */}
-      <div className={`input-group ${errors.lga ? 'has-error' : ''}`}>
+      {/* LGA */}
+      <div className={`input-group ${errors.lga ? "has-error" : ""}`}>
         <label htmlFor="addr-lga">
-          <Navigation size={12} />
-          Local Government Area <span style={{ color: 'var(--error)' }}>*</span>
+          <Navigation size={12} /> Local Government Area <span style={{ color:"var(--error)" }}>*</span>
         </label>
         <div className="input-wrapper">
-          <Navigation className="input-icon" />
-          <select
-            id="addr-lga"
-            value={address.lga}
-            onChange={handleLGAChange}
-            disabled={disabled || !address.state}
-            aria-describedby={errors.lga ? 'addr-lga-err' : undefined}
-          >
-            <option value="">
-              {!address.state ? '— Select a state first —' : '— Select LGA —'}
-            </option>
-            {lgas.map(l => (
-              <option key={l} value={l}>{l}</option>
-            ))}
+          <Navigation className="input-icon" size={16} />
+          <select id="addr-lga" value={address.lga} onChange={handleLGAChange}
+            disabled={disabled || !address.state}>
+            <option value="">{!address.state ? "— Select a state first —" : "— Select LGA —"}</option>
+            {lgas.map((l) => <option key={l} value={l}>{l}</option>)}
           </select>
           <ChevronDown className="select-arrow" />
         </div>
-        {!address.state && (
-          <span className="field-hint">Select a state to unlock LGAs</span>
-        )}
-        {errors.lga && (
-          <span id="addr-lga-err" className="field-error" role="alert">
-            {errors.lga}
-          </span>
-        )}
+        {!address.state && <span className="field-hint">Select a state to see its LGAs</span>}
+        {errors.lga && <span className="field-error">{errors.lga}</span>}
       </div>
 
-      {/* ── City / Town ── */}
-      <div className={`input-group ${errors.city ? 'has-error' : ''}`}>
+      {/* City / Town within LGA */}
+      <div className={`input-group ${errors.city ? "has-error" : ""}`}>
         <label htmlFor="addr-city">
-          <Home size={12} />
-          City / Town <span style={{ color: 'var(--error)' }}>*</span>
+          <Home size={12} /> City / Town <span style={{ color:"var(--error)" }}>*</span>
         </label>
         <div className="input-wrapper">
-          <Home className="input-icon" />
-          <select
-            id="addr-city"
-            value={address.city}
-            onChange={handleCityChange}
-            disabled={disabled || !address.lga}
-            aria-describedby={errors.city ? 'addr-city-err' : undefined}
-          >
-            <option value="">
-              {!address.lga ? '— Select LGA first —' : '— Select City/Town —'}
-            </option>
-            {cities.map(c => (
-              <option key={c} value={c}>{c}</option>
-            ))}
+          <Home className="input-icon" size={16} />
+          <select id="addr-city" value={address.city} onChange={handleCityChange}
+            disabled={disabled || !address.lga}>
+            <option value="">{!address.lga ? "— Select LGA first —" : "— Select City/Town —"}</option>
+            {cities.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
           <ChevronDown className="select-arrow" />
         </div>
-        {!address.lga && (
-          <span className="field-hint">Select an LGA to unlock cities</span>
-        )}
-        {errors.city && (
-          <span id="addr-city-err" className="field-error" role="alert">
-            {errors.city}
-          </span>
-        )}
+        {!address.lga && <span className="field-hint">Select an LGA to see its cities</span>}
+        {errors.city && <span className="field-error">{errors.city}</span>}
       </div>
 
-      {/* ── Street Address ── */}
-      <div className={`input-group full-width ${errors.street ? 'has-error' : ''}`}>
+      {/* Street Address Line 1 */}
+      <div className={`input-group full-width ${errors.street ? "has-error" : ""}`}>
         <label htmlFor="addr-street">
-          <MapPin size={12} />
-          Street Address <span style={{ color: 'var(--error)' }}>*</span>
+          <MapPin size={12} /> Address Line 1 <span style={{ color:"var(--error)" }}>*</span>
         </label>
         <div className="input-wrapper">
-          <MapPin className="input-icon" />
-          <input
-            id="addr-street"
-            type="text"
-            value={address.street}
+          <MapPin className="input-icon" size={16} />
+          <input id="addr-street" type="text" value={address.street}
             onChange={handleStreetChange}
             placeholder="e.g. 12 Ahmadu Bello Way"
-            disabled={disabled}
-            maxLength={200}
-            aria-describedby={errors.street ? 'addr-street-err' : undefined}
-          />
+            disabled={disabled} maxLength={200} />
         </div>
-        {errors.street && (
-          <span id="addr-street-err" className="field-error" role="alert">
-            {errors.street}
-          </span>
-        )}
+        {errors.street && <span className="field-error">{errors.street}</span>}
       </div>
 
-      {/* ── Landmark (optional) ── */}
+      {/* Street Address Line 2 */}
       <div className="input-group full-width">
-        <label htmlFor="addr-landmark">
-          <Landmark size={12} />
-          Nearest Landmark
-          <span style={{ color: 'var(--text-3)', fontWeight: 400, marginLeft: '0.25rem' }}>
-            (optional)
-          </span>
+        <label htmlFor="addr-street2">
+          <Building2 size={12} /> Address Line 2
+          <span style={{ color:"var(--text-3)", fontWeight:400, marginLeft:"0.25rem" }}>(optional)</span>
         </label>
         <div className="input-wrapper">
-          <Landmark className="input-icon" />
-          <input
-            id="addr-landmark"
-            type="text"
-            value={address.landmark}
-            onChange={handleLandmarkChange}
-            placeholder="e.g. Opposite Unity Bank, near Central Mosque"
-            disabled={disabled}
-            maxLength={200}
-          />
+          <Building2 className="input-icon" size={16} />
+          <input id="addr-street2" type="text" value={address.street2}
+            onChange={handleStreet2Change}
+            placeholder="e.g. Flat 3B, Unity Estate"
+            disabled={disabled} maxLength={200} />
         </div>
-        <span className="field-hint">
-          Helps with accurate location identification
-        </span>
       </div>
 
-      {/* ── Full Address Preview ── */}
+      {/* Postal Code */}
+      <div className="input-group">
+        <label htmlFor="addr-postcode">
+          <Hash size={12} /> Postal Code
+          <span style={{ color:"var(--text-3)", fontWeight:400, marginLeft:"0.25rem" }}>(optional)</span>
+        </label>
+        <div className="input-wrapper">
+          <Hash className="input-icon" size={16} />
+          <input id="addr-postcode" type="text" value={address.postcode}
+            onChange={handlePostcodeChange}
+            placeholder="e.g. 100001"
+            disabled={disabled} maxLength={10} />
+        </div>
+      </div>
+
+      {/* Nearest Landmark */}
+      <div className="input-group">
+        <label htmlFor="addr-landmark">
+          <Landmark size={12} /> Nearest Landmark
+          <span style={{ color:"var(--text-3)", fontWeight:400, marginLeft:"0.25rem" }}>(optional)</span>
+        </label>
+        <div className="input-wrapper">
+          <Landmark className="input-icon" size={16} />
+          <input id="addr-landmark" type="text" value={address.landmark}
+            onChange={handleLandmarkChange}
+            placeholder="e.g. Opposite Unity Bank"
+            disabled={disabled} maxLength={200} />
+        </div>
+      </div>
+
+      {/* Full Address Preview */}
       {derived.isAddressComplete && (
         <div className="input-group full-width">
-          <label>
-            <MapPin size={12} />
-            Address Preview
-          </label>
+          <label><MapPin size={12} /> Address Preview</label>
           <div className="address-preview">
-            <MapPin size={14} style={{ flexShrink: 0, color: 'var(--success)' }} />
+            <MapPin size={14} style={{ flexShrink:0, color:"var(--success)" }} />
             <span>{derived.fullAddress}</span>
           </div>
         </div>
@@ -180,360 +145,584 @@ export function AddressFields({ address, handlers, derived, errors = {}, disable
     </>
   );
 }
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Icon from "./Icon";
-import { getAdminRecords, getUsers, deleteUser, updateUserRole, exportRecordsExcel } from "../services/api";
+import {
+  getAdminRecords, getUsers, deleteUser, updateUserRole,
+  exportRecordsExcel, exportUsersExcel,
+  getAdminConversations, getMessages, sendMessage, clearChat,
+} from "../services/api";
 import { useAuth } from "../context/AuthContext";
+import { useSocket } from "../hooks/useSocket";
 
-const ROLES = ["Field Volunteer", "Health Worker", "Program Manager", "Data Analyst", "Administrator"];
+const ROLES = ["Field Volunteer","Health Worker","Program Manager","Data Analyst","Administrator"];
+const SC = { active:"#10b981", idle:"#f59e0b", offline:"#6b7280" };
+const SL = { active:"Active",  idle:"Idle",    offline:"Offline"  };
 
-export default function AdminDashboard({ onBack }) {
+export default function AdminDashboard() {
   const { user, logout } = useAuth();
-  const [tab, setTab] = useState("records");
-  const [records, setRecords] = useState([]);
-  const [users,   setUsers]   = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState("");
-  const [search,  setSearch]  = useState("");
-  const [exporting, setExporting] = useState(false);
 
+  const [tab,       setTab]      = useState("records");
+  const [records,   setRecords]  = useState([]);
+  const [users,     setUsers]    = useState([]);
+  const [loading,   setLoading]  = useState(true);
+  const [error,     setError]    = useState("");
+  const [search,    setSearch]   = useState("");
+  const [exporting, setExport]   = useState(false);
+  const [statuses,  setStatuses] = useState({});
+
+  // unreadMap: userId → count  (drives red dots)
+  const [unreadMap, setUnread]   = useState({});
+  const totalUnread = Object.values(unreadMap).reduce((a,b)=>a+b,0);
+
+  // Chat
+  const [chatUser,  setChatUser] = useState(null);
+  const [messages,  setMessages] = useState([]);
+  const [chatInput, setChatIn]   = useState("");
+  const [sending,   setSending]  = useState(false);
+  const [clearing,  setClearing] = useState(false);
+  const bottomRef   = useRef(null);
+  const sendingRef  = useRef(false);  // prevents double-send
+
+  // Stable refs for socket callbacks
+  const chatUserRef = useRef(null);
+  const userIdRef   = useRef(null);
+  useEffect(() => { chatUserRef.current = chatUser; }, [chatUser]);
+  useEffect(() => { userIdRef.current   = user?._id; }, [user]);
+
+  // ── Socket ────────────────────────────────────────────────
+  const { pingUser } = useSocket(user?._id, {
+
+    onMessage: (msg) => {
+      const senderId   = String(msg.sender?._id   || msg.sender   || "");
+      const receiverId = String(msg.receiver?._id || msg.receiver || "");
+      const myId       = String(userIdRef.current || "");
+      const peer       = String(chatUserRef.current?._id || "");
+
+      console.log("[AdminDashboard] newMessage", { senderId, receiverId, myId, peer,
+        isMine: senderId===myId, involvesMe: senderId===myId||receiverId===myId });
+
+      if (senderId !== myId && receiverId !== myId) return;
+
+      const otherId = senderId === myId ? receiverId : senderId;
+
+      if (otherId === peer) {
+        setMessages((prev) => {
+          // Replace my own optimistic
+          const optIdx = prev.findIndex(
+            (m) => m._opt && String(m.sender?._id || m.sender) === myId && m.content === msg.content
+          );
+          if (optIdx !== -1) {
+            const next = [...prev]; next[optIdx] = msg; return next;
+          }
+          if (prev.find((m) => m._id === msg._id)) return prev;
+          return [...prev, msg];
+        });
+      } else if (senderId !== myId) {
+        console.log("[AdminDashboard] red dot for", otherId);
+        setUnread((prev) => ({ ...prev, [otherId]: (prev[otherId] || 0) + 1 }));
+      }
+    },
+
+    onStatus: ({ userId, status }) => {
+      setStatuses((p) => ({ ...p, [String(userId)]: status }));
+      setUsers((p) => p.map((u) => String(u._id) === String(userId) ? { ...u, status } : u));
+    },
+  });
+
+  // ── Data loading ──────────────────────────────────────────
   useEffect(() => { loadData(); }, [tab]);
 
   const loadData = async () => {
-    setLoading(true);
-    setError("");
+    setLoading(true); setError("");
     try {
       if (tab === "records") {
-        const data = await getAdminRecords(user.token);
-        setRecords(data);
+        setRecords(await getAdminRecords(user.token));
       } else {
-        const data = await getUsers(user.token);
-        setUsers(data);
+        const [userData, convos] = await Promise.all([
+          getUsers(user.token),
+          getAdminConversations(user.token),
+        ]);
+        setUsers(userData);
+        const s = {}; userData.forEach((u) => { s[u._id] = u.status || "offline"; });
+        setStatuses(s);
+        const map = {}; convos.forEach((c) => { if (c.unread > 0) map[c.user._id] = c.unread; });
+        setUnread(map);
       }
-    } catch (err) {
-      setError(err.message);
+    } catch (err) { setError(err.message); }
+    finally { setLoading(false); }
+  };
+
+  // ── Open chat ─────────────────────────────────────────────
+  const openChat = async (u) => {
+    // Update ref SYNCHRONOUSLY so socket messages arriving during the async fetch
+    // are routed to this panel, not to the red-dot counter
+    chatUserRef.current = u;
+    setChatUser(u);
+    setMessages([]);
+    setUnread((p) => { const n = {...p}; delete n[String(u._id)]; return n; });
+    try {
+      const fetched = await getMessages(user.token, u._id);
+      // Merge: fetched is ground truth, but keep any socket msgs that arrived during fetch
+      setMessages((prev) => {
+        const ids   = new Set(fetched.map((m) => m._id));
+        const extra = prev.filter((m) => !m._opt && !ids.has(m._id));
+        return [...fetched, ...extra].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      });
+    } catch {}
+  };
+
+  const closeChat = () => { chatUserRef.current = null; setChatUser(null); setMessages([]); };
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // ── Send ──────────────────────────────────────────────────
+  const handleSend = async () => {
+    if (!chatInput.trim() || !chatUser || sendingRef.current) return;
+    sendingRef.current = true;
+    const content = chatInput.trim();
+    setChatIn("");
+    const opt = {
+      _id: "opt-" + Date.now(),
+      sender:   { _id: user._id },
+      receiver: { _id: chatUser._id },
+      content, read: false,
+      createdAt: new Date().toISOString(),
+      _opt: true,
+    };
+    setMessages((p) => [...p, opt]);
+    try {
+      const saved = await sendMessage(user.token, { receiverId: chatUser._id, content });
+      setMessages((p) => p.map((m) => m._opt ? saved : m));
+    } catch {
+      setMessages((p) => p.filter((m) => !m._opt));
     } finally {
-      setLoading(false);
+      sendingRef.current = false;
+      setSending(false);
     }
   };
 
-  const handleDeleteUser = async (id) => {
-    if (!confirm("Delete this user? This cannot be undone.")) return;
+  // ── Ping ──────────────────────────────────────────────────
+  const handlePing = (u) => {
+    console.log("[AdminDashboard] pinging", u._id, u.fullName);
+    pingUser(u._id, user.fullName);
+  };
+
+  // ── Clear chat ────────────────────────────────────────────
+  const handleClear = async () => {
+    if (!chatUser || !confirm(`Clear all messages with ${chatUser.fullName}?`)) return;
+    setClearing(true);
     try {
-      await deleteUser(user.token, id);
-      setUsers((prev) => prev.filter((u) => u._id !== id));
-    } catch (err) {
-      alert(err.message);
-    }
+      const result = await clearChat(user.token, chatUser._id);
+      console.log("[admin] clearChat result:", result);
+      setMessages([]);
+      setUnread((p) => { const n = {...p}; delete n[String(chatUser._id)]; return n; });
+    } catch (e) { alert(e.message); }
+    setClearing(false);
+  };
+
+  // ── User management ───────────────────────────────────────
+  const handleDeleteUser = async (id) => {
+    if (!confirm("Delete this user?")) return;
+    try { await deleteUser(user.token, id); setUsers((p) => p.filter((u)=>u._id!==id)); if(chatUser?._id===id) closeChat(); }
+    catch (e) { alert(e.message); }
   };
 
   const handleRoleChange = async (id, role) => {
-    try {
-      await updateUserRole(user.token, id, role);
-      setUsers((prev) => prev.map((u) => u._id === id ? { ...u, role } : u));
-    } catch (err) {
-      alert(err.message);
-    }
+    try { await updateUserRole(user.token,id,role); setUsers((p)=>p.map((u)=>u._id===id?{...u,role}:u)); }
+    catch (e) { alert(e.message); }
   };
 
-  const handleExport = async () => {
-    setExporting(true);
-    try { await exportRecordsExcel(user.token); }
-    finally { setExporting(false); }
-  };
-
-  const handleLogout = () => {
-    logout();
-    window.location.href = "/";
-  };
-
-  const filteredRecords = records.filter((r) => {
-    const q = search.toLowerCase();
-    return (
-      r.firstName?.toLowerCase().includes(q) ||
-      r.lastName?.toLowerCase().includes(q)  ||
-      r.address?.toLowerCase().includes(q)   ||
-      r.submittedBy?.fullName?.toLowerCase().includes(q)
-    );
+  // ── Filters ───────────────────────────────────────────────
+  const fRec = records.filter((r) => {
+    const q=search.toLowerCase();
+    return r.firstName?.toLowerCase().includes(q)||r.lastName?.toLowerCase().includes(q)
+      ||(r.address?.full||"").toLowerCase().includes(q);
   });
 
-  const filteredUsers = users.filter((u) => {
-    const q = search.toLowerCase();
-    return u.fullName?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q);
-  });
+  const STATUS_ORDER = { active: 0, idle: 1, offline: 2 };
+  const fUsr = users
+    .filter((u) => {
+      const q = search.toLowerCase();
+      return u.fullName?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q);
+    })
+    .sort((a, b) => {
+      const sa = STATUS_ORDER[statuses[a._id] || a.status || "offline"] ?? 2;
+      const sb = STATUS_ORDER[statuses[b._id] || b.status || "offline"] ?? 2;
+      if (sa !== sb) return sa - sb;
+      // Within same status: unread float to top
+      return (unreadMap[b._id] || 0) - (unreadMap[a._id] || 0);
+    });
 
-  const bmiColor = (bmi) => {
-    if (!bmi) return "var(--text-3)";
-    const b = parseFloat(bmi);
-    if (b < 18.5) return "#f59e0b";
-    if (b < 25)   return "#10b981";
-    if (b < 30)   return "#f59e0b";
-    return "#ef4444";
+  const bmiColor = (v) => {
+    if(!v) return "var(--text-3)";
+    const b=parseFloat(v);
+    return b<18.5?"#f59e0b":b<25?"#10b981":b<30?"#f59e0b":"#ef4444";
   };
 
+  const thisMo = records.filter((r)=>{
+    const d=new Date(r.createdAt),n=new Date();
+    return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear();
+  }).length;
+
+  const actCt  = Object.values(statuses).filter(s=>s==="active").length;
+  const idleCt = Object.values(statuses).filter(s=>s==="idle").length;
+  const offCt  = Object.values(statuses).filter(s=>s==="offline").length;
+
+  // ── JSX ───────────────────────────────────────────────────
   return (
     <div className="admin-page">
-      <div className="admin-bg-grid" />
+      <div className="admin-bg-grid"/>
 
-      {/* ── Header ── */}
+      {/* Header */}
       <div className="admin-header">
         <div className="admin-header-left">
-          <div className="landing-logo-icon">
-            <Icon name="shield-plus" size={18} />
-          </div>
+          <div className="landing-logo-icon"><Icon name="shield-plus" size={18}/></div>
           <div className="admin-title-block">
             <h1 className="admin-title">Admin Dashboard</h1>
-            <p className="admin-sub">
-              Logged in as <strong>{user.fullName}</strong> · Administrator
-            </p>
+            <p className="admin-sub">Logged in as <strong>{user.fullName}</strong> · Administrator</p>
           </div>
         </div>
-
         <div className="admin-header-right">
-          {/* User chip */}
           <div className="user-chip">
-            <div className="user-chip-avatar">
-              {user.fullName?.charAt(0).toUpperCase()}
-            </div>
+            <div className="user-chip-avatar">{user.fullName?.charAt(0).toUpperCase()}</div>
             <div className="user-chip-info">
               <span className="user-chip-name">{user.fullName}</span>
               <span className="user-chip-role">Administrator</span>
             </div>
-            <button
-              className="user-chip-logout"
-              onClick={handleLogout}
-              title="Logout"
-            >
-              <Icon name="log-out" size={15} />
+            <button className="user-chip-logout" onClick={() => { logout(); window.location.href="/"; }} title="Logout">
+              <Icon name="log-out" size={15}/>
             </button>
           </div>
-
-          {/* Export button */}
-          {tab === "records" && (
-            <button
-              className="btn btn-success"
-              onClick={handleExport}
-              disabled={exporting || records.length === 0}
-            >
-              {exporting
-                ? <><span className="login-spinner" />Exporting...</>
-                : <><Icon name="file-text" size={16} />Export to Excel</>
-              }
+          {tab==="records" && (
+            <button className="btn btn-success" disabled={exporting||records.length===0}
+              onClick={()=>{setExport(true);exportRecordsExcel(user.token).finally(()=>setExport(false));}}>
+              {exporting?<><span className="login-spinner"/>Exporting...</>:<><Icon name="file-text" size={16}/>Export Records</>}
+            </button>
+          )}
+          {tab==="users" && (
+            <button className="btn btn-secondary" disabled={exporting||users.length===0}
+              onClick={()=>{setExport(true);exportUsersExcel(user.token).finally(()=>setExport(false));}}>
+              {exporting?<><span className="login-spinner"/>Exporting...</>:<><Icon name="file-text" size={16}/>Export Users</>}
             </button>
           )}
         </div>
       </div>
 
-      {/* ── Stats bar ── */}
+      {/* Stats */}
       <div className="admin-stats-bar">
-        <div className="admin-stat">
-          <span className="admin-stat-val">{records.length}</span>
-          <span className="admin-stat-label">Total Records</span>
-        </div>
-        <div className="admin-stat">
-          <span className="admin-stat-val">{users.length}</span>
-          <span className="admin-stat-label">Registered Users</span>
-        </div>
-        <div className="admin-stat">
-          <span className="admin-stat-val">
-            {records.filter((r) => {
-              const d = new Date(r.createdAt);
-              const now = new Date();
-              return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-            }).length}
-          </span>
-          <span className="admin-stat-label">This Month</span>
-        </div>
-        <div className="admin-stat">
-          <span className="admin-stat-val">
-            {users.filter((u) => u.role === "Field Volunteer").length}
-          </span>
-          <span className="admin-stat-label">Field Volunteers</span>
-        </div>
+        {[
+          {val:records.length,  label:"Total Records"},
+          {val:users.length,    label:"Registered Users"},
+          {val:actCt,           label:"🟢 Active",  color:"#10b981"},
+          {val:idleCt,          label:"🟡 Idle",    color:"#f59e0b"},
+          {val:offCt,           label:"⚫ Offline", color:"#6b7280"},
+          {val:thisMo,          label:"This Month"},
+        ].map(({val,label,color})=>(
+          <div className="admin-stat" key={label}>
+            <span className="admin-stat-val" style={color?{color}:{}}>{val}</span>
+            <span className="admin-stat-label">{label}</span>
+          </div>
+        ))}
       </div>
 
-      {/* ── Toolbar ── */}
+      {/* Toolbar */}
       <div className="admin-toolbar">
         <div className="admin-tabs">
-          <button
-            className={`admin-tab${tab === "records" ? " active" : ""}`}
-            onClick={() => { setTab("records"); setSearch(""); }}
-          >
-            <Icon name="clipboard-list" size={15} />
-            Beneficiary Records
+          <button className={`admin-tab${tab==="records"?" active":""}`}
+            onClick={()=>{setTab("records");setSearch("");}}>
+            <Icon name="clipboard-list" size={15}/>Beneficiary Records
           </button>
-          <button
-            className={`admin-tab${tab === "users" ? " active" : ""}`}
-            onClick={() => { setTab("users"); setSearch(""); }}
-          >
-            <Icon name="users" size={15} />
-            Manage Users
+          <button className={`admin-tab${tab==="users"?" active":""}`} style={{position:"relative"}}
+            onClick={()=>{setTab("users");setSearch("");}}>
+            <Icon name="users" size={15}/>Manage Users
+            {totalUnread>0&&(
+              <span style={{position:"absolute",top:-5,right:-5,background:"#ef4444",color:"white",
+                borderRadius:"999px",fontSize:"0.6rem",fontWeight:800,padding:"0.1rem 0.35rem",
+                border:"2px solid var(--bg)",minWidth:16,textAlign:"center"}}>
+                {totalUnread}
+              </span>
+            )}
           </button>
         </div>
-
-        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", flex: 1, justifyContent: "flex-end" }}>
-          <div className="input-wrapper" style={{ maxWidth: 340, width: "100%" }}>
-            <Icon name="search" size={16} className="input-icon" />
-            <input
-              type="text"
-              placeholder={tab === "records" ? "Search by name, address, volunteer…" : "Search by name or email…"}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{
-                width: "100%", padding: "0.6rem 1rem 0.6rem 2.5rem",
-                background: "var(--input)", border: "1px solid var(--border)",
-                borderRadius: "0.5rem", color: "var(--text)",
-                fontSize: "0.875rem", fontFamily: "inherit",
-              }}
-            />
+        <div style={{display:"flex",gap:"0.75rem",alignItems:"center",flex:1,justifyContent:"flex-end"}}>
+          <div className="input-wrapper" style={{maxWidth:340,width:"100%"}}>
+            <Icon name="search" size={16} className="input-icon"/>
+            <input type="text"
+              placeholder={tab==="records"?"Search records…":"Search users…"}
+              value={search} onChange={(e)=>setSearch(e.target.value)}
+              style={{width:"100%",padding:"0.6rem 1rem 0.6rem 2.5rem",background:"var(--input)",
+                border:"1px solid var(--border)",borderRadius:"0.5rem",
+                color:"var(--text)",fontSize:"0.875rem",fontFamily:"inherit"}}/>
           </div>
-          <button className="btn btn-secondary" onClick={loadData} style={{ flexShrink: 0 }}>
-            <Icon name="refresh-cw" size={15} />
-            Refresh
+          <button className="btn btn-secondary" onClick={loadData} style={{flexShrink:0}}>
+            <Icon name="refresh-cw" size={15}/>Refresh
           </button>
         </div>
       </div>
 
-      {/* ── Error ── */}
-      {error && (
-        <div className="submit-error">
-          <Icon name="x" size={14} />{error}
-        </div>
-      )}
+      {error   && <div className="submit-error"><Icon name="x" size={14}/>{error}</div>}
+      {loading && <div className="admin-loading"><span className="login-spinner" style={{width:20,height:20}}/>Loading...</div>}
 
-      {/* ── Loading ── */}
-      {loading && (
-        <div className="admin-loading">
-          <span className="login-spinner" style={{ width: 20, height: 20 }} />
-          Loading...
-        </div>
-      )}
-
-      {/* ── Records table ── */}
-      {!loading && tab === "records" && (
+      {/* Records table */}
+      {!loading&&tab==="records"&&(
         <div className="admin-table-wrap">
-          {filteredRecords.length === 0 ? (
-            <div className="admin-loading">
-              <Icon name="clipboard-list" size={32} />
-              No records found
-            </div>
-          ) : (
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Gender</th>
-                  <th>Age</th>
-                  <th>Phone</th>
-                  <th>Address</th>
-                  <th>BP</th>
-                  <th>Blood Sugar</th>
-                  <th>BMI</th>
-                  <th>Conditions</th>
-                  <th>Volunteer</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredRecords.map((r) => (
-                  <tr key={r._id}>
-                    <td className="td-name">{r.firstName} {r.lastName}</td>
-                    <td className="td-muted" style={{ textTransform: "capitalize" }}>{r.gender || "—"}</td>
-                    <td className="td-muted">{r.age || "—"}</td>
-                    <td className="td-muted">{r.phone || "—"}</td>
-                    <td className="td-muted">{r.address || "—"}</td>
-                    <td className="td-muted">
-                      {r.bloodPressureSystolic && r.bloodPressureDiastolic
-                        ? `${r.bloodPressureSystolic}/${r.bloodPressureDiastolic}`
-                        : "—"}
-                    </td>
-                    <td className="td-muted">{r.bloodSugar ? `${r.bloodSugar} mg/dL` : "—"}</td>
-                    <td>
-                      {r.bmi
-                        ? <span style={{ color: bmiColor(r.bmi), fontWeight: 700 }}>{r.bmi}</span>
-                        : "—"}
-                    </td>
-                    <td>
-                      {r.conditions?.length
-                        ? r.conditions.map((c) => (
-                          <span key={c} className="tag" style={{ fontSize: "0.68rem", padding: "0.15rem 0.5rem", marginRight: 2 }}>{c}</span>
-                        ))
-                        : "—"}
-                    </td>
-                    <td className="td-muted">{r.submittedBy?.fullName || r.volunteerName || "—"}</td>
-                    <td className="td-muted" style={{ whiteSpace: "nowrap", fontSize: "0.78rem" }}>
-                      {new Date(r.submittedAt || r.createdAt).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+          {fRec.length===0
+            ? <div className="admin-loading"><Icon name="clipboard-list" size={32}/>No records found</div>
+            : <table className="admin-table">
+                <thead><tr>
+                  <th>Name</th><th>Gender</th><th>Age</th><th>Phone</th><th>Address</th>
+                  <th>BP</th><th>Blood Sugar</th><th>BMI</th><th>Conditions</th><th>Volunteer</th><th>Date</th>
+                </tr></thead>
+                <tbody>
+                  {fRec.map((r)=>(
+                    <tr key={r._id}>
+                      <td className="td-name">{r.firstName} {r.lastName}</td>
+                      <td className="td-muted" style={{textTransform:"capitalize"}}>{r.gender||"—"}</td>
+                      <td className="td-muted">{r.age||"—"}</td>
+                      <td className="td-muted">{r.phone||"—"}</td>
+                      <td className="td-muted">{r.address?.full||r.address||"—"}</td>
+                      <td className="td-muted">{r.bloodPressureSystolic&&r.bloodPressureDiastolic?`${r.bloodPressureSystolic}/${r.bloodPressureDiastolic}`:"—"}</td>
+                      <td className="td-muted">{r.bloodSugar?`${r.bloodSugar} mg/dL`:"—"}</td>
+                      <td>{r.bmi?<span style={{color:bmiColor(r.bmi),fontWeight:700}}>{r.bmi}</span>:"—"}</td>
+                      <td>{r.conditions?.length?r.conditions.map((c)=><span key={c} className="tag" style={{fontSize:"0.68rem",padding:"0.15rem 0.5rem",marginRight:2}}>{c}</span>):"—"}</td>
+                      <td className="td-muted">{r.submittedBy?.fullName||r.volunteerName||"—"}</td>
+                      <td className="td-muted" style={{whiteSpace:"nowrap",fontSize:"0.78rem"}}>{new Date(r.submittedAt||r.createdAt).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>}
         </div>
       )}
 
-      {/* ── Users table ── */}
-      {!loading && tab === "users" && (
-        <div className="admin-table-wrap">
-          {filteredUsers.length === 0 ? (
-            <div className="admin-loading">
-              <Icon name="users" size={32} />
-              No users found
-            </div>
-          ) : (
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Joined</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.map((u) => (
-                  <tr key={u._id}>
-                    <td>
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                        <div className="user-chip-avatar" style={{ width: 28, height: 28, fontSize: "0.72rem" }}>
-                          {u.fullName?.charAt(0).toUpperCase()}
-                        </div>
-                        <span className="td-name">{u.fullName}</span>
+      {/* Users tab */}
+      {!loading&&tab==="users"&&(
+        <div style={{display:"flex",gap:"1.25rem",alignItems:"flex-start"}}>
+
+          {/* Table */}
+          <div className="admin-table-wrap" style={{flex:1,minWidth:0}}>
+            {fUsr.length===0
+              ? <div className="admin-loading"><Icon name="users" size={32}/>No users found</div>
+              : <table className="admin-table">
+                  <thead><tr>
+                    <th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Last Seen</th><th>Joined</th><th>Actions</th>
+                  </tr></thead>
+                  <tbody>
+                    {fUsr.map((u)=>{
+                      const st     = statuses[u._id]||u.status||"offline";
+                      const unread = unreadMap[u._id]||0;
+                      const active = chatUser?._id===u._id;
+                      return (
+                        <tr key={u._id}
+                          style={{background:active?"rgba(37,99,235,0.08)":undefined}}>
+                          <td>
+                            <div style={{display:"flex",alignItems:"center",gap:"0.5rem"}}>
+                              <div style={{position:"relative",flexShrink:0}}>
+                                <div className="user-chip-avatar" style={{width:28,height:28,fontSize:"0.72rem"}}>
+                                  {u.fullName?.charAt(0).toUpperCase()}
+                                </div>
+                                <span style={{position:"absolute",bottom:0,right:0,width:8,height:8,
+                                  borderRadius:"50%",background:SC[st],border:"1.5px solid var(--card)"}}/>
+                              </div>
+                              <span className="td-name">{u.fullName}</span>
+                              {/* RED DOT unread badge */}
+                              {unread>0&&(
+                                <span style={{background:"#ef4444",color:"white",borderRadius:"999px",
+                                  fontSize:"0.62rem",fontWeight:800,padding:"0.1rem 0.45rem",
+                                  animation:"pulse 1.4s ease-in-out infinite"}}>
+                                  {unread} new
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="td-muted">{u.email}</td>
+                          <td>
+                            <select value={u.role}
+                              onChange={(e)=>handleRoleChange(u._id,e.target.value)}
+                              className="role-select" disabled={u._id===user._id}
+                              onClick={(e)=>e.stopPropagation()}>
+                              {ROLES.map((r)=><option key={r} value={r}>{r}</option>)}
+                            </select>
+                          </td>
+                          <td>
+                            <span style={{display:"inline-flex",alignItems:"center",gap:"0.35rem",
+                              fontSize:"0.78rem",color:SC[st],fontWeight:600}}>
+                              <span style={{width:7,height:7,borderRadius:"50%",background:SC[st],display:"inline-block"}}/>
+                              {SL[st]}
+                            </span>
+                          </td>
+                          <td className="td-muted" style={{fontSize:"0.75rem"}}>
+                            {u.lastSeen?new Date(u.lastSeen).toLocaleString():"—"}
+                          </td>
+                          <td className="td-muted" style={{fontSize:"0.78rem"}}>
+                            {new Date(u.createdAt).toLocaleDateString()}
+                          </td>
+                          <td>
+                            <div style={{display:"flex",gap:"0.35rem"}}>
+                              {/* Chat icon — red when unread */}
+                              <button className="icon-btn" title="Open chat"
+                                onClick={()=>openChat(u)}
+                                style={{color:unread>0?"#ef4444":"#10b981",position:"relative"}}>
+                                <Icon name="message-circle" size={14}/>
+                                {unread>0&&(
+                                  <span style={{position:"absolute",top:-3,right:-3,width:7,height:7,
+                                    borderRadius:"50%",background:"#ef4444",border:"1px solid var(--card)"}}/>
+                                )}
+                              </button>
+                              {/* Ping */}
+                              <button className="icon-btn" title="Ping user"
+                                style={{color:"#f59e0b"}} onClick={()=>handlePing(u)}>
+                                <Icon name="bell" size={14}/>
+                              </button>
+                              {u._id!==user._id&&(
+                                <button className="icon-btn red" title="Delete user"
+                                  onClick={()=>handleDeleteUser(u._id)}>
+                                  <Icon name="trash-2" size={14}/>
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>}
+          </div>
+
+          {/* Chat panel */}
+          {chatUser&&(
+            <div className="admin-chat-panel">
+              {/* Header */}
+              <div className="admin-chat-header">
+                <div style={{display:"flex",alignItems:"center",gap:"0.6rem",flex:1,minWidth:0}}>
+                  <div style={{position:"relative",flexShrink:0}}>
+                    <div className="user-chip-avatar" style={{width:32,height:32,fontSize:"0.78rem"}}>
+                      {chatUser.fullName?.charAt(0).toUpperCase()}
+                    </div>
+                    <span style={{position:"absolute",bottom:0,right:0,width:9,height:9,
+                      borderRadius:"50%",background:SC[statuses[chatUser._id]||"offline"],
+                      border:"2px solid var(--card)"}}/>
+                  </div>
+                  <div style={{minWidth:0}}>
+                    <div style={{fontWeight:700,fontSize:"0.875rem",
+                      whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
+                      {chatUser.fullName}
+                    </div>
+                    <div style={{fontSize:"0.7rem",color:SC[statuses[chatUser._id]||"offline"]}}>
+                      {SL[statuses[chatUser._id]||"offline"]} · {chatUser.role}
+                    </div>
+                  </div>
+                </div>
+                <div style={{display:"flex",gap:"0.35rem",flexShrink:0}}>
+                  <button className="icon-btn" title="Ping user"
+                    style={{color:"#f59e0b"}} onClick={()=>handlePing(chatUser)}>
+                    <Icon name="bell" size={14}/>
+                  </button>
+                  <button className="icon-btn red" title="Clear all messages"
+                    disabled={clearing||messages.length===0}
+                    style={{opacity:messages.length===0?0.4:1}}
+                    onClick={handleClear}>
+                    {clearing
+                      ? <span className="login-spinner" style={{width:12,height:12}}/>
+                      : <Icon name="trash-2" size={14}/>}
+                  </button>
+                  <button className="icon-btn" title="Close" onClick={closeChat}>
+                    <Icon name="x" size={14}/>
+                  </button>
+                </div>
+              </div>
+
+              {/* Messages */}
+              <div className="admin-chat-messages">
+                {messages.length===0&&(
+                  <div className="chat-empty">
+                    <Icon name="message-circle" size={24}/>
+                    <p>No messages yet</p>
+                  </div>
+                )}
+                {messages.map((m)=>{
+                  const mine = String(m.sender?._id || m.sender) === String(user._id);
+                  return (
+                    <div key={m._id} className={`chat-msg ${mine?"mine":"theirs"}`}>
+                      <div className="chat-bubble">{m.content}</div>
+                      <div className="chat-time">
+                        {new Date(m.createdAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}
+                        {mine&&<span className="chat-read">{m.read?" ✓✓":" ✓"}</span>}
                       </div>
-                    </td>
-                    <td className="td-muted">{u.email}</td>
-                    <td>
-                      <select
-                        value={u.role}
-                        onChange={(e) => handleRoleChange(u._id, e.target.value)}
-                        className="role-select"
-                        disabled={u._id === user._id}
-                      >
-                        {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
-                      </select>
-                    </td>
-                    <td className="td-muted" style={{ fontSize: "0.78rem" }}>
-                      {new Date(u.createdAt).toLocaleDateString()}
-                    </td>
-                    <td>
-                      {u._id !== user._id && (
-                        <button
-                          className="icon-btn red"
-                          onClick={() => handleDeleteUser(u._id)}
-                          title="Delete user"
-                        >
-                          <Icon name="trash-2" size={14} />
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+                  );
+                })}
+                <div ref={bottomRef}/>
+              </div>
+
+              {/* Input */}
+              <div className="chat-input-row">
+                <input className="chat-input"
+                  placeholder={`Message ${chatUser.fullName}…`}
+                  value={chatInput}
+                  onChange={(e)=>setChatIn(e.target.value)}
+                  onKeyDown={(e)=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();handleSend();}}}
+                  maxLength={500} autoFocus/>
+                <button className="chat-send" onClick={handleSend}
+                  disabled={sending||!chatInput.trim()}>
+                  <Icon name="send" size={16}/>
+                </button>
+              </div>
+            </div>
           )}
         </div>
       )}
+    </div>
+  );
+}
+import { useState, useEffect } from "react";
+import Icon from "./Icon";
+import { saveCookieConsent } from "../services/api";
+import { useAuth } from "../context/AuthContext";
+
+export default function CookieBanner() {
+  const { user } = useAuth();
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const consent = localStorage.getItem("bhf_cookie_consent");
+    if (!consent) setVisible(true);
+  }, []);
+
+  const handle = async (accepted) => {
+    localStorage.setItem("bhf_cookie_consent", accepted ? "accepted" : "declined");
+    setVisible(false);
+    if (user) {
+      try { await saveCookieConsent(user.token, accepted); } catch {}
+    }
+  };
+
+  if (!visible) return null;
+
+  return (
+    <div className="cookie-banner">
+      <div className="cookie-banner-inner">
+        <div className="cookie-icon">
+          <Icon name="shield-check" size={18} color="#10b981" />
+        </div>
+        <p className="cookie-text">
+          We use cookies for site functionality and to improve your experience.
+          See our <a href="#" className="cookie-link">Privacy Policy</a>.
+        </p>
+        <div className="cookie-actions">
+          <button className="cookie-btn cookie-decline" onClick={() => handle(false)}>
+            Decline
+          </button>
+          <button className="cookie-btn cookie-accept" onClick={() => handle(true)}>
+            Accept
+          </button>
+        </div>
+        <button className="cookie-dismiss" onClick={() => handle(false)}>
+          <Icon name="x" size={14} />
+        </button>
+      </div>
     </div>
   );
 }
@@ -628,6 +817,202 @@ function Dashboard({ currentStep, setCurrentStep, lang, setLang, dashboardOpen, 
 }
 
 export default Dashboard;
+import { useState, useEffect, useRef } from "react";
+import Icon from "./Icon";
+import { getMessages, sendMessage, getAdminId } from "../services/api";
+import { useAuth } from "../context/AuthContext";
+import { useSocket } from "../hooks/useSocket";
+
+// ── Inner component — only mounts for non-admin users ────────
+function UserChat({ user }) {
+  const [open,     setOpen]    = useState(false);
+  const [messages, setMsgs]    = useState([]);
+  const [input,    setInput]   = useState("");
+  const [adminId,  setAdminId] = useState(null);
+  const [unread,   setUnread]  = useState(0);
+  const [ping,     setPing]    = useState(null);
+  const [cleared,  setCleared] = useState(false);
+
+  const sendingRef  = useRef(false);
+  const bottomRef   = useRef(null);
+  const openRef     = useRef(false);
+  const myIdRef     = useRef(String(user._id));
+  const adminIdRef  = useRef(null);
+
+  useEffect(() => { openRef.current   = open;             }, [open]);
+  useEffect(() => { myIdRef.current   = String(user._id); }, [user._id]);
+  useEffect(() => { adminIdRef.current = adminId;         }, [adminId]);
+
+  // ── Socket ────────────────────────────────────────────────
+  useSocket(user._id, {
+    onMessage: (msg) => {
+      const sid = String(msg.sender?._id   || msg.sender   || "");
+      const rid = String(msg.receiver?._id || msg.receiver || "");
+      const me  = myIdRef.current;
+
+      console.log("[FloatingChat] newMessage", { sid, rid, me, match: sid===me||rid===me });
+
+      if (sid !== me && rid !== me) return;
+
+      setMsgs((prev) => {
+        // Replace my own optimistic with real saved record
+        const optIdx = prev.findIndex(
+          (m) => m._opt && String(m.sender?._id || m.sender) === me && m.content === msg.content
+        );
+        if (optIdx !== -1) {
+          const next = [...prev]; next[optIdx] = msg; return next;
+        }
+        if (prev.find((m) => m._id === msg._id)) return prev;
+        return [...prev, msg];
+      });
+
+      if (!openRef.current && sid !== me) setUnread((u) => u + 1);
+    },
+
+    onPinged: (data) => {
+      setPing(data);
+      setTimeout(() => setPing(null), 6000);
+    },
+
+    onChatCleared: () => {
+      console.log("[FloatingChat] chatCleared — wipe only, no re-fetch");
+      setMsgs([]);
+      setUnread(0);
+      setCleared(true);
+    },
+  });
+
+  // ── Load admin ID once ────────────────────────────────────
+  useEffect(() => {
+    getAdminId(user.token).then((a) => setAdminId(a._id)).catch(() => {});
+  }, [user._id]);
+
+  // ── Load / merge history when chat opens ─────────────────
+  useEffect(() => {
+    if (!open || !adminId) return;
+    if (cleared) { setUnread(0); return; } // admin just cleared — DB is empty, skip fetch
+    setUnread(0);
+    getMessages(user.token, adminId).then((fetched) => {
+      setMsgs((prev) => {
+        const ids   = new Set(fetched.map((m) => m._id));
+        const extra = prev.filter((m) => !m._opt && !ids.has(m._id));
+        return [...fetched, ...extra].sort(
+          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+        );
+      });
+    }).catch(() => {});
+  }, [open, adminId]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // ── Send ──────────────────────────────────────────────────
+  const handleSend = async () => {
+    if (!input.trim() || !adminId || sendingRef.current) return;
+    sendingRef.current = true;
+    setCleared(false);
+    const content = input.trim();
+    setInput("");
+
+    const opt = {
+      _id: "opt-" + Date.now(),
+      sender:   { _id: user._id },
+      receiver: { _id: adminId },
+      content, read: false,
+      createdAt: new Date().toISOString(),
+      _opt: true,
+    };
+    setMsgs((p) => [...p, opt]);
+
+    try {
+      const saved = await sendMessage(user.token, { receiverId: adminId, content });
+      setMsgs((p) => p.map((m) => m._opt ? saved : m));
+    } catch {
+      setMsgs((p) => p.filter((m) => !m._opt));
+    } finally {
+      sendingRef.current = false;
+    }
+  };
+
+  return (
+    <>
+      {ping && (
+        <div className="ping-popup">
+          <Icon name="bell" size={14} />
+          <span>{ping.message}</span>
+        </div>
+      )}
+
+      <button className="chat-fab" onClick={() => setOpen((o) => !o)}>
+        <Icon name="message-circle" size={22} />
+        {unread > 0 && <span className="chat-fab-badge">{unread}</span>}
+      </button>
+
+      {open && (
+        <div className="chat-window">
+          <div className="chat-header">
+            <div className="chat-header-info">
+              <div className="chat-avatar">A</div>
+              <div>
+                <div className="chat-header-name">BHF Support</div>
+                <div className="chat-header-status">Admin</div>
+              </div>
+            </div>
+            <button className="chat-close" onClick={() => setOpen(false)}>
+              <Icon name="x" size={15} />
+            </button>
+          </div>
+
+          <div className="chat-messages">
+            {messages.length === 0 && (
+              <div className="chat-empty">
+                <Icon name="message-circle" size={28} />
+                <p>Send a message to BHF Support</p>
+              </div>
+            )}
+            {messages.map((m) => {
+              const mine = String(m.sender?._id || m.sender) === String(user._id);
+              return (
+                <div key={m._id} className={`chat-msg ${mine ? "mine" : "theirs"}`}>
+                  <div className="chat-bubble">{m.content}</div>
+                  <div className="chat-time">
+                    {new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    {mine && <span className="chat-read">{m.read ? " ✓✓" : " ✓"}</span>}
+                  </div>
+                </div>
+              );
+            })}
+            <div ref={bottomRef} />
+          </div>
+
+          <div className="chat-input-row">
+            <input
+              className="chat-input"
+              placeholder="Type a message..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
+              }}
+              maxLength={500}
+            />
+            <button className="chat-send" onClick={handleSend} disabled={!input.trim()}>
+              <Icon name="send" size={16} />
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+// ── Outer wrapper — returns null for admins without running hooks
+export default function FloatingChat() {
+  const { user } = useAuth();
+  if (!user || user.role === "Administrator") return null;
+  return <UserChat user={user} />;
+}
 import { useState, useEffect, useRef, useCallback } from "react";
 import Icon from "./Icon";
 
@@ -990,26 +1375,69 @@ function LandingPage({ onStart, lang, setLang }) {
 export default LandingPage;
 import {
   Activity, ArrowLeft, ArrowRight, BadgeCheck, BarChart2,
-  Briefcase, Building2, Calculator, Calendar, Check,
+  Bell, Briefcase, Building2, Calculator, Calendar, Check,
   CheckCircle2, ChevronDown, ClipboardList, Droplets,
-  Eye, EyeOff, FileSpreadsheet, Globe, HeartPulse,
-  House, Lock, LogOut, Mail, MapPin, Menu, Phone,
-  Ruler, Scale, ShieldCheck, ShieldPlus, Smartphone,
-  TrendingUp, Trash2, User, UserRound, Users, X,
+  Eye, EyeOff, FileSpreadsheet, FileText, Globe, Hash,
+  HeartPulse, House, Landmark, Lock, LogOut, Mail, MapPin,
+  Menu, MessageCircle, Navigation, Phone, RefreshCw,
+  Ruler, Scale, Send, Server, ShieldCheck, ShieldPlus,
+  Smartphone, TrendingUp, Trash2, User, UserRound, Users, X,
 } from "lucide-react";
 
 const MAP = {
-  "activity": Activity, "arrow-left": ArrowLeft, "arrow-right": ArrowRight,
-  "badge-check": BadgeCheck, "bar-chart-2": BarChart2, "briefcase": Briefcase,
-  "building-2": Building2, "calculator": Calculator, "calendar": Calendar,
-  "check": Check, "check-circle-2": CheckCircle2, "chevron-down": ChevronDown,
-  "clipboard-list": ClipboardList, "droplets": Droplets, "eye": Eye,
-  "eye-off": EyeOff, "file-spreadsheet": FileSpreadsheet, "globe": Globe,
-  "heart-pulse": HeartPulse, "house": House, "lock": Lock, "log-out": LogOut,
-  "mail": Mail, "map-pin": MapPin, "menu": Menu, "phone": Phone,
-  "ruler": Ruler, "scale": Scale, "shield-check": ShieldCheck,
-  "shield-plus": ShieldPlus, "smartphone": Smartphone, "trending-up": TrendingUp,
-  "trash-2": Trash2, "user": User, "user-round": UserRound, "users": Users, "x": X,
+  "activity":        Activity,
+  "arrow-left":      ArrowLeft,
+  "arrow-right":     ArrowRight,
+  "badge-check":     BadgeCheck,
+  "bar-chart-2":     BarChart2,
+  "bell":            Bell,
+  "briefcase":       Briefcase,
+  "building-2":      Building2,
+  "calculator":      Calculator,
+  "calendar":        Calendar,
+  "check":           Check,
+  "check-circle-2":  CheckCircle2,
+  "chevron-down":    ChevronDown,
+  "clipboard-list":  ClipboardList,
+  "droplets":        Droplets,
+  "eye":             Eye,
+  "eye-off":         EyeOff,
+  "file-spreadsheet":FileSpreadsheet,
+  "file-text":       FileText,
+  "globe":           Globe,
+  "hash":            Hash,
+  "heart-pulse":     HeartPulse,
+  "house":           House,
+  "landmark":        Landmark,
+  "lock":            Lock,
+  "log-out":         LogOut,
+  "mail":            Mail,
+  "map-pin":         MapPin,
+  "menu":            Menu,
+  "message-circle":  MessageCircle,
+  "navigation":      Navigation,
+  "phone":           Phone,
+  "refresh-cw":      RefreshCw,
+  "ruler":           Ruler,
+  "scale":           Scale,
+  "send":            Send,
+  "server":          Server,
+  "shield-check":    ShieldCheck,
+  "shield-plus":     ShieldPlus,
+  "smartphone":      Smartphone,
+  "search":          ({ size, color, className, style }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke={color || "currentColor"} strokeWidth={1.75} strokeLinecap="round"
+      strokeLinejoin="round" className={className} style={style}>
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+  ),
+  "trending-up":     TrendingUp,
+  "trash-2":         Trash2,
+  "user":            User,
+  "user-round":      UserRound,
+  "users":           Users,
+  "x":               X,
 };
 
 export default function Icon({ name, size = 18, color, className, style }) {
@@ -1017,7 +1445,6 @@ export default function Icon({ name, size = 18, color, className, style }) {
   if (!C) return <span style={{ display: "inline-block", width: size, height: size }} />;
   return <C size={size} color={color} className={className} style={style} strokeWidth={1.75} />;
 }
-
 import { useState } from "react";
 import Icon from "./Icon";
 import { loginUser, registerUser } from "../services/api";
@@ -1162,6 +1589,7 @@ export default function LoginPage({ onSuccess, onBack, lang = "en" }) {
     </div>
   );
 }
+
 // src/components/ServerWake.jsx
 import { useEffect, useState } from "react";
 import Icon from "./Icon";
@@ -1338,7 +1766,7 @@ export default function ServerWake({ children }) {
 import { useEffect } from "react";
 import Icon from "./Icon";
 import { useNigeriaAddress } from "../hooks/useNigeriaAddress";
-import { AddressFields }     from "./address/AddressFields";
+import { AddressFields } from "./address/AddressFields";
 
 const t = {
   en: {
@@ -1370,25 +1798,22 @@ const t = {
 function Step1({ formData, setFormData, lang }) {
   const i18n = t[lang] || t.en;
 
-  // Plain field handler — unchanged from your original
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  // Address hook — seeded from existing record when editing
-  const { address, handlers, derived } = useNigeriaAddress(
-    formData.address || {}
-  );
+  const { address, handlers, derived } = useNigeriaAddress(formData.address || {});
 
-  // Sync address hook state → parent formData whenever any address field changes
   useEffect(() => {
     setFormData((prev) => ({
       ...prev,
       address: {
         street:   address.street,
+        street2:  address.street2,
         landmark: address.landmark,
         city:     address.city,
         lga:      address.lga,
         state:    address.state,
+        postcode: address.postcode,
         country:  "Nigeria",
         full:     derived.fullAddress,
       },
@@ -1403,17 +1828,14 @@ function Step1({ formData, setFormData, lang }) {
       </h2>
 
       <div className="form-grid">
-
         {/* First Name */}
         <div className="input-group">
           <label htmlFor="firstName">{i18n.firstName}</label>
           <div className="input-wrapper">
             <Icon name="user" size={16} className="input-icon" />
-            <input
-              type="text" id="firstName" name="firstName"
+            <input type="text" id="firstName" name="firstName"
               placeholder={i18n.placeholders.firstName}
-              value={formData.firstName} onChange={handleChange} required
-            />
+              value={formData.firstName} onChange={handleChange} required />
           </div>
         </div>
 
@@ -1422,11 +1844,9 @@ function Step1({ formData, setFormData, lang }) {
           <label htmlFor="lastName">{i18n.lastName}</label>
           <div className="input-wrapper">
             <Icon name="user" size={16} className="input-icon" />
-            <input
-              type="text" id="lastName" name="lastName"
+            <input type="text" id="lastName" name="lastName"
               placeholder={i18n.placeholders.lastName}
-              value={formData.lastName} onChange={handleChange} required
-            />
+              value={formData.lastName} onChange={handleChange} required />
           </div>
         </div>
 
@@ -1435,14 +1855,9 @@ function Step1({ formData, setFormData, lang }) {
           <label htmlFor="gender">{i18n.gender}</label>
           <div className="input-wrapper">
             <Icon name="users" size={16} className="input-icon" />
-            <select
-              id="gender" name="gender"
-              value={formData.gender} onChange={handleChange} required
-            >
+            <select id="gender" name="gender" value={formData.gender} onChange={handleChange} required>
               {i18n.genderOptions.map((opt, i) => (
-                <option key={i} value={i === 0 ? "" : opt.toLowerCase()} disabled={i === 0}>
-                  {opt}
-                </option>
+                <option key={i} value={i === 0 ? "" : opt.toLowerCase()} disabled={i === 0}>{opt}</option>
               ))}
             </select>
             <Icon name="chevron-down" size={14} className="select-arrow" />
@@ -1454,11 +1869,9 @@ function Step1({ formData, setFormData, lang }) {
           <label htmlFor="age">{i18n.age}</label>
           <div className="input-wrapper">
             <Icon name="calendar" size={16} className="input-icon" />
-            <input
-              type="number" id="age" name="age"
+            <input type="number" id="age" name="age"
               placeholder={i18n.placeholders.age} min="1" max="120"
-              value={formData.age} onChange={handleChange} required
-            />
+              value={formData.age} onChange={handleChange} required />
           </div>
         </div>
 
@@ -1467,34 +1880,25 @@ function Step1({ formData, setFormData, lang }) {
           <label htmlFor="phone">{i18n.phone}</label>
           <div className="input-wrapper">
             <Icon name="phone" size={16} className="input-icon" />
-            <input
-              type="tel" id="phone" name="phone"
+            <input type="tel" id="phone" name="phone"
               placeholder={i18n.placeholders.phone}
-              value={formData.phone} onChange={handleChange}
-            />
+              value={formData.phone} onChange={handleChange} />
           </div>
         </div>
 
-        {/* Dynamic Address — replaces the old single address input */}
-        <AddressFields
-          address={address}
-          handlers={handlers}
-          derived={derived}
-        />
+        {/* Address fields */}
+        <AddressFields address={address} handlers={handlers} derived={derived} />
 
         {/* Volunteer Name */}
         <div className="input-group full-width">
           <label htmlFor="volunteerName">{i18n.volunteerName}</label>
           <div className="input-wrapper">
             <Icon name="badge-check" size={16} className="input-icon" />
-            <input
-              type="text" id="volunteerName" name="volunteerName"
+            <input type="text" id="volunteerName" name="volunteerName"
               placeholder={i18n.placeholders.volunteerName}
-              value={formData.volunteerName} onChange={handleChange} required
-            />
+              value={formData.volunteerName} onChange={handleChange} required />
           </div>
         </div>
-
       </div>
     </section>
   );
@@ -1702,1038 +2106,1079 @@ export const useAuth = () => {
   return ctx;
 };
 
-
 export const NIGERIA_ADDRESS_DATA = {
+
   "Abia": {
-    lgas: {
-      "Aba North": ["Aba", "Ariaria", "Eziama", "Obuda"],
-      "Aba South": ["Aba", "Igwebuike", "Nkwoagu", "Obohia"],
-      "Arochukwu": ["Arochukwu", "Ohafia", "Abam", "Ututu"],
-      "Bende": ["Bende", "Uzuakoli", "Isuikwuato", "Ohafia"],
-      "Isuikwuato": ["Isuikwuato", "Uturu", "Ntigha", "Abiriba"],
-      "Isiala Ngwa North": ["Omoba", "Amapu", "Isiala Ngwa", "Ntigha"],
-      "Isiala Ngwa South": ["Okpuala", "Nkwo Ntigha", "Obohia", "Ntigha"],
-      "Obingwa": ["Obingwa", "Umuoha", "Mgboko", "Amaise"],
-      "Ohafia": ["Ohafia", "Abiriba", "Ebem", "Nkporo"],
-      "Osisioma": ["Osisioma", "Umuola", "Eziukwu", "Asa"],
-      "Ugwunagbo": ["Ugwunagbo", "Akwete", "Obete", "Asa"],
-      "Ukwa East": ["Azumini", "Ukwa", "Obete", "Oguta"],
-      "Ukwa West": ["Ohanku", "Ndoki", "Obete", "Asa"],
-      "Umuahia North": ["Umuahia", "Ibeku", "Nkwoagu", "Alaoji"],
-      "Umuahia South": ["Umuahia", "Olokoro", "Ikwuano", "Ntigha"],
-      "Umu Nneochi": ["Umu Nneochi", "Uturu", "Ntigha", "Isuikwuato"]
-    }
+    "Aba North":        ["Aba"],
+    "Aba South":        ["Aba", "Opobo"],
+    "Arochukwu":        ["Arochukwu", "Ohafia"],
+    "Bende":            ["Bende", "Uzuakoli"],
+    "Ikwuano":          ["Ikwuano", "Oloko"],
+    "Isiala Ngwa North":["Isiala Ngwa"],
+    "Isiala Ngwa South":["Isiala Ngwa"],
+    "Isuikwuato":       ["Isuikwuato"],
+    "Obi Ngwa":         ["Obi Ngwa"],
+    "Ohafia":           ["Ohafia", "Abiriba"],
+    "Osisioma":         ["Osisioma"],
+    "Ugwunagbo":        ["Ugwunagbo"],
+    "Ukwa East":        ["Ukwa"],
+    "Ukwa West":        ["Ukwa"],
+    "Umuahia North":    ["Umuahia"],
+    "Umuahia South":    ["Umuahia", "Ibeku"],
+    "Umu Nneochi":      ["Umu Nneochi"],
   },
+
   "Adamawa": {
-    lgas: {
-      "Demsa": ["Demsa", "Lafin", "Dong", "Kiri"],
-      "Fufure": ["Fufure", "Malabu", "Yadim", "Gurin"],
-      "Ganye": ["Ganye", "Sugu", "Mayo-Ine", "Toungo"],
-      "Girei": ["Girei", "Gayama", "Bambal", "Song"],
-      "Gombi": ["Gombi", "Baza", "Birni", "Zumo"],
-      "Guyuk": ["Guyuk", "Toungo", "Daware", "Mbulo"],
-      "Hong": ["Hong", "Garaha", "Wunti", "Daware"],
-      "Jada": ["Jada", "Toungo", "Gurumpawo", "Sugu"],
-      "Lamurde": ["Lamurde", "Yola", "Demsa", "Kiri"],
-      "Madagali": ["Madagali", "Gulak", "Wula", "Bazza"],
-      "Maiha": ["Maiha", "Yola", "Belel", "Malabu"],
-      "Mayo-Belwa": ["Mayo-Belwa", "Toungo", "Jada", "Sugu"],
-      "Michika": ["Michika", "Mubi", "Madagali", "Gulak"],
-      "Mubi North": ["Mubi", "Uba", "Bazza", "Biu"],
-      "Mubi South": ["Mubi", "Uba", "Bazza", "Hong"],
-      "Numan": ["Numan", "Demsa", "Lafin", "Kiri"],
-      "Shelleng": ["Shelleng", "Dong", "Kiri", "Lafin"],
-      "Song": ["Song", "Girei", "Bambal", "Gayama"],
-      "Toungo": ["Toungo", "Jada", "Ganye", "Sugu"],
-      "Yola North": ["Yola", "Jimeta", "Doubeli", "Jambutu"],
-      "Yola South": ["Yola", "Rumde", "Adarawo", "Gwadabawa"]
-    }
+    "Demsa":            ["Demsa"],
+    "Fufure":           ["Fufure"],
+    "Ganye":            ["Ganye"],
+    "Gayuk":            ["Gayuk"],
+    "Gombi":            ["Gombi"],
+    "Grie":             ["Grie"],
+    "Hong":             ["Hong"],
+    "Jada":             ["Jada"],
+    "Lamurde":          ["Lamurde"],
+    "Madagali":         ["Madagali"],
+    "Maiha":            ["Maiha"],
+    "Mayo Belwa":       ["Mayo Belwa"],
+    "Michika":          ["Michika"],
+    "Mubi North":       ["Mubi"],
+    "Mubi South":       ["Mubi"],
+    "Numan":            ["Numan"],
+    "Shelleng":         ["Shelleng"],
+    "Song":             ["Song"],
+    "Toungo":           ["Toungo"],
+    "Yola North":       ["Yola", "Jimeta"],
+    "Yola South":       ["Yola"],
   },
+
   "Akwa Ibom": {
-    lgas: {
-      "Abak": ["Abak", "Ikot Ekpene", "Etim Ekpo", "Ukanafun"],
-      "Eastern Obolo": ["Eket", "Oron", "Uyo", "Ibeno"],
-      "Eket": ["Eket", "Esit Eket", "Ibeno", "Ikot Abasi"],
-      "Esit Eket": ["Eket", "Ibeno", "Ikot Abasi", "Esit"],
-      "Essien Udim": ["Essien Udim", "Ikot Ekpene", "Abak", "Ukanafun"],
-      "Etim Ekpo": ["Abak", "Ikot Ekpene", "Ukanafun", "Etim Ekpo"],
-      "Etinan": ["Etinan", "Nsit Ubium", "Abak", "Ikot Ekpene"],
-      "Ibeno": ["Ibeno", "Eket", "Esit Eket", "Ikot Abasi"],
-      "Ibesikpo Asutan": ["Eket", "Uyo", "Ikot Abasi", "Asutan"],
-      "Ikono": ["Ikono", "Ikot Ekpene", "Abak", "Ukanafun"],
-      "Ikot Abasi": ["Ikot Abasi", "Eket", "Ibeno", "Oron"],
-      "Ikot Ekpene": ["Ikot Ekpene", "Abak", "Essien Udim", "Ukanafun"],
-      "Ini": ["Ini", "Ikot Ekpene", "Abak", "Ukanafun"],
-      "Itu": ["Itu", "Uyo", "Ikot Ekpene", "Nkari"],
-      "Mbo": ["Oron", "Eket", "Mbo", "Ibeno"],
-      "Mkpat Enin": ["Ikot Abasi", "Eket", "Oron", "Enin"],
-      "Nsit Atai": ["Uyo", "Ikot Ekpene", "Abak", "Atai"],
-      "Nsit Ibom": ["Uyo", "Ikot Ekpene", "Abak", "Ibom"],
-      "Nsit Ubium": ["Etinan", "Abak", "Ikot Ekpene", "Ubium"],
-      "Obot Akara": ["Ikot Ekpene", "Abak", "Ukanafun", "Akara"],
-      "Okobo": ["Oron", "Eket", "Ibeno", "Okobo"],
-      "Onna": ["Eket", "Ibeno", "Ikot Abasi", "Onna"],
-      "Oron": ["Oron", "Eket", "Ibeno", "Mbo"],
-      "Oruk Anam": ["Ikot Abasi", "Eket", "Oron", "Anam"],
-      "Ukanafun": ["Ukanafun", "Abak", "Ikot Ekpene", "Essien Udim"],
-      "Uruan": ["Uyo", "Uruan", "Ikot Ekpene", "Itu"],
-      "Urue-Offong/Oruko": ["Oron", "Eket", "Ibeno", "Oruko"],
-      "Uyo": ["Uyo", "Ikot Ekpene", "Abak", "Eket"]
-    }
+    "Abak":             ["Abak"],
+    "Eastern Obolo":    ["Eastern Obolo"],
+    "Eket":             ["Eket"],
+    "Esit Eket":        ["Esit Eket"],
+    "Essien Udim":      ["Essien Udim"],
+    "Etim Ekpo":        ["Etim Ekpo"],
+    "Etinan":           ["Etinan"],
+    "Ibeno":            ["Ibeno"],
+    "Ibesikpo Asutan":  ["Ibesikpo"],
+    "Ibiono Ibom":      ["Ibiono"],
+    "Ika":              ["Ika"],
+    "Ikono":            ["Ikono"],
+    "Ikot Abasi":       ["Ikot Abasi"],
+    "Ikot Ekpene":      ["Ikot Ekpene"],
+    "Ini":              ["Ini"],
+    "Itu":              ["Itu"],
+    "Mbo":              ["Mbo"],
+    "Mkpat Enin":       ["Mkpat Enin"],
+    "Nsit Atai":        ["Nsit Atai"],
+    "Nsit Ibom":        ["Nsit Ibom"],
+    "Nsit Ubium":       ["Nsit Ubium"],
+    "Obot Akara":       ["Obot Akara"],
+    "Okobo":            ["Okobo"],
+    "Onna":             ["Onna"],
+    "Oron":             ["Oron"],
+    "Oruk Anam":        ["Oruk Anam"],
+    "Udung Uko":        ["Udung Uko"],
+    "Ukanafun":         ["Ukanafun"],
+    "Uruan":            ["Uruan"],
+    "Urue Offong/Oruko":["Urue Offong"],
+    "Uyo":              ["Uyo", "Ewet", "Shelter Afrique"],
   },
+
   "Anambra": {
-    lgas: {
-      "Aguata": ["Aguata", "Ekwulobia", "Igboukwu", "Nnewi"],
-      "Anambra East": ["Aguleri", "Umuleri", "Nteje", "Otuocha"],
-      "Anambra West": ["Nzam", "Ezi-Oye", "Molusi", "Ifitedunu"],
-      "Anaocha": ["Adazi-Nnukwu", "Agulu", "Neni", "Ichida"],
-      "Awka North": ["Awka", "Mgbakwu", "Amanuke", "Achalla"],
-      "Awka South": ["Awka", "Amikwo", "Nibo", "Okpuno"],
-      "Ayamelum": ["Anaku", "Igbariam", "Omor", "Ifite-Ogwari"],
-      "Dunukofia": ["Ifite-Dunu", "Ukpo", "Umunnachi", "Nawgu"],
-      "Ekwusigo": ["Ozubulu", "Ichi", "Ekwulobia", "Atani"],
-      "Idemili North": ["Onitsha", "Ogidi", "Nkpor", "Oba"],
-      "Idemili South": ["Ojoto", "Oraukwu", "Alor", "Obosi"],
-      "Ihiala": ["Ihiala", "Nnewi", "Lilu", "Mbosi"],
-      "Njikoka": ["Abagana", "Enugwu-Agidi", "Nawgu", "Nimo"],
-      "Nnewi North": ["Nnewi", "Otolo", "Uruagu", "Umudim"],
-      "Nnewi South": ["Nnewi", "Osumenyi", "Ukpor", "Amichi"],
-      "Ogbaru": ["Atani", "Onitsha", "Oguta", "Ossomala"],
-      "Onitsha North": ["Onitsha", "GRA", "Trans-Ekulu", "Odoakpu"],
-      "Onitsha South": ["Onitsha", "Fegge", "Woliwo", "Inland Town"],
-      "Orumba North": ["Ajalli", "Nanka", "Oko", "Agulu"],
-      "Orumba South": ["Agbudu", "Awgbu", "Nkerechi", "Ufuma"],
-      "Oyi": ["Nteje", "Awkuzu", "Ogbunike", "Umunya"]
-    }
+    "Aguata":           ["Aguata", "Ekwulobia"],
+    "Anambra East":     ["Anambra East"],
+    "Anambra West":     ["Anambra West"],
+    "Anaocha":          ["Anaocha", "Nnewi"],
+    "Awka North":       ["Awka"],
+    "Awka South":       ["Awka", "Amawbia"],
+    "Ayamelum":         ["Ayamelum"],
+    "Dunukofia":        ["Dunukofia"],
+    "Ekwusigo":         ["Ekwusigo", "Ozubulu"],
+    "Idemili North":    ["Onitsha", "Ogidi"],
+    "Idemili South":    ["Ojoto"],
+    "Ihiala":           ["Ihiala", "Nnewi"],
+    "Njikoka":          ["Njikoka", "Enugwu-Ukwu"],
+    "Nnewi North":      ["Nnewi"],
+    "Nnewi South":      ["Nnewi"],
+    "Ogbaru":           ["Ogbaru", "Atani"],
+    "Onitsha North":    ["Onitsha"],
+    "Onitsha South":    ["Onitsha"],
+    "Orumba North":     ["Orumba"],
+    "Orumba South":     ["Orumba"],
+    "Oyi":              ["Oyi", "Nteje"],
   },
+
   "Bauchi": {
-    lgas: {
-      "Alkaleri": ["Alkaleri", "Lame", "Gwaram", "Duguri"],
-      "Bauchi": ["Bauchi", "Wunti", "Birchi", "Miri"],
-      "Bogoro": ["Bogoro", "Tafawa Balewa", "Lere", "Alkaleri"],
-      "Damban": ["Damban", "Gamawa", "Jama'are", "Alkaleri"],
-      "Darazo": ["Darazo", "Biu", "Yakubu", "Kari"],
-      "Dass": ["Dass", "Bogoro", "Tafawa Balewa", "Lere"],
-      "Gamawa": ["Gamawa", "Damban", "Jama'are", "Misau"],
-      "Ganjuwa": ["Ganjuwa", "Bauchi", "Azare", "Misau"],
-      "Giade": ["Giade", "Jama'are", "Misau", "Azare"],
-      "Itas/Gadau": ["Itas", "Gadau", "Azare", "Misau"],
-      "Jama'are": ["Jama'are", "Misau", "Azare", "Gamawa"],
-      "Katagum": ["Azare", "Misau", "Gamawa", "Jama'are"],
-      "Kirfi": ["Kirfi", "Alkaleri", "Lame", "Gwaram"],
-      "Misau": ["Misau", "Azare", "Gamawa", "Jama'are"],
-      "Ningi": ["Ningi", "Alkaleri", "Lame", "Gwaram"],
-      "Shira": ["Shira", "Azare", "Misau", "Gamawa"],
-      "Tafawa Balewa": ["Tafawa Balewa", "Bogoro", "Dass", "Lere"],
-      "Toro": ["Toro", "Bauchi", "Ganjuwa", "Lere"],
-      "Warji": ["Warji", "Azare", "Misau", "Gamawa"],
-      "Zaki": ["Zaki", "Azare", "Misau", "Gamawa"]
-    }
+    "Alkaleri":         ["Alkaleri"],
+    "Bauchi":           ["Bauchi"],
+    "Bogoro":           ["Bogoro"],
+    "Damban":           ["Damban"],
+    "Darazo":           ["Darazo"],
+    "Dass":             ["Dass"],
+    "Gamawa":           ["Gamawa"],
+    "Ganjuwa":          ["Ganjuwa"],
+    "Giade":            ["Giade"],
+    "Itas/Gadau":       ["Itas", "Gadau"],
+    "Jama'are":         ["Jama'are"],
+    "Katagum":          ["Azare"],
+    "Kirfi":            ["Kirfi"],
+    "Misau":            ["Misau"],
+    "Ningi":            ["Ningi"],
+    "Shira":            ["Shira"],
+    "Tafawa Balewa":    ["Tafawa Balewa", "Bauchi"],
+    "Toro":             ["Toro"],
+    "Warji":            ["Warji"],
+    "Zaki":             ["Zaki"],
   },
+
   "Bayelsa": {
-    lgas: {
-      "Brass": ["Brass", "Twon Brass", "Okpoama", "Liama"],
-      "Ekeremor": ["Ekeremor", "Agge", "Oporoma", "Agbere"],
-      "Kolokuma/Opokuma": ["Kaiama", "Kokodiagbene", "Opokuma", "Kolokuma"],
-      "Nembe": ["Nembe", "Bassambiri", "Ogbolomabiri", "Liama"],
-      "Ogbia": ["Ogbia", "Otuabula", "Otuoke", "Anyama"],
-      "Sagbama": ["Sagbama", "Kaiama", "Tungbo", "Agbere"],
-      "Southern Ijaw": ["Burutu", "Patani", "Angalabiri", "Olugbobiri"],
-      "Yenagoa": ["Yenagoa", "Amarata", "Opolo", "Kpansia"]
-    }
+    "Brass":            ["Brass", "Twon-Brass"],
+    "Ekeremor":         ["Ekeremor"],
+    "Kolokuma/Opokuma": ["Kolokuma"],
+    "Nembe":            ["Nembe"],
+    "Ogbia":            ["Ogbia"],
+    "Sagbama":          ["Sagbama"],
+    "Southern Ijaw":    ["Southern Ijaw"],
+    "Yenagoa":          ["Yenagoa", "Amarata", "Opolo", "Kpansia"],
   },
+
   "Benue": {
-    lgas: {
-      "Ado": ["Ado", "Otukpo", "Ogbadibo", "Apa"],
-      "Agatu": ["Agatu", "Otukpo", "Ogbadibo", "Apa"],
-      "Apa": ["Apa", "Otukpo", "Ogbadibo", "Agatu"],
-      "Buruku": ["Buruku", "Gboko", "Tarka", "Guma"],
-      "Gboko": ["Gboko", "Tarka", "Buruku", "Guma"],
-      "Guma": ["Makurdi", "Guma", "Logo", "Buruku"],
-      "Gwer East": ["Yandev", "Naka", "Gwer", "Makurdi"],
-      "Gwer West": ["Naka", "Gwer", "Yandev", "Makurdi"],
-      "Katsina-Ala": ["Katsina-Ala", "Logo", "Ushongo", "Vandeikya"],
-      "Konshisha": ["Konshisha", "Tiv", "Buruku", "Gboko"],
-      "Kwande": ["Adikpo", "Kwande", "Vandeikya", "Ushongo"],
-      "Logo": ["Logo", "Katsina-Ala", "Ushongo", "Vandeikya"],
-      "Makurdi": ["Makurdi", "North Bank", "Wadata", "High Level"],
-      "Obi": ["Obi", "Otukpo", "Ogbadibo", "Apa"],
-      "Ogbadibo": ["Otukpo", "Ogbadibo", "Apa", "Agatu"],
-      "Ohimini": ["Ohimini", "Otukpo", "Ogbadibo", "Apa"],
-      "Oju": ["Oju", "Otukpo", "Ogbadibo", "Apa"],
-      "Okpokwu": ["Otukpo", "Okpokwu", "Apa", "Agatu"],
-      "Otukpo": ["Otukpo", "Adoka", "Ogbadibo", "Okpokwu"],
-      "Tarka": ["Tarka", "Gboko", "Buruku", "Guma"],
-      "Ukum": ["Ukum", "Katsina-Ala", "Logo", "Ushongo"],
-      "Ushongo": ["Ushongo", "Katsina-Ala", "Logo", "Vandeikya"],
-      "Vandeikya": ["Vandeikya", "Kwande", "Ushongo", "Logo"]
-    }
+    "Agatu":            ["Agatu"],
+    "Apa":              ["Apa"],
+    "Ado":              ["Ado"],
+    "Buruku":           ["Buruku"],
+    "Gboko":            ["Gboko"],
+    "Guma":             ["Guma"],
+    "Gwer East":        ["Gwer East"],
+    "Gwer West":        ["Gwer West"],
+    "Katsina-Ala":      ["Katsina-Ala"],
+    "Konshisha":        ["Konshisha"],
+    "Kwande":           ["Kwande"],
+    "Logo":             ["Logo"],
+    "Makurdi":          ["Makurdi", "North Bank", "Wadata"],
+    "Obi":              ["Obi"],
+    "Ogbadibo":         ["Ogbadibo"],
+    "Oju":              ["Oju"],
+    "Okpokwu":          ["Okpokwu"],
+    "Ohimini":          ["Ohimini"],
+    "Oturkpo":          ["Oturkpo"],
+    "Tarka":            ["Tarka"],
+    "Ukum":             ["Ukum"],
+    "Ushongo":          ["Ushongo"],
+    "Vandeikya":        ["Vandeikya"],
   },
+
   "Borno": {
-    lgas: {
-      "Abadam": ["Abadam", "Mobbar", "Guzamala", "Nganzai"],
-      "Askira/Uba": ["Uba", "Askira", "Biu", "Hawul"],
-      "Bama": ["Bama", "Dikwa", "Konduga", "Jere"],
-      "Bayo": ["Bayo", "Hawul", "Kwaya Kusar", "Biu"],
-      "Biu": ["Biu", "Hawul", "Kwaya Kusar", "Shani"],
-      "Chibok": ["Chibok", "Damboa", "Biu", "Hawul"],
-      "Damboa": ["Damboa", "Chibok", "Biu", "Gwoza"],
-      "Dikwa": ["Dikwa", "Bama", "Konduga", "Jere"],
-      "Gubio": ["Gubio", "Nganzai", "Guzamala", "Mobbar"],
-      "Guzamala": ["Guzamala", "Nganzai", "Mobbar", "Abadam"],
-      "Gwoza": ["Gwoza", "Damboa", "Askira/Uba", "Biu"],
-      "Hawul": ["Kwaya Kusar", "Biu", "Hawul", "Shani"],
-      "Jere": ["Maiduguri", "Jere", "Konduga", "Bama"],
-      "Kaga": ["Kaga", "Magumeri", "Nganzai", "Gubio"],
-      "Kala/Balge": ["Kala", "Balge", "Bama", "Dikwa"],
-      "Konduga": ["Konduga", "Bama", "Jere", "Maiduguri"],
-      "Kukawa": ["Kukawa", "Mobbar", "Guzamala", "Nganzai"],
-      "Kwaya Kusar": ["Kwaya Kusar", "Hawul", "Biu", "Shani"],
-      "Mafa": ["Mafa", "Konduga", "Bama", "Dikwa"],
-      "Magumeri": ["Magumeri", "Nganzai", "Gubio", "Kaga"],
-      "Maiduguri": ["Maiduguri", "Bolori", "Gwange", "Old Maiduguri"],
-      "Marte": ["Marte", "Mobbar", "Nganzai", "Guzamala"],
-      "Mobbar": ["Mobbar", "Kukawa", "Guzamala", "Nganzai"],
-      "Monguno": ["Monguno", "Kukawa", "Mobbar", "Nganzai"],
-      "Ngala": ["Ngala", "Dikwa", "Bama", "Kala/Balge"],
-      "Nganzai": ["Nganzai", "Gubio", "Kaga", "Guzamala"],
-      "Shani": ["Shani", "Biu", "Hawul", "Kwaya Kusar"]
-    }
+    "Abadam":           ["Abadam"],
+    "Askira/Uba":       ["Askira", "Uba"],
+    "Bama":             ["Bama"],
+    "Bayo":             ["Bayo"],
+    "Biu":              ["Biu"],
+    "Chibok":           ["Chibok"],
+    "Damboa":           ["Damboa"],
+    "Dikwa":            ["Dikwa"],
+    "Gubio":            ["Gubio"],
+    "Guzamala":         ["Guzamala"],
+    "Gwoza":            ["Gwoza"],
+    "Hawul":            ["Hawul"],
+    "Jere":             ["Bama Road", "Gamboru"],
+    "Kaga":             ["Kaga"],
+    "Kala/Balge":       ["Kala"],
+    "Konduga":          ["Konduga"],
+    "Kukawa":           ["Kukawa"],
+    "Kwaya Kusar":      ["Kwaya Kusar"],
+    "Mafa":             ["Mafa"],
+    "Magumeri":         ["Magumeri"],
+    "Maiduguri":        ["Maiduguri", "Bolori", "Gwange", "GRA", "Wulari"],
+    "Marte":            ["Marte"],
+    "Mobbar":           ["Mobbar"],
+    "Monguno":          ["Monguno"],
+    "Ngala":            ["Ngala"],
+    "Nganzai":          ["Nganzai"],
+    "Shani":            ["Shani"],
   },
+
   "Cross River": {
-    lgas: {
-      "Abi": ["Abi", "Yakurr", "Obubra", "Etung"],
-      "Akamkpa": ["Akamkpa", "Calabar", "Odukpani", "Boki"],
-      "Akpabuyo": ["Calabar", "Akpabuyo", "Odukpani", "Biase"],
-      "Bakassi": ["Bakassi", "Akpabuyo", "Calabar", "Odukpani"],
-      "Bekwarra": ["Bekwarra", "Obanliku", "Obudu", "Ogoja"],
-      "Biase": ["Biase", "Odukpani", "Akpabuyo", "Calabar"],
-      "Boki": ["Boki", "Obanliku", "Etung", "Obudu"],
-      "Calabar Municipal": ["Calabar", "Marian", "Nassarawa", "Diamond"],
-      "Calabar South": ["Calabar", "Nsefik", "Ekorinim", "Henshaw Town"],
-      "Etung": ["Etung", "Abi", "Boki", "Obanliku"],
-      "Ikom": ["Ikom", "Etung", "Boki", "Yala"],
-      "Obanliku": ["Obanliku", "Bekwarra", "Obudu", "Boki"],
-      "Obubra": ["Obubra", "Abi", "Yakurr", "Etung"],
-      "Obudu": ["Obudu", "Bekwarra", "Obanliku", "Boki"],
-      "Odukpani": ["Odukpani", "Calabar", "Akpabuyo", "Biase"],
-      "Ogoja": ["Ogoja", "Yala", "Bekwarra", "Obanliku"],
-      "Yakurr": ["Yakurr", "Abi", "Obubra", "Etung"],
-      "Yala": ["Yala", "Ogoja", "Bekwarra", "Ikom"]
-    }
+    "Abi":              ["Abi"],
+    "Akamkpa":          ["Akamkpa"],
+    "Akpabuyo":         ["Akpabuyo"],
+    "Bakassi":          ["Bakassi"],
+    "Bekwarra":         ["Bekwarra"],
+    "Biase":            ["Biase"],
+    "Boki":             ["Boki"],
+    "Calabar Municipal":["Calabar", "Marian", "Nassarawa", "Diamond Hill"],
+    "Calabar South":    ["Calabar", "Henshaw Town", "Ikot Ansa"],
+    "Etung":            ["Etung"],
+    "Ikom":             ["Ikom"],
+    "Obanliku":         ["Obanliku"],
+    "Obubra":           ["Obubra"],
+    "Obudu":            ["Obudu"],
+    "Odukpani":         ["Odukpani"],
+    "Ogoja":            ["Ogoja"],
+    "Yakurr":           ["Ugep"],
+    "Yala":             ["Yala"],
   },
+
   "Delta": {
-    lgas: {
-      "Aniocha North": ["Issele-Uku", "Ogwashi-Uku", "Ubulu-Uku", "Onicha-Olona"],
-      "Aniocha South": ["Ogwashi-Uku", "Ubulu-Uku", "Issele-Uku", "Asaba"],
-      "Bomadi": ["Bomadi", "Burutu", "Patani", "Ughelli"],
-      "Burutu": ["Burutu", "Patani", "Bomadi", "Ughelli"],
-      "Ethiope East": ["Abraka", "Oghareki", "Oria", "Asaba"],
-      "Ethiope West": ["Oghara", "Eku", "Mosogar", "Abraka"],
-      "Ika North East": ["Agbor", "Abavo", "Owhelogbo", "Ute-Okpu"],
-      "Ika South": ["Agbor", "Owa-Oyibu", "Owa-Alero", "Abavo"],
-      "Isoko North": ["Oleh", "Ozoro", "Emevor", "Aviara"],
-      "Isoko South": ["Oleh", "Ozoro", "Emevor", "Emede"],
-      "Ndokwa East": ["Ashaka", "Ase", "Kwale", "Abbi"],
-      "Ndokwa West": ["Kwale", "Abbi", "Ashaka", "Aboh"],
-      "Okpe": ["Sapele", "Ugolo", "Mosogar", "Oghara"],
-      "Oshimili North": ["Asaba", "Ibusa", "Oko", "Ogwashi-Uku"],
-      "Oshimili South": ["Asaba", "Ibusa", "Oko", "Ogwashi-Uku"],
-      "Patani": ["Patani", "Burutu", "Bomadi", "Ughelli"],
-      "Sapele": ["Sapele", "Ogorode", "Amukpe", "Ugboro"],
-      "Udu": ["Udu", "Warri", "Uvwie", "Effurun"],
-      "Ughelli North": ["Ughelli", "Orogun", "Otu-Jeremi", "Agbarho"],
-      "Ughelli South": ["Ughelli", "Orogun", "Otu-Jeremi", "Agbarho"],
-      "Ukwuani": ["Kwale", "Abbi", "Ashaka", "Aboh"],
-      "Uvwie": ["Effurun", "Warri", "Udu", "Uvwie"],
-      "Warri North": ["Warri", "Koko", "Sapele", "Burutu"],
-      "Warri South": ["Warri", "Effurun", "Udu", "Uvwie"],
-      "Warri South West": ["Warri", "Burutu", "Sapele", "Koko"]
-    }
+    "Aniocha North":    ["Aniocha", "Issele-Uku"],
+    "Aniocha South":    ["Aniocha", "Ogwashi-Uku"],
+    "Bomadi":           ["Bomadi"],
+    "Burutu":           ["Burutu"],
+    "Ethiope East":     ["Ethiope", "Ughelli"],
+    "Ethiope West":     ["Oghara"],
+    "Ika North East":   ["Agbor"],
+    "Ika South":        ["Agbor"],
+    "Isoko North":      ["Isoko"],
+    "Isoko South":      ["Oleh"],
+    "Ndokwa East":      ["Ndokwa"],
+    "Ndokwa West":      ["Kwale"],
+    "Okpe":             ["Okpe", "Sapele"],
+    "Oshimili North":   ["Asaba"],
+    "Oshimili South":   ["Asaba", "GRA", "Cable Point"],
+    "Patani":           ["Patani"],
+    "Sapele":           ["Sapele", "Ogorode", "Amukpe"],
+    "Udu":              ["Udu", "Effurun"],
+    "Ughelli North":    ["Ughelli"],
+    "Ughelli South":    ["Ughelli"],
+    "Ukwuani":          ["Ukwuani", "Aboh"],
+    "Uvwie":            ["Uvwie", "Effurun"],
+    "Warri Central":    ["Warri", "Okumagba"],
+    "Warri North":      ["Warri"],
+    "Warri South":      ["Warri", "GRA", "Igbudu", "Pessu"],
+    "Warri South West": ["Warri"],
   },
+
   "Ebonyi": {
-    lgas: {
-      "Abakaliki": ["Abakaliki", "Kpirikpiri", "Nkwagu", "Amasiri"],
-      "Afikpo North": ["Afikpo", "Isu", "Mgbo", "Edda"],
-      "Afikpo South": ["Afikpo", "Isu", "Mgbo", "Edda"],
-      "Ebonyi": ["Ebonyi", "Abakaliki", "Nkwagu", "Amasiri"],
-      "Ezza North": ["Ezza", "Abakaliki", "Nkwagu", "Amasiri"],
-      "Ezza South": ["Ezza", "Abakaliki", "Nkwagu", "Amasiri"],
-      "Ikwo": ["Ikwo", "Abakaliki", "Nkwagu", "Amasiri"],
-      "Ishielu": ["Ishielu", "Abakaliki", "Nkwagu", "Amasiri"],
-      "Ivo": ["Ivo", "Afikpo", "Isu", "Mgbo"],
-      "Izzi": ["Izzi", "Abakaliki", "Nkwagu", "Amasiri"],
-      "Ohaozara": ["Ohaozara", "Afikpo", "Isu", "Mgbo"],
-      "Ohaukwu": ["Ohaukwu", "Abakaliki", "Nkwagu", "Amasiri"],
-      "Onicha": ["Onicha", "Afikpo", "Isu", "Mgbo"]
-    }
+    "Abakaliki":        ["Abakaliki", "GRA", "Kpirikpiri"],
+    "Afikpo North":     ["Afikpo"],
+    "Afikpo South":     ["Afikpo"],
+    "Ebonyi":           ["Ebonyi"],
+    "Ezza North":       ["Ezza"],
+    "Ezza South":       ["Ezza"],
+    "Ikwo":             ["Ikwo"],
+    "Ishielu":          ["Ishielu"],
+    "Ivo":              ["Ivo"],
+    "Izzi":             ["Izzi"],
+    "Ohaozara":         ["Ohaozara"],
+    "Ohaukwu":          ["Ohaukwu"],
+    "Onicha":           ["Onicha"],
   },
+
   "Edo": {
-    lgas: {
-      "Akoko-Edo": ["Akoko-Edo", "Benin City", "Etsako", "Owan"],
-      "Egor": ["Benin City", "Egor", "Ikpoba-Okha", "Ovia"],
-      "Esan Central": ["Irrua", "Uromi", "Esan", "Benin City"],
-      "Esan North East": ["Uromi", "Irrua", "Esan", "Benin City"],
-      "Esan South East": ["Ubiaja", "Esan", "Irrua", "Benin City"],
-      "Esan West": ["Ekpoma", "Esan", "Irrua", "Benin City"],
-      "Etsako Central": ["Auchi", "Etsako", "Akoko-Edo", "Owan"],
-      "Etsako East": ["Auchi", "Etsako", "Akoko-Edo", "Owan"],
-      "Etsako West": ["Auchi", "Fugar", "Etsako", "Akoko-Edo"],
-      "Igueben": ["Igueben", "Ekpoma", "Esan", "Benin City"],
-      "Ikpoba-Okha": ["Benin City", "Ikpoba-Okha", "Egor", "Ovia"],
-      "Orhionmwon": ["Benin City", "Orhionmwon", "Ovia", "Egor"],
-      "Oredo": ["Benin City", "GRA", "Ring Road", "Sapele Road"],
-      "Ovia North East": ["Iguosa", "Ovia", "Benin City", "Egor"],
-      "Ovia South West": ["Ovia", "Iguosa", "Benin City", "Egor"],
-      "Owan East": ["Owan", "Auchi", "Etsako", "Akoko-Edo"],
-      "Owan West": ["Owan", "Auchi", "Etsako", "Akoko-Edo"],
-      "Uhunmwonde": ["Benin City", "Uhunmwonde", "Egor", "Ikpoba-Okha"]
-    }
+    "Akoko-Edo":        ["Akoko-Edo", "Igarra"],
+    "Egor":             ["Benin City", "Uselu", "Ugbowo"],
+    "Esan Central":     ["Ekpoma"],
+    "Esan North East":  ["Uromi"],
+    "Esan South East":  ["Ubiaja"],
+    "Esan West":        ["Ekpoma"],
+    "Etsako Central":   ["Fugar"],
+    "Etsako East":      ["Auchi"],
+    "Etsako West":      ["Auchi"],
+    "Igueben":          ["Igueben"],
+    "Ikpoba Okha":      ["Benin City", "Aduwawa", "Ikpoba Hill"],
+    "Oredo":            ["Benin City", "GRA", "Ring Road", "New Benin"],
+    "Orhionmwon":       ["Orhionmwon"],
+    "Ovia North East":  ["Ovia", "Sapele Road"],
+    "Ovia South West":  ["Ovia"],
+    "Owan East":        ["Owan"],
+    "Owan West":        ["Owan"],
+    "Uhunmwonde":       ["Uhunmwonde"],
   },
+
   "Ekiti": {
-    lgas: {
-      "Ado Ekiti": ["Ado Ekiti", "Basiri", "Ijigbo", "Oke-Ila"],
-      "Efon": ["Efon-Alaaye", "Ado Ekiti", "Emure", "Ekiti"],
-      "Ekiti East": ["Omuo Ekiti", "Ado Ekiti", "Ikere", "Oye"],
-      "Ekiti South West": ["Aramoko", "Ado Ekiti", "Ikere", "Oye"],
-      "Ekiti West": ["Aramoko", "Ado Ekiti", "Ikere", "Oye"],
-      "Emure": ["Emure-Ekiti", "Ado Ekiti", "Ikere", "Oye"],
-      "Gbonyin": ["Ise-Ekiti", "Ado Ekiti", "Ikere", "Oye"],
-      "Ido/Osi": ["Ido-Ekiti", "Ado Ekiti", "Ikere", "Oye"],
-      "Ijero": ["Ijero-Ekiti", "Ado Ekiti", "Ikere", "Oye"],
-      "Ikere": ["Ikere-Ekiti", "Ado Ekiti", "Oye", "Emure"],
-      "Ikole": ["Ikole-Ekiti", "Ado Ekiti", "Ikere", "Oye"],
-      "Ilejemeje": ["Ilejemeje", "Ado Ekiti", "Ikere", "Oye"],
-      "Irepodun/Ifelodun": ["Irepodun", "Ado Ekiti", "Ikere", "Oye"],
-      "Ise/Orun": ["Ise-Ekiti", "Ado Ekiti", "Ikere", "Oye"],
-      "Moba": ["Otun-Ekiti", "Ado Ekiti", "Ikere", "Oye"],
-      "Oye": ["Oye-Ekiti", "Ado Ekiti", "Ikere", "Emure"]
-    }
+    "Ado Ekiti":        ["Ado Ekiti", "Basiri", "GRA", "Ijigbo"],
+    "Efon":             ["Efon-Alaaye"],
+    "Ekiti East":       ["Omuo Ekiti"],
+    "Ekiti South West": ["Ilawe Ekiti"],
+    "Ekiti West":       ["Aramoko Ekiti"],
+    "Emure":            ["Emure Ekiti"],
+    "Gbonyin":          ["Ise Ekiti"],
+    "Ido/Osi":          ["Osi"],
+    "Ijero":            ["Ijero Ekiti"],
+    "Ikere":            ["Ikere Ekiti"],
+    "Ikole":            ["Ikole Ekiti"],
+    "Ilejemeje":        ["Ilejemeje"],
+    "Irepodun/Ifelodun":["Irepodun"],
+    "Ise/Orun":         ["Ise Ekiti"],
+    "Moba":             ["Otun Ekiti"],
+    "Oye":              ["Oye Ekiti"],
   },
+
   "Enugu": {
-    lgas: {
-      "Aninri": ["Aninri", "Awgu", "Oji River", "Udi"],
-      "Awgu": ["Awgu", "Oji River", "Udi", "Enugu"],
-      "Enugu East": ["Enugu", "Independence Layout", "New Haven", "Trans-Ekulu"],
-      "Enugu North": ["Enugu", "Achara Layout", "Ogui", "Coal Camp"],
-      "Enugu South": ["Enugu", "Asata", "Abakpa", "Nike"],
-      "Ezeagu": ["Ezeagu", "Oji River", "Udi", "Enugu"],
-      "Igbo Etiti": ["Igbo-Etiti", "Obollo-Afor", "Opi", "Enugu"],
-      "Igbo Eze North": ["Obollo-Afor", "Enugu", "Opi", "Igbo Eze"],
-      "Igbo Eze South": ["Obollo-Afor", "Enugu", "Opi", "Igbo Eze"],
-      "Isi Uzo": ["Isi Uzo", "Enugu", "Opi", "Igbo Eze"],
-      "Nkanu East": ["Nkanu", "Enugu", "Abakpa", "Nike"],
-      "Nkanu West": ["Nkanu", "Enugu", "Abakpa", "Nike"],
-      "Nsukka": ["Nsukka", "Enugu", "Opi", "Igbo Eze"],
-      "Oji River": ["Oji River", "Awgu", "Udi", "Enugu"],
-      "Udenu": ["Udenu", "Obollo-Afor", "Enugu", "Opi"],
-      "Udi": ["Udi", "Awgu", "Oji River", "Enugu"],
-      "Uzo Uwani": ["Uzo Uwani", "Enugu", "Opi", "Igbo Eze"]
-    }
+    "Aninri":           ["Aninri", "Nkerefi"],
+    "Awgu":             ["Awgu"],
+    "Enugu East":       ["Enugu", "Trans-Ekulu", "Abakpa"],
+    "Enugu North":      ["Enugu", "Coal Camp", "Ogui", "Achara Layout"],
+    "Enugu South":      ["Enugu", "New Haven", "GRA", "Asata"],
+    "Ezeagu":           ["Ezeagu"],
+    "Igbo Etiti":       ["Igbo Etiti", "Ogbede"],
+    "Igbo Eze North":   ["Igbo Eze", "Obollo-Afor"],
+    "Igbo Eze South":   ["Igbo Eze"],
+    "Isi Uzo":          ["Isi Uzo"],
+    "Nkanu East":       ["Nkanu", "Mbeeli"],
+    "Nkanu West":       ["Nkanu"],
+    "Nsukka":           ["Nsukka"],
+    "Oji River":        ["Oji River"],
+    "Udenu":            ["Udenu", "Obollo-Afor"],
+    "Udi":              ["Udi"],
+    "Uzo Uwani":        ["Uzo Uwani"],
   },
+
   "FCT": {
-    lgas: {
-      "Abaji": ["Abaji", "Abuja", "Gwagwalada", "Kuje"],
-      "Bwari": ["Bwari", "Abuja", "Gwagwalada", "Kuje"],
-      "Gwagwalada": ["Gwagwalada", "Abuja", "Bwari", "Kuje"],
-      "Kuje": ["Kuje", "Abuja", "Gwagwalada", "Bwari"],
-      "Kwali": ["Kwali", "Abuja", "Gwagwalada", "Kuje"],
-      "Municipal Area Council": ["Abuja", "Garki", "Wuse", "Maitama", "Asokoro", "Gwarinpa", "Kubwa", "Nyanya", "Karu"]
-    }
+    "Abaji":            ["Abaji", "Yaba", "Nuku"],
+    "Bwari":            ["Bwari", "Ushafa", "Dutse", "Kawu"],
+    "Gwagwalada":       ["Gwagwalada", "Dobi", "Gwako"],
+    "Kuje":             ["Kuje", "Chibiri", "Rubochi"],
+    "Kwali":            ["Kwali", "Pai", "Yangoji"],
+    "Municipal Area Council": [
+      "Abuja CBD", "Garki", "Wuse", "Wuse 2", "Maitama",
+      "Asokoro", "Gwarinpa", "Kubwa", "Nyanya", "Karu",
+      "Lugbe", "Galadimawa", "Lokogoma", "Apo", "Gudu",
+      "Jabi", "Wuye", "Utako", "Katampe", "Deidei",
+    ],
   },
+
   "Gombe": {
-    lgas: {
-      "Akko": ["Gombe", "Akko", "Nafada", "Yamaltu"],
-      "Balanga": ["Balanga", "Gombe", "Nafada", "Yamaltu"],
-      "Billiri": ["Billiri", "Gombe", "Nafada", "Yamaltu"],
-      "Dukku": ["Dukku", "Gombe", "Nafada", "Yamaltu"],
-      "Funakaye": ["Bajoga", "Gombe", "Nafada", "Yamaltu"],
-      "Gombe": ["Gombe", "Deba", "Pantami", "Tumfure"],
-      "Kaltungo": ["Kaltungo", "Gombe", "Nafada", "Yamaltu"],
-      "Kwami": ["Kwami", "Gombe", "Nafada", "Yamaltu"],
-      "Nafada": ["Nafada", "Gombe", "Dukku", "Yamaltu"],
-      "Shongom": ["Shongom", "Gombe", "Nafada", "Yamaltu"],
-      "Yamaltu/Deba": ["Yamaltu", "Deba", "Gombe", "Nafada"]
-    }
+    "Akko":             ["Gombe", "Kumo"],
+    "Balanga":          ["Balanga"],
+    "Billiri":          ["Billiri"],
+    "Dukku":            ["Dukku"],
+    "Funakaye":         ["Funakaye", "Bajoga"],
+    "Gombe":            ["Gombe", "Pantami", "Tumfure", "GRA"],
+    "Kaltungo":         ["Kaltungo"],
+    "Kwami":            ["Kwami"],
+    "Nafada":           ["Nafada"],
+    "Shongom":          ["Shongom"],
+    "Yamaltu/Deba":     ["Yamaltu"],
   },
+
   "Imo": {
-    lgas: {
-      "Aboh Mbaise": ["Aboh Mbaise", "Owerri", "Mbaise", "Ahiazu"],
-      "Ahiazu Mbaise": ["Ahiazu", "Owerri", "Mbaise", "Aboh"],
-      "Ehime Mbano": ["Ehime Mbano", "Owerri", "Mbaise", "Ikeduru"],
-      "Ezinihitte": ["Ezinihitte", "Owerri", "Mbaise", "Ahiazu"],
-      "Ideato North": ["Ideato", "Orlu", "Orsu", "Imo"],
-      "Ideato South": ["Ideato", "Orlu", "Orsu", "Imo"],
-      "Ihitte/Uboma": ["Ihitte", "Owerri", "Mbaise", "Ikeduru"],
-      "Ikeduru": ["Ikeduru", "Owerri", "Mbaise", "Aboh"],
-      "Isiala Mbano": ["Isiala Mbano", "Owerri", "Mbaise", "Ikeduru"],
-      "Isu": ["Isu", "Orlu", "Orsu", "Imo"],
-      "Mbaitoli": ["Mbaitoli", "Owerri", "Mbaise", "Ikeduru"],
-      "Ngor Okpala": ["Ngor Okpala", "Owerri", "Mbaise", "Ikeduru"],
-      "Njaba": ["Njaba", "Orlu", "Orsu", "Imo"],
-      "Nkwerre": ["Nkwerre", "Orlu", "Orsu", "Imo"],
-      "Nwangele": ["Nwangele", "Orlu", "Orsu", "Imo"],
-      "Obowo": ["Obowo", "Owerri", "Mbaise", "Ikeduru"],
-      "Oguta": ["Oguta", "Owerri", "Mbaise", "Ikeduru"],
-      "Ohaji/Egbema": ["Ohaji", "Owerri", "Mbaise", "Ikeduru"],
-      "Okigwe": ["Okigwe", "Owerri", "Mbaise", "Ikeduru"],
-      "Onuimo": ["Onuimo", "Orlu", "Orsu", "Imo"],
-      "Orlu": ["Orlu", "Imo", "Orsu", "Isu"],
-      "Orsu": ["Orsu", "Orlu", "Imo", "Isu"],
-      "Oru East": ["Mgbidi", "Orlu", "Orsu", "Imo"],
-      "Oru West": ["Oru", "Orlu", "Orsu", "Imo"],
-      "Owerri Municipal": ["Owerri", "Ikenegbu", "Orji", "Aladinma"],
-      "Owerri North": ["Owerri", "Ikenegbu", "Orji", "Aladinma"],
-      "Owerri West": ["Owerri", "Ikenegbu", "Orji", "Aladinma"]
-    }
+    "Aboh Mbaise":      ["Aboh Mbaise"],
+    "Ahiazu Mbaise":    ["Ahiazu Mbaise"],
+    "Ehime Mbano":      ["Ehime Mbano"],
+    "Ezinihitte":       ["Ezinihitte"],
+    "Ideato North":     ["Ideato"],
+    "Ideato South":     ["Ideato"],
+    "Ihitte/Uboma":     ["Ihitte"],
+    "Ikeduru":          ["Ikeduru", "Iho"],
+    "Isiala Mbano":     ["Isiala Mbano"],
+    "Isu":              ["Isu"],
+    "Mbaitoli":         ["Mbaitoli", "Nwaorieubi"],
+    "Ngor Okpala":      ["Ngor Okpala"],
+    "Njaba":            ["Njaba"],
+    "Nkwerre":          ["Nkwerre"],
+    "Nwangele":         ["Nwangele"],
+    "Obowo":            ["Obowo"],
+    "Oguta":            ["Oguta"],
+    "Ohaji/Egbema":     ["Ohaji"],
+    "Okigwe":           ["Okigwe"],
+    "Onuimo":           ["Onuimo"],
+    "Orlu":             ["Orlu"],
+    "Orsu":             ["Orsu"],
+    "Oru East":         ["Oru East"],
+    "Oru West":         ["Mgbidi"],
+    "Owerri Municipal": ["Owerri", "Aladinma", "GRA", "World Bank"],
+    "Owerri North":     ["Owerri", "Avu"],
+    "Owerri West":      ["Owerri", "Oguta Road"],
   },
+
   "Jigawa": {
-    lgas: {
-      "Auyo": ["Auyo", "Hadejia", "Kafin Hausa", "Gumel"],
-      "Babura": ["Babura", "Gumel", "Hadejia", "Dutse"],
-      "Biriniwa": ["Biriniwa", "Hadejia", "Kafin Hausa", "Gumel"],
-      "Birnin Kudu": ["Birnin Kudu", "Dutse", "Gwaram", "Kafin Hausa"],
-      "Buji": ["Buji", "Dutse", "Gwaram", "Kafin Hausa"],
-      "Dutse": ["Dutse", "Birnin Kudu", "Gwaram", "Kafin Hausa"],
-      "Gagarawa": ["Gagarawa", "Hadejia", "Gumel", "Dutse"],
-      "Garki": ["Garki", "Dutse", "Gwaram", "Kafin Hausa"],
-      "Gumel": ["Gumel", "Hadejia", "Kafin Hausa", "Babura"],
-      "Guri": ["Guri", "Hadejia", "Kafin Hausa", "Gumel"],
-      "Gwaram": ["Gwaram", "Dutse", "Birnin Kudu", "Kafin Hausa"],
-      "Gwiwa": ["Gwiwa", "Dutse", "Gwaram", "Kafin Hausa"],
-      "Hadejia": ["Hadejia", "Gumel", "Kafin Hausa", "Dutse"],
-      "Jahun": ["Jahun", "Dutse", "Gwaram", "Kafin Hausa"],
-      "Kafin Hausa": ["Kafin Hausa", "Hadejia", "Gumel", "Dutse"],
-      "Kaugama": ["Kaugama", "Hadejia", "Gumel", "Dutse"],
-      "Kazaure": ["Kazaure", "Gumel", "Hadejia", "Dutse"],
-      "Kiri Kasama": ["Kiri Kasama", "Hadejia", "Gumel", "Dutse"],
-      "Kiyawa": ["Kiyawa", "Dutse", "Gwaram", "Kafin Hausa"],
-      "Maigatari": ["Maigatari", "Hadejia", "Gumel", "Dutse"],
-      "Malam Madori": ["Malam Madori", "Hadejia", "Gumel", "Dutse"],
-      "Miga": ["Miga", "Dutse", "Gwaram", "Kafin Hausa"],
-      "Ringim": ["Ringim", "Dutse", "Gwaram", "Kafin Hausa"],
-      "Roni": ["Roni", "Dutse", "Gwaram", "Kafin Hausa"],
-      "Sule Tankarkar": ["Sule Tankarkar", "Dutse", "Gwaram", "Kafin Hausa"],
-      "Taura": ["Taura", "Dutse", "Gwaram", "Kafin Hausa"],
-      "Yankwashi": ["Yankwashi", "Dutse", "Gwaram", "Kafin Hausa"]
-    }
+    "Auyo":             ["Auyo"],
+    "Babura":           ["Babura"],
+    "Biriniwa":         ["Biriniwa"],
+    "Birnin Kudu":      ["Birnin Kudu"],
+    "Buji":             ["Buji"],
+    "Dutse":            ["Dutse", "GRA", "New Layout"],
+    "Gagarawa":         ["Gagarawa"],
+    "Garki":            ["Garki"],
+    "Gumel":            ["Gumel"],
+    "Guri":             ["Guri"],
+    "Gwaram":           ["Gwaram"],
+    "Gwiwa":            ["Gwiwa"],
+    "Hadejia":          ["Hadejia"],
+    "Jahun":            ["Jahun"],
+    "Kafin Hausa":      ["Kafin Hausa"],
+    "Kaugama":          ["Kaugama"],
+    "Kazaure":          ["Kazaure"],
+    "Kiri Kasama":      ["Kiri Kasama"],
+    "Kiyawa":           ["Kiyawa"],
+    "Maigatari":        ["Maigatari"],
+    "Malam Madori":     ["Malam Madori"],
+    "Miga":             ["Miga"],
+    "Ringim":           ["Ringim"],
+    "Roni":             ["Roni"],
+    "Sule Tankarkar":   ["Sule Tankarkar"],
+    "Taura":            ["Taura"],
+    "Yankwashi":        ["Yankwashi"],
   },
+
   "Kaduna": {
-    lgas: {
-      "Birnin Gwari": ["Birnin Gwari", "Kaduna", "Zaria", "Soba"],
-      "Chikun": ["Kaduna", "Chikun", "Zaria", "Igabi"],
-      "Giwa": ["Giwa", "Zaria", "Kaduna", "Igabi"],
-      "Igabi": ["Kaduna", "Igabi", "Zaria", "Chikun"],
-      "Ikara": ["Ikara", "Zaria", "Kaduna", "Kubau"],
-      "Jaba": ["Jaba", "Kaduna", "Zaria", "Jema'a"],
-      "Jema'a": ["Kafanchan", "Jema'a", "Kaduna", "Jaba"],
-      "Kachia": ["Kachia", "Kaduna", "Zaria", "Chikun"],
-      "Kaduna North": ["Kaduna", "Rigasa", "Ungwan Rimi", "Badiko"],
-      "Kaduna South": ["Kaduna", "Tudun Wada", "Kabala", "Television"],
-      "Kagarko": ["Kagarko", "Kaduna", "Zaria", "Kachia"],
-      "Kajuru": ["Kajuru", "Kaduna", "Zaria", "Chikun"],
-      "Kaura": ["Kaura", "Kaduna", "Zaria", "Jema'a"],
-      "Kauru": ["Kauru", "Zaria", "Kaduna", "Kubau"],
-      "Kubau": ["Kubau", "Zaria", "Kaduna", "Kauru"],
-      "Kudan": ["Kudan", "Zaria", "Kaduna", "Giwa"],
-      "Lere": ["Lere", "Kaduna", "Zaria", "Kachia"],
-      "Makarfi": ["Makarfi", "Zaria", "Kaduna", "Kubau"],
-      "Sabon Gari": ["Zaria", "Sabon Gari", "Kaduna", "Giwa"],
-      "Sanga": ["Sanga", "Kaduna", "Zaria", "Jema'a"],
-      "Soba": ["Soba", "Zaria", "Kaduna", "Kubau"],
-      "Zangon Kataf": ["Zangon Kataf", "Kaduna", "Zaria", "Jema'a"],
-      "Zaria": ["Zaria", "Sabon Gari", "Tudun Wada", "Kwarbai"]
-    }
+    "Birnin Gwari":     ["Birnin Gwari"],
+    "Chikun":           ["Chikun", "Kakuri"],
+    "Giwa":             ["Giwa"],
+    "Igabi":            ["Igabi", "Rigasa"],
+    "Ikara":            ["Ikara"],
+    "Jaba":             ["Jaba", "Kwoi"],
+    "Jema'a":           ["Kafanchan"],
+    "Kachia":           ["Kachia"],
+    "Kaduna North":     ["Kaduna", "Rigasa", "Kawo", "Malali", "Ungwan Rimi"],
+    "Kaduna South":     ["Kaduna", "Barnawa", "Television", "Tudun Wada", "Gonin Gora"],
+    "Kagarko":          ["Kagarko"],
+    "Kajuru":           ["Kajuru"],
+    "Kaura":            ["Kaura", "Kagoro"],
+    "Kauru":            ["Kauru"],
+    "Kubau":            ["Kubau"],
+    "Kudan":            ["Kudan"],
+    "Lere":             ["Lere"],
+    "Makarfi":          ["Makarfi"],
+    "Sabon Gari":       ["Sabon Gari", "Zaria Road"],
+    "Sanga":            ["Sanga"],
+    "Soba":             ["Soba"],
+    "Zangon Kataf":     ["Zangon Kataf", "Zonkwa"],
+    "Zaria":            ["Zaria", "Sabon Gari", "Samaru", "Kwarbai", "Tudun Wada"],
   },
+
   "Kano": {
-    lgas: {
-      "Ajingi": ["Ajingi", "Kano", "Wudil", "Gaya"],
-      "Albasu": ["Albasu", "Kano", "Wudil", "Gaya"],
-      "Bagwai": ["Bagwai", "Kano", "Wudil", "Gaya"],
-      "Bebeji": ["Bebeji", "Kano", "Wudil", "Gaya"],
-      "Bichi": ["Bichi", "Kano", "Gwarzo", "Wudil"],
-      "Bunkure": ["Bunkure", "Kano", "Wudil", "Gaya"],
-      "Dala": ["Kano", "Dala", "Gwale", "Municipal"],
-      "Dambatta": ["Dambatta", "Kano", "Gwarzo", "Shanono"],
-      "Dawakin Kudu": ["Kano", "Dawakin Kudu", "Tarauni", "Municipal"],
-      "Dawakin Tofa": ["Kano", "Dawakin Tofa", "Tofa", "Gwarzo"],
-      "Doguwa": ["Doguwa", "Kano", "Wudil", "Gaya"],
-      "Fagge": ["Kano", "Fagge", "Municipal", "Gwale"],
-      "Gabasawa": ["Gabasawa", "Kano", "Wudil", "Gaya"],
-      "Garko": ["Garko", "Kano", "Wudil", "Gaya"],
-      "Garun Mallam": ["Garun Mallam", "Kano", "Wudil", "Gaya"],
-      "Gaya": ["Gaya", "Kano", "Wudil", "Albasu"],
-      "Gezawa": ["Gezawa", "Kano", "Wudil", "Gaya"],
-      "Gwale": ["Kano", "Gwale", "Municipal", "Nasarawa"],
-      "Gwarzo": ["Gwarzo", "Kano", "Bichi", "Shanono"],
-      "Kabo": ["Kabo", "Kano", "Gwarzo", "Shanono"],
-      "Kano Municipal": ["Kano", "Sabon Gari", "Bompai", "Zoo Road"],
-      "Karaye": ["Karaye", "Kano", "Gwarzo", "Shanono"],
-      "Kibiya": ["Kibiya", "Kano", "Wudil", "Gaya"],
-      "Kiru": ["Kiru", "Kano", "Gwarzo", "Shanono"],
-      "Kumbotso": ["Kano", "Kumbotso", "Municipal", "Nasarawa"],
-      "Kunchi": ["Kunchi", "Kano", "Gwarzo", "Shanono"],
-      "Kura": ["Kura", "Kano", "Wudil", "Gaya"],
-      "Madobi": ["Madobi", "Kano", "Wudil", "Gaya"],
-      "Makoda": ["Makoda", "Kano", "Gwarzo", "Shanono"],
-      "Minjibir": ["Minjibir", "Kano", "Wudil", "Gaya"],
-      "Nasarawa": ["Kano", "Nasarawa", "Municipal", "Gwale"],
-      "Rano": ["Rano", "Kano", "Wudil", "Gaya"],
-      "Rimin Gado": ["Rimin Gado", "Kano", "Gwarzo", "Shanono"],
-      "Rogo": ["Rogo", "Kano", "Wudil", "Gaya"],
-      "Shanono": ["Shanono", "Kano", "Gwarzo", "Bichi"],
-      "Sumaila": ["Sumaila", "Kano", "Wudil", "Gaya"],
-      "Takai": ["Takai", "Kano", "Wudil", "Gaya"],
-      "Tarauni": ["Kano", "Tarauni", "Municipal", "Nasarawa"],
-      "Tofa": ["Tofa", "Kano", "Gwarzo", "Shanono"],
-      "Tsanyawa": ["Tsanyawa", "Kano", "Gwarzo", "Shanono"],
-      "Tudun Wada": ["Kano", "Tudun Wada", "Municipal", "Nasarawa"],
-      "Ungogo": ["Kano", "Ungogo", "Municipal", "Nasarawa"],
-      "Warawa": ["Warawa", "Kano", "Wudil", "Gaya"],
-      "Wudil": ["Wudil", "Kano", "Gaya", "Albasu"]
-    }
+    "Ajingi":           ["Ajingi"],
+    "Albasu":           ["Albasu"],
+    "Bagwai":           ["Bagwai"],
+    "Bebeji":           ["Bebeji"],
+    "Bichi":            ["Bichi"],
+    "Bunkure":          ["Bunkure"],
+    "Dala":             ["Kano", "Dala", "Gyadi-Gyadi"],
+    "Dambatta":         ["Dambatta"],
+    "Dawakin Kudu":     ["Dawakin Kudu"],
+    "Dawakin Tofa":     ["Dawakin Tofa"],
+    "Doguwa":           ["Doguwa"],
+    "Fagge":            ["Kano", "Fagge"],
+    "Gabasawa":         ["Gabasawa"],
+    "Garko":            ["Garko"],
+    "Garun Mallam":     ["Garun Mallam"],
+    "Gaya":             ["Gaya"],
+    "Gezawa":           ["Gezawa"],
+    "Gwale":            ["Kano", "Gwale"],
+    "Gwarzo":           ["Gwarzo"],
+    "Kabo":             ["Kabo"],
+    "Kano Municipal":   ["Kano", "Sabon Gari", "Bompai", "Zoo Road", "Nasarawa"],
+    "Karaye":           ["Karaye"],
+    "Kibiya":           ["Kibiya"],
+    "Kiru":             ["Kiru"],
+    "Kumbotso":         ["Kumbotso"],
+    "Kunchi":           ["Kunchi"],
+    "Kura":             ["Kura"],
+    "Madobi":           ["Madobi"],
+    "Makoda":           ["Makoda"],
+    "Minjibir":         ["Minjibir"],
+    "Nasarawa":         ["Kano", "Nasarawa"],
+    "Rano":             ["Rano"],
+    "Rimin Gado":       ["Rimin Gado"],
+    "Rogo":             ["Rogo"],
+    "Shanono":          ["Shanono"],
+    "Sumaila":          ["Sumaila"],
+    "Takai":            ["Takai"],
+    "Tarauni":          ["Kano", "Tarauni"],
+    "Tofa":             ["Tofa"],
+    "Tsanyawa":         ["Tsanyawa"],
+    "Tudun Wada":       ["Tudun Wada"],
+    "Ungogo":           ["Ungogo"],
+    "Warawa":           ["Warawa"],
+    "Wudil":            ["Wudil"],
   },
+
   "Katsina": {
-    lgas: {
-      "Bakori": ["Bakori", "Katsina", "Funtua", "Malumfashi"],
-      "Batagarawa": ["Batagarawa", "Katsina", "Funtua", "Malumfashi"],
-      "Batsari": ["Batsari", "Katsina", "Funtua", "Malumfashi"],
-      "Baure": ["Baure", "Katsina", "Funtua", "Malumfashi"],
-      "Bindawa": ["Bindawa", "Katsina", "Funtua", "Malumfashi"],
-      "Charanchi": ["Charanchi", "Katsina", "Funtua", "Malumfashi"],
-      "Dan Musa": ["Dan Musa", "Katsina", "Funtua", "Malumfashi"],
-      "Dandume": ["Dandume", "Katsina", "Funtua", "Malumfashi"],
-      "Danja": ["Danja", "Katsina", "Funtua", "Malumfashi"],
-      "Daura": ["Daura", "Katsina", "Funtua", "Malumfashi"],
-      "Dutsi": ["Dutsi", "Katsina", "Funtua", "Malumfashi"],
-      "Dutsin-Ma": ["Dutsin-Ma", "Katsina", "Funtua", "Malumfashi"],
-      "Faskari": ["Faskari", "Katsina", "Funtua", "Malumfashi"],
-      "Funtua": ["Funtua", "Katsina", "Bakori", "Malumfashi"],
-      "Ingawa": ["Ingawa", "Katsina", "Funtua", "Malumfashi"],
-      "Jibia": ["Jibia", "Katsina", "Funtua", "Malumfashi"],
-      "Kafur": ["Kafur", "Katsina", "Funtua", "Malumfashi"],
-      "Kaita": ["Kaita", "Katsina", "Funtua", "Malumfashi"],
-      "Kankara": ["Kankara", "Katsina", "Funtua", "Malumfashi"],
-      "Kankia": ["Kankia", "Katsina", "Funtua", "Malumfashi"],
-      "Katsina": ["Katsina", "Jibia", "Daura", "Funtua"],
-      "Kurfi": ["Kurfi", "Katsina", "Funtua", "Malumfashi"],
-      "Kusada": ["Kusada", "Katsina", "Funtua", "Malumfashi"],
-      "Mai'Adua": ["Mai'Adua", "Katsina", "Funtua", "Malumfashi"],
-      "Malumfashi": ["Malumfashi", "Katsina", "Funtua", "Bakori"],
-      "Mani": ["Mani", "Katsina", "Funtua", "Malumfashi"],
-      "Mashi": ["Mashi", "Katsina", "Funtua", "Malumfashi"],
-      "Matazu": ["Matazu", "Katsina", "Funtua", "Malumfashi"],
-      "Musawa": ["Musawa", "Katsina", "Funtua", "Malumfashi"],
-      "Rimi": ["Rimi", "Katsina", "Funtua", "Malumfashi"],
-      "Sabuwa": ["Sabuwa", "Katsina", "Funtua", "Malumfashi"],
-      "Safana": ["Safana", "Katsina", "Funtua", "Malumfashi"],
-      "Sandamu": ["Sandamu", "Katsina", "Funtua", "Malumfashi"],
-      "Zango": ["Zango", "Katsina", "Funtua", "Malumfashi"]
-    }
+    "Bakori":           ["Bakori"],
+    "Batagarawa":       ["Batagarawa"],
+    "Batsari":          ["Batsari"],
+    "Baure":            ["Baure"],
+    "Bindawa":          ["Bindawa"],
+    "Charanchi":        ["Charanchi"],
+    "Dan Musa":         ["Dan Musa"],
+    "Dandume":          ["Dandume"],
+    "Danja":            ["Danja"],
+    "Daura":            ["Daura"],
+    "Dutsi":            ["Dutsi"],
+    "Dutsin Ma":        ["Dutsin Ma"],
+    "Faskari":          ["Faskari"],
+    "Funtua":           ["Funtua", "Sabon Gari"],
+    "Ingawa":           ["Ingawa"],
+    "Jibia":            ["Jibia"],
+    "Kafur":            ["Kafur"],
+    "Kaita":            ["Kaita"],
+    "Kankara":          ["Kankara"],
+    "Kankia":           ["Kankia"],
+    "Katsina":          ["Katsina", "GRA", "Kofar Kaura", "Housing Estate"],
+    "Kurfi":            ["Kurfi"],
+    "Kusada":           ["Kusada"],
+    "Mai'Adua":         ["Mai'Adua"],
+    "Malumfashi":       ["Malumfashi"],
+    "Mani":             ["Mani"],
+    "Mashi":            ["Mashi"],
+    "Matazu":           ["Matazu"],
+    "Musawa":           ["Musawa"],
+    "Rimi":             ["Rimi"],
+    "Sabuwa":           ["Sabuwa"],
+    "Safana":           ["Safana"],
+    "Sandamu":          ["Sandamu"],
+    "Zango":            ["Zango"],
   },
+
   "Kebbi": {
-    lgas: {
-      "Aleiro": ["Aleiro", "Birnin Kebbi", "Argungu", "Yauri"],
-      "Arewa Dandi": ["Arewa Dandi", "Birnin Kebbi", "Argungu", "Yauri"],
-      "Argungu": ["Argungu", "Birnin Kebbi", "Yauri", "Koko"],
-      "Augie": ["Augie", "Birnin Kebbi", "Argungu", "Yauri"],
-      "Bagudo": ["Bagudo", "Birnin Kebbi", "Argungu", "Yauri"],
-      "Birnin Kebbi": ["Birnin Kebbi", "Argungu", "Yauri", "Koko"],
-      "Bunza": ["Bunza", "Birnin Kebbi", "Argungu", "Yauri"],
-      "Dandi": ["Dandi", "Birnin Kebbi", "Argungu", "Yauri"],
-      "Fakai": ["Fakai", "Birnin Kebbi", "Argungu", "Yauri"],
-      "Gwandu": ["Gwandu", "Birnin Kebbi", "Argungu", "Yauri"],
-      "Jega": ["Jega", "Birnin Kebbi", "Argungu", "Yauri"],
-      "Kalgo": ["Kalgo", "Birnin Kebbi", "Argungu", "Yauri"],
-      "Koko/Besse": ["Koko", "Birnin Kebbi", "Argungu", "Yauri"],
-      "Maiyama": ["Maiyama", "Birnin Kebbi", "Argungu", "Yauri"],
-      "Ngaski": ["Ngaski", "Birnin Kebbi", "Argungu", "Yauri"],
-      "Sakaba": ["Sakaba", "Birnin Kebbi", "Argungu", "Yauri"],
-      "Shanga": ["Shanga", "Birnin Kebbi", "Argungu", "Yauri"],
-      "Suru": ["Suru", "Birnin Kebbi", "Argungu", "Yauri"],
-      "Wasagu/Danko": ["Wasagu", "Birnin Kebbi", "Argungu", "Yauri"],
-      "Yauri": ["Yauri", "Birnin Kebbi", "Argungu", "Koko"],
-      "Zuru": ["Zuru", "Birnin Kebbi", "Argungu", "Yauri"]
-    }
+    "Aleiro":           ["Aleiro"],
+    "Arewa Dandi":      ["Arewa Dandi"],
+    "Argungu":          ["Argungu"],
+    "Augie":            ["Augie"],
+    "Bagudo":           ["Bagudo"],
+    "Birnin Kebbi":     ["Birnin Kebbi", "GRA", "Tudun Wada", "Nasarawa"],
+    "Bunza":            ["Bunza"],
+    "Dandi":            ["Dandi"],
+    "Fakai":            ["Fakai"],
+    "Gwandu":           ["Gwandu"],
+    "Jega":             ["Jega"],
+    "Kalgo":            ["Kalgo"],
+    "Koko/Besse":       ["Koko"],
+    "Maiyama":          ["Maiyama"],
+    "Ngaski":           ["Ngaski"],
+    "Sakaba":           ["Sakaba"],
+    "Shanga":           ["Shanga"],
+    "Suru":             ["Suru"],
+    "Wasagu/Danko":     ["Wasagu"],
+    "Yauri":            ["Yauri"],
+    "Zuru":             ["Zuru"],
   },
+
   "Kogi": {
-    lgas: {
-      "Adavi": ["Adavi", "Okene", "Ogori-Magongo", "Okehi"],
-      "Ajaokuta": ["Ajaokuta", "Lokoja", "Kogi", "Ogori-Magongo"],
-      "Ankpa": ["Ankpa", "Lokoja", "Kogi", "Ofu"],
-      "Bassa": ["Bassa", "Lokoja", "Kogi", "Ajaokuta"],
-      "Dekina": ["Dekina", "Lokoja", "Kogi", "Ofu"],
-      "Ibaji": ["Ibaji", "Lokoja", "Kogi", "Idah"],
-      "Idah": ["Idah", "Lokoja", "Kogi", "Ofu"],
-      "Igalamela-Odolu": ["Ajaka", "Lokoja", "Kogi", "Idah"],
-      "Ijumu": ["Ijumu", "Lokoja", "Kogi", "Okehi"],
-      "Kabba/Bunu": ["Kabba", "Lokoja", "Kogi", "Okehi"],
-      "Kogi": ["Lokoja", "Kogi", "Ajaokuta", "Ankpa"],
-      "Lokoja": ["Lokoja", "Adankolo", "Gangare", "Old GRA"],
-      "Mopa-Muro": ["Mopa", "Lokoja", "Kogi", "Okehi"],
-      "Ofu": ["Ofu", "Lokoja", "Kogi", "Idah"],
-      "Ogori/Magongo": ["Ogori", "Lokoja", "Kogi", "Okehi"],
-      "Okehi": ["Okehi", "Okene", "Lokoja", "Kogi"],
-      "Okene": ["Okene", "Lokoja", "Kogi", "Okehi"],
-      "Olamaboro": ["Olamaboro", "Lokoja", "Kogi", "Idah"],
-      "Omala": ["Omala", "Lokoja", "Kogi", "Ofu"],
-      "Yagba East": ["Egbe", "Lokoja", "Kogi", "Okehi"],
-      "Yagba West": ["Ogbe", "Lokoja", "Kogi", "Okehi"]
-    }
+    "Adavi":            ["Adavi", "Okene"],
+    "Ajaokuta":         ["Ajaokuta"],
+    "Ankpa":            ["Ankpa"],
+    "Bassa":            ["Bassa"],
+    "Dekina":           ["Dekina"],
+    "Ibaji":            ["Ibaji"],
+    "Idah":             ["Idah"],
+    "Igalamela Odolu":  ["Igalamela"],
+    "Ijumu":            ["Ijumu"],
+    "Kabba/Bunu":       ["Kabba"],
+    "Kogi":             ["Kogi"],
+    "Lokoja":           ["Lokoja", "Adankolo", "Gangare", "New Layout", "Felele"],
+    "Mopa Muro":        ["Mopa"],
+    "Ofu":              ["Ofu"],
+    "Ogori/Magongo":    ["Ogori"],
+    "Okehi":            ["Okehi"],
+    "Okene":            ["Okene"],
+    "Olamaboro":        ["Olamaboro"],
+    "Omala":            ["Omala"],
+    "Yagba East":       ["Yagba", "Isanlu"],
+    "Yagba West":       ["Yagba", "Ogbe"],
   },
+
   "Kwara": {
-    lgas: {
-      "Asa": ["Asa", "Ilorin", "Offa", "Isin"],
-      "Baruten": ["Baruten", "Ilorin", "Offa", "Isin"],
-      "Edu": ["Edu", "Ilorin", "Offa", "Isin"],
-      "Ekiti": ["Ekiti", "Ilorin", "Offa", "Isin"],
-      "Ifelodun": ["Ifelodun", "Ilorin", "Offa", "Isin"],
-      "Ilorin East": ["Ilorin", "Ilorin East", "Offa", "Asa"],
-      "Ilorin South": ["Ilorin", "Ilorin South", "Offa", "Asa"],
-      "Ilorin West": ["Ilorin", "Ilorin West", "Offa", "Asa"],
-      "Irepodun": ["Irepodun", "Ilorin", "Offa", "Isin"],
-      "Isin": ["Isin", "Ilorin", "Offa", "Ekiti"],
-      "Kaiama": ["Kaiama", "Ilorin", "Offa", "Isin"],
-      "Moro": ["Moro", "Ilorin", "Offa", "Isin"],
-      "Offa": ["Offa", "Ilorin", "Asa", "Isin"],
-      "Oke Ero": ["Oke Ero", "Ilorin", "Offa", "Isin"],
-      "Oyun": ["Oyun", "Ilorin", "Offa", "Isin"],
-      "Patigi": ["Patigi", "Ilorin", "Offa", "Isin"]
-    }
+    "Asa":              ["Asa"],
+    "Baruten":          ["Baruten", "Kaiama"],
+    "Edu":              ["Edu", "Lafiagi"],
+    "Ifelodun":         ["Ifelodun", "Share"],
+    "Ilorin East":      ["Ilorin", "Oke-Oyi", "Offa Garage"],
+    "Ilorin South":     ["Ilorin", "Agbeyangi", "Muritala"],
+    "Ilorin West":      ["Ilorin", "GRA", "Fate", "Tanke", "Surulere"],
+    "Irepodun":         ["Irepodun", "Omu Aran"],
+    "Isin":             ["Isin", "Owu"],
+    "Kaiama":           ["Kaiama"],
+    "Moro":             ["Moro", "Shao"],
+    "Offa":             ["Offa"],
+    "Oke Ero":          ["Oke Ero", "Ijan"],
+    "Oyun":             ["Oyun", "Offa"],
+    "Pategi":           ["Pategi"],
+    "Ilorin":           ["Ilorin", "GRA", "Tanke", "Fate", "Adewole"],
   },
+
   "Lagos": {
-    lgas: {
-      "Agege": ["Agege", "Oke-Odo", "Alimosho", "Ikeja"],
-      "Ajeromi-Ifelodun": ["Ajegunle", "Amukoko", "Olodi-Apapa", "Ifelodun"],
-      "Alimosho": ["Alimosho", "Egbeda", "Ipaja", "Agbado"],
-      "Amuwo-Odofin": ["Festac Town", "Mile 2", "Kirikiri", "Satellite Town"],
-      "Apapa": ["Apapa", "Iganmu", "Sari-Iganmu", "Olodi"],
-      "Badagry": ["Badagry", "Ajara", "Ganyingbo", "Topo"],
-      "Epe": ["Epe", "Ejinrin", "Ijebu Ode", "Ketu"],
-      "Eti-Osa": ["Victoria Island", "Lekki", "Ajah", "Eti-Osa"],
-      "Ibeju-Lekki": ["Ibeju", "Lekki", "Ibeju-Lekki", "Etan"],
-      "Ifako-Ijaiye": ["Ifako", "Ijaiye", "Ogba", "Agege"],
-      "Ikeja": ["Ikeja", "GRA", "Allen Avenue", "Maryland"],
-      "Ikorodu": ["Ikorodu", "Imota", "Ijede", "Igbogbo"],
-      "Kosofe": ["Kosofe", "Ketu", "Ojota", "Ikosi"],
-      "Lagos Island": ["Lagos Island", "Isale-Eko", "Marina", "Idumota"],
-      "Lagos Mainland": ["Ebute Meta", "Yaba", "Surulere", "Mushin"],
-      "Mushin": ["Mushin", "Idi-Araba", "Ojuwoye", "Eric Moore"],
-      "Ojo": ["Ojo", "Iba", "Igbo Elerin", "Ijanikin"],
-      "Oshodi-Isolo": ["Oshodi", "Isolo", "Mafoluku", "Ejigbo"],
-      "Shomolu": ["Shomolu", "Bariga", "Onipanu", "Fadeyi"],
-      "Somolu": ["Somolu", "Bariga", "Onipanu", "Fadeyi"],
-      "Surulere": ["Surulere", "Bode Thomas", "Ojuelegba", "Aguda"]
-    }
+    "Agege":            ["Agege", "Orile-Agege", "Ifako"],
+    "Ajeromi/Ifelodun": ["Ajegunle", "Kirikiri"],
+    "Alimosho":         ["Egbeda", "Ikotun", "Ijegun", "Igando", "Ayobo", "Ipaja"],
+    "Amuwo-Odofin":     ["Festac Town", "Mile 2", "Ago Palace", "Apple Junction"],
+    "Apapa":            ["Apapa", "GRA", "Olodi", "Iganmu"],
+    "Badagry":          ["Badagry", "Ajara", "Topo"],
+    "Epe":              ["Epe", "Itoikin"],
+    "Eti-Osa":          ["Victoria Island", "Lekki Phase 1", "Lekki Phase 2", "Ajah", "Chevron"],
+    "Ibeju-Lekki":      ["Ibeju", "Lekki", "Epe Road"],
+    "Ifako-Ijaiye":     ["Ifako", "Ijaiye", "Agbado"],
+    "Ikeja":            ["Ikeja", "Allen Avenue", "GRA", "Maryland", "Oregun", "Alausa"],
+    "Ikorodu":          ["Ikorodu", "Imota", "Ijede", "Igbogbo", "Bayeku"],
+    "Kosofe":           ["Ketu", "Ojota", "Ikosi", "Mile 12", "Oworo"],
+    "Lagos Island":     ["Lagos Island", "Isale-Eko", "Marina", "Idumota"],
+    "Lagos Mainland":   ["Yaba", "Ebute Meta", "Oyingbo", "Sabo", "Iwaya"],
+    "Mushin":           ["Mushin", "Idi-Araba", "Papa Ajao", "New Garage"],
+    "Ojo":              ["Ojo", "Iba", "Ijanikin"],
+    "Oshodi/Isolo":     ["Oshodi", "Isolo", "Ejigbo", "Ilasamaja"],
+    "Shomolu":          ["Shomolu", "Bariga", "Gbagada"],
+    "Surulere":         ["Surulere", "Bode Thomas", "Ojuelegba", "Aguda", "Eric Moore"],
   },
+
   "Nasarawa": {
-    lgas: {
-      "Akwanga": ["Akwanga", "Lafia", "Keffi", "Nasarawa"],
-      "Awe": ["Awe", "Lafia", "Keffi", "Nasarawa"],
-      "Doma": ["Doma", "Lafia", "Keffi", "Nasarawa"],
-      "Karu": ["Karu", "Keffi", "Nasarawa", "Lafia"],
-      "Keana": ["Keana", "Lafia", "Keffi", "Nasarawa"],
-      "Keffi": ["Keffi", "Nasarawa", "Lafia", "Akwanga"],
-      "Kokona": ["Kokona", "Nasarawa", "Lafia", "Keffi"],
-      "Lafia": ["Lafia", "Keffi", "Nasarawa", "Akwanga"],
-      "Nasarawa": ["Nasarawa", "Lafia", "Keffi", "Akwanga"],
-      "Nasarawa Egon": ["Nasarawa Egon", "Lafia", "Keffi", "Nasarawa"],
-      "Obi": ["Obi", "Lafia", "Keffi", "Nasarawa"],
-      "Toto": ["Toto", "Nasarawa", "Lafia", "Keffi"],
-      "Wamba": ["Wamba", "Lafia", "Keffi", "Nasarawa"]
-    }
+    "Akwanga":          ["Akwanga"],
+    "Awe":              ["Awe"],
+    "Doma":             ["Doma"],
+    "Karu":             ["Karu", "Mararaba", "Nyanya"],
+    "Keana":            ["Keana"],
+    "Keffi":            ["Keffi", "Sabon Gari", "New Layout"],
+    "Kokona":           ["Kokona"],
+    "Lafia":            ["Lafia", "GRA", "New Market"],
+    "Nasarawa":         ["Nasarawa"],
+    "Nasarawa Egon":    ["Nasarawa Egon"],
+    "Obi":              ["Obi"],
+    "Toto":             ["Toto"],
+    "Wamba":            ["Wamba"],
   },
+
   "Niger": {
-    lgas: {
-      "Agaie": ["Agaie", "Bida", "Minna", "Kontagora"],
-      "Agwara": ["Agwara", "Bida", "Minna", "Kontagora"],
-      "Bida": ["Bida", "Agaie", "Lapai", "Minna"],
-      "Borgu": ["Borgu", "Kontagora", "Minna", "Bida"],
-      "Bosso": ["Minna", "Bosso", "Chanchaga", "Kontagora"],
-      "Chanchaga": ["Minna", "Chanchaga", "Bosso", "Kontagora"],
-      "Edati": ["Edati", "Bida", "Minna", "Kontagora"],
-      "Gbako": ["Gbako", "Bida", "Minna", "Kontagora"],
-      "Gurara": ["Gurara", "Minna", "Bida", "Kontagora"],
-      "Katcha": ["Katcha", "Bida", "Minna", "Kontagora"],
-      "Kontagora": ["Kontagora", "Minna", "Bida", "Borgu"],
-      "Lapai": ["Lapai", "Bida", "Minna", "Agaie"],
-      "Lavun": ["Lavun", "Bida", "Minna", "Kontagora"],
-      "Magama": ["Magama", "Minna", "Bida", "Kontagora"],
-      "Mariga": ["Mariga", "Minna", "Bida", "Kontagora"],
-      "Mashegu": ["Mashegu", "Minna", "Bida", "Kontagora"],
-      "Mokwa": ["Mokwa", "Minna", "Bida", "Kontagora"],
-      "Moya": ["Moya", "Minna", "Bida", "Kontagora"],
-      "Paikoro": ["Paikoro", "Minna", "Bida", "Kontagora"],
-      "Rafi": ["Rafi", "Minna", "Bida", "Kontagora"],
-      "Rijau": ["Rijau", "Minna", "Bida", "Kontagora"],
-      "Shiroro": ["Shiroro", "Minna", "Bida", "Kontagora"],
-      "Suleja": ["Suleja", "Minna", "Bida", "Kontagora"],
-      "Tafa": ["Tafa", "Minna", "Bida", "Kontagora"],
-      "Wushishi": ["Wushishi", "Minna", "Bida", "Kontagora"]
-    }
+    "Agaie":            ["Agaie"],
+    "Agwara":           ["Agwara"],
+    "Bida":             ["Bida"],
+    "Borgu":            ["Borgu", "New Bussa"],
+    "Bosso":            ["Minna", "Bosso Estate"],
+    "Chanchaga":        ["Minna", "GRA", "Kpakungu", "Maitumbi", "Tunga"],
+    "Edati":            ["Edati"],
+    "Gbako":            ["Gbako"],
+    "Gurara":           ["Gurara"],
+    "Katcha":           ["Katcha"],
+    "Kontagora":        ["Kontagora"],
+    "Lapai":            ["Lapai"],
+    "Lavun":            ["Lavun"],
+    "Magama":           ["Magama"],
+    "Mariga":           ["Mariga"],
+    "Mashegu":          ["Mashegu"],
+    "Mokwa":            ["Mokwa"],
+    "Moya":             ["Moya"],
+    "Paikoro":          ["Paikoro"],
+    "Rafi":             ["Rafi"],
+    "Rijau":            ["Rijau"],
+    "Shiroro":          ["Shiroro"],
+    "Suleja":           ["Suleja", "Madala"],
+    "Tafa":             ["Tafa"],
+    "Wushishi":         ["Wushishi"],
   },
+
   "Ogun": {
-    lgas: {
-      "Abeokuta North": ["Abeokuta", "Itoku", "Iberekodo", "Oke-Lantoro"],
-      "Abeokuta South": ["Abeokuta", "Oke-Ilewo", "Isale-Igbehin", "Adatan"],
-      "Ado-Odo/Ota": ["Ota", "Ado-Odo", "Agbara", "Sango-Ota"],
-      "Egbado North": ["Ilaro", "Egbado", "Ado-Odo", "Imeko"],
-      "Egbado South": ["Ilaro", "Egbado", "Ado-Odo", "Agbara"],
-      "Ewekoro": ["Ewekoro", "Abeokuta", "Ifo", "Obafemi-Owode"],
-      "Ifo": ["Ifo", "Abeokuta", "Ado-Odo", "Obafemi-Owode"],
-      "Ijebu East": ["Ijebu East", "Ijebu Ode", "Ogun", "Sagamu"],
-      "Ijebu North": ["Ijebu North", "Ijebu Ode", "Ogun", "Sagamu"],
-      "Ijebu North East": ["Ijebu North East", "Ijebu Ode", "Ogun", "Sagamu"],
-      "Ijebu Ode": ["Ijebu Ode", "Sagamu", "Abeokuta", "Ogun"],
-      "Ikenne": ["Ikenne", "Sagamu", "Ijebu Ode", "Ogun"],
-      "Imeko Afon": ["Imeko", "Abeokuta", "Egbado", "Ado-Odo"],
-      "Ipokia": ["Ipokia", "Abeokuta", "Ado-Odo", "Agbara"],
-      "Obafemi Owode": ["Owode", "Abeokuta", "Ifo", "Sagamu"],
-      "Odeda": ["Odeda", "Abeokuta", "Ewekoro", "Ifo"],
-      "Odogbolu": ["Odogbolu", "Sagamu", "Ijebu Ode", "Ogun"],
-      "Ogun Waterside": ["Ogun Waterside", "Sagamu", "Ijebu Ode", "Ogun"],
-      "Remo North": ["Remo North", "Sagamu", "Ijebu Ode", "Ogun"],
-      "Shagamu": ["Sagamu", "Ikenne", "Ijebu Ode", "Ogun"]
-    }
+    "Abeokuta North":   ["Abeokuta", "Lafenwa", "Panseke", "Iberekodo"],
+    "Abeokuta South":   ["Abeokuta", "Oke-Ilewo", "Adatan", "Asero"],
+    "Ado-Odo/Ota":      ["Ota", "Sango-Ota", "Agbara", "Ado-Odo"],
+    "Egbado North":     ["Ilaro"],
+    "Egbado South":     ["Ilaro", "Idiroko"],
+    "Ewekoro":          ["Ewekoro"],
+    "Ifo":              ["Ifo", "Sango-Ota"],
+    "Ijebu East":       ["Ijebu East", "Epe"],
+    "Ijebu North":      ["Ijebu North", "Ijebu Igbo"],
+    "Ijebu North East": ["Ijebu North East"],
+    "Ijebu Ode":        ["Ijebu Ode"],
+    "Ikenne":           ["Ikenne", "Sagamu", "Remo North"],
+    "Imeko Afon":       ["Imeko"],
+    "Ipokia":           ["Ipokia"],
+    "Obafemi Owode":    ["Owode", "Sagamu Road"],
+    "Odeda":            ["Odeda"],
+    "Odogbolu":         ["Odogbolu"],
+    "Ogun Waterside":   ["Ogun Waterside"],
+    "Remo North":       ["Remo North", "Sagamu"],
+    "Shagamu":          ["Sagamu", "Makun"],
   },
+
   "Ondo": {
-    lgas: {
-      "Akoko North East": ["Akoko North East", "Akure", "Ondo", "Owo"],
-      "Akoko North West": ["Akoko North West", "Akure", "Ondo", "Owo"],
-      "Akoko South East": ["Akoko South East", "Akure", "Ondo", "Owo"],
-      "Akoko South West": ["Oka Akoko", "Akure", "Ondo", "Owo"],
-      "Akure North": ["Akure", "Akure North", "Ondo", "Owo"],
-      "Akure South": ["Akure", "Akure South", "Ondo", "Owo"],
-      "Ese Odo": ["Ese Odo", "Akure", "Ondo", "Owo"],
-      "Idanre": ["Idanre", "Akure", "Ondo", "Owo"],
-      "Ifedore": ["Ifedore", "Akure", "Ondo", "Owo"],
-      "Ilaje": ["Igbokoda", "Akure", "Ondo", "Owo"],
-      "Ile Oluji/Okeigbo": ["Ile Oluji", "Akure", "Ondo", "Owo"],
-      "Irele": ["Irele", "Akure", "Ondo", "Owo"],
-      "Odigbo": ["Odigbo", "Akure", "Ondo", "Owo"],
-      "Okitipupa": ["Okitipupa", "Akure", "Ondo", "Owo"],
-      "Ondo East": ["Ondo", "Akure", "Owo", "Odigbo"],
-      "Ondo West": ["Ondo", "Akure", "Owo", "Odigbo"],
-      "Ose": ["Ose", "Akure", "Ondo", "Owo"],
-      "Owo": ["Owo", "Akure", "Ondo", "Odigbo"]
-    }
+    "Akoko North East": ["Ikare"],
+    "Akoko North West": ["Okeagbe"],
+    "Akoko South East": ["Isua Akoko"],
+    "Akoko South West": ["Oka Akoko"],
+    "Akure North":      ["Akure", "Oba-Ile", "Igoba"],
+    "Akure South":      ["Akure", "GRA", "Alagbaka", "FUTA Road"],
+    "Ese Odo":          ["Ese Odo"],
+    "Idanre":           ["Idanre"],
+    "Ifedore":          ["Ifedore", "Igbara-Oke"],
+    "Ilaje":            ["Ilaje", "Igbokoda"],
+    "Ile Oluji/Okeigbo":["Ile Oluji"],
+    "Irele":            ["Irele"],
+    "Odigbo":           ["Ore"],
+    "Okitipupa":        ["Okitipupa"],
+    "Ondo East":        ["Ondo"],
+    "Ondo West":        ["Ondo"],
+    "Ose":              ["Ose"],
+    "Owo":              ["Owo"],
   },
+
   "Osun": {
-    lgas: {
-      "Atakumosa East": ["Atakumosa East", "Osogbo", "Ile-Ife", "Ilesha"],
-      "Atakumosa West": ["Atakumosa West", "Osogbo", "Ile-Ife", "Ilesha"],
-      "Aiyedaade": ["Osogbo", "Ile-Ife", "Ilesha", "Aiyedaade"],
-      "Aiyedire": ["Osogbo", "Ile-Ife", "Ilesha", "Aiyedire"],
-      "Boluwaduro": ["Osogbo", "Ile-Ife", "Ilesha", "Boluwaduro"],
-      "Boripe": ["Osogbo", "Ile-Ife", "Ilesha", "Boripe"],
-      "Ede North": ["Ede", "Osogbo", "Ile-Ife", "Ilesha"],
-      "Ede South": ["Ede", "Osogbo", "Ile-Ife", "Ilesha"],
-      "Egbedore": ["Osogbo", "Ile-Ife", "Ilesha", "Egbedore"],
-      "Ejigbo": ["Ejigbo", "Osogbo", "Ile-Ife", "Ilesha"],
-      "Ife Central": ["Ile-Ife", "Osogbo", "Ilesha", "Ife"],
-      "Ife East": ["Ile-Ife", "Osogbo", "Ilesha", "Ife"],
-      "Ife North": ["Ile-Ife", "Osogbo", "Ilesha", "Ife"],
-      "Ife South": ["Ile-Ife", "Osogbo", "Ilesha", "Ife"],
-      "Ifedayo": ["Osogbo", "Ile-Ife", "Ilesha", "Ifedayo"],
-      "Ifelodun": ["Osogbo", "Ile-Ife", "Ilesha", "Ifelodun"],
-      "Ila": ["Ila Orangun", "Osogbo", "Ile-Ife", "Ilesha"],
-      "Ilesa East": ["Ilesha", "Osogbo", "Ile-Ife", "Ilesa"],
-      "Ilesa West": ["Ilesha", "Osogbo", "Ile-Ife", "Ilesa"],
-      "Irepodun": ["Osogbo", "Ile-Ife", "Ilesha", "Irepodun"],
-      "Irewole": ["Osogbo", "Ile-Ife", "Ilesha", "Irewole"],
-      "Isokan": ["Osogbo", "Ile-Ife", "Ilesha", "Isokan"],
-      "Iwo": ["Iwo", "Osogbo", "Ile-Ife", "Ilesha"],
-      "Obokun": ["Osogbo", "Ile-Ife", "Ilesha", "Obokun"],
-      "Odo Otin": ["Osogbo", "Ile-Ife", "Ilesha", "Odo Otin"],
-      "Ola Oluwa": ["Osogbo", "Ile-Ife", "Ilesha", "Ola Oluwa"],
-      "Olorunda": ["Osogbo", "Ile-Ife", "Ilesha", "Olorunda"],
-      "Oriade": ["Osogbo", "Ile-Ife", "Ilesha", "Oriade"],
-      "Orolu": ["Osogbo", "Ile-Ife", "Ilesha", "Orolu"],
-      "Osogbo": ["Osogbo", "Ile-Ife", "Ilesha", "Olorunda"]
-    }
+    "Aiyedade":         ["Aiyedade"],
+    "Aiyedire":         ["Aiyedire"],
+    "Atakumosa East":   ["Atakumosa"],
+    "Atakumosa West":   ["Atakumosa"],
+    "Boluwaduro":       ["Boluwaduro"],
+    "Boripe":           ["Boripe", "Ikirun"],
+    "Ede North":        ["Ede"],
+    "Ede South":        ["Ede"],
+    "Egbedore":         ["Egbedore"],
+    "Ejigbo":           ["Ejigbo"],
+    "Ife Central":      ["Ile-Ife", "Lagere", "Mayfair"],
+    "Ife East":         ["Ile-Ife"],
+    "Ife North":        ["Ile-Ife"],
+    "Ife South":        ["Ile-Ife"],
+    "Ifedayo":          ["Ifedayo"],
+    "Ifelodun":         ["Ifelodun", "Ikirun"],
+    "Ila":              ["Ila Orangun"],
+    "Ilesa East":       ["Ilesa"],
+    "Ilesa West":       ["Ilesa"],
+    "Irepodun":         ["Irepodun"],
+    "Irewole":          ["Ikire"],
+    "Isokan":           ["Isokan"],
+    "Iwo":              ["Iwo"],
+    "Obokun":           ["Obokun"],
+    "Odo Otin":         ["Odo Otin"],
+    "Ola Oluwa":        ["Ola Oluwa"],
+    "Olorunda":         ["Osogbo", "Oke-Baale", "GRA", "Station Road"],
+    "Oriade":           ["Oriade"],
+    "Orolu":            ["Orolu"],
+    "Osogbo":           ["Osogbo", "Alekuwodo", "Ogo-Oluwa"],
   },
+
   "Oyo": {
-    lgas: {
-      "Afijio": ["Afijio", "Ibadan", "Oyo", "Ogbomoso"],
-      "Akinyele": ["Akinyele", "Ibadan", "Oyo", "Ogbomoso"],
-      "Atiba": ["Oyo", "Ibadan", "Ogbomoso", "Atiba"],
-      "Atisbo": ["Atisbo", "Ibadan", "Oyo", "Ogbomoso"],
-      "Egbeda": ["Egbeda", "Ibadan", "Oyo", "Ogbomoso"],
-      "Ibadan North": ["Ibadan", "Agodi", "Mokola", "Oke-Ado"],
-      "Ibadan North East": ["Ibadan", "Ring Road", "Bodija", "Challenge"],
-      "Ibadan North West": ["Ibadan", "Oke-Ado", "Mokola", "Agodi"],
-      "Ibadan South East": ["Ibadan", "Iyaganku", "Bashorun", "Agodi"],
-      "Ibadan South West": ["Ibadan", "Iyaganku", "Ring Road", "Bashorun"],
-      "Ibarapa Central": ["Igbo-Ora", "Ibadan", "Oyo", "Ogbomoso"],
-      "Ibarapa East": ["Eruwa", "Ibadan", "Oyo", "Ogbomoso"],
-      "Ibarapa North": ["Tede", "Ibadan", "Oyo", "Ogbomoso"],
-      "Ido": ["Ido", "Ibadan", "Oyo", "Ogbomoso"],
-      "Irepo": ["Irepo", "Ibadan", "Oyo", "Ogbomoso"],
-      "Iseyin": ["Iseyin", "Ibadan", "Oyo", "Ogbomoso"],
-      "Itesiwaju": ["Itesiwaju", "Ibadan", "Oyo", "Ogbomoso"],
-      "Iwajowa": ["Iwajowa", "Ibadan", "Oyo", "Ogbomoso"],
-      "Kajola": ["Kajola", "Ibadan", "Oyo", "Ogbomoso"],
-      "Lagelu": ["Lagelu", "Ibadan", "Oyo", "Ogbomoso"],
-      "Ogbomoso North": ["Ogbomoso", "Ibadan", "Oyo", "Ogbomosho"],
-      "Ogbomoso South": ["Ogbomoso", "Ibadan", "Oyo", "Ogbomosho"],
-      "Ogo Oluwa": ["Ogo Oluwa", "Ibadan", "Oyo", "Ogbomoso"],
-      "Olorunsogo": ["Olorunsogo", "Ibadan", "Oyo", "Ogbomoso"],
-      "Oluyole": ["Oluyole", "Ibadan", "Oyo", "Ogbomoso"],
-      "Ona Ara": ["Ona Ara", "Ibadan", "Oyo", "Ogbomoso"],
-      "Orelope": ["Orelope", "Ibadan", "Oyo", "Ogbomoso"],
-      "Ori Ire": ["Ori Ire", "Ibadan", "Oyo", "Ogbomoso"],
-      "Oyo East": ["Oyo", "Ibadan", "Ogbomoso", "Oyo East"],
-      "Oyo West": ["Oyo", "Ibadan", "Ogbomoso", "Oyo West"],
-      "Saki East": ["Saki", "Ibadan", "Oyo", "Ogbomoso"],
-      "Saki West": ["Saki", "Ibadan", "Oyo", "Ogbomoso"],
-      "Surulere": ["Surulere", "Ibadan", "Oyo", "Ogbomoso"]
-    }
+    "Afijio":           ["Afijio"],
+    "Akinyele":         ["Moniya", "Akinyele"],
+    "Atiba":            ["Oyo", "New Oyo"],
+    "Atisbo":           ["Atisbo"],
+    "Egbeda":           ["Egbeda", "Akobo", "Basorun"],
+    "Ibadan North":     ["Ibadan", "Agodi", "Mokola", "Bodija", "Oke-Ado"],
+    "Ibadan North East":["Ibadan", "Challenge", "New Ife Road", "Ring Road"],
+    "Ibadan North West":["Ibadan", "Oke-Are", "Gbaremu"],
+    "Ibadan South East":["Ibadan", "Iyaganku GRA", "Agodi GRA", "Gbagi"],
+    "Ibadan South West":["Ibadan", "Iyaganku", "Ring Road", "Bashorun"],
+    "Ibarapa Central":  ["Igbo-Ora"],
+    "Ibarapa East":     ["Lanlate"],
+    "Ibarapa North":    ["Ibarapa North"],
+    "Ido":              ["Ido"],
+    "Irepo":            ["Kishi"],
+    "Iseyin":           ["Iseyin"],
+    "Itesiwaju":        ["Itesiwaju"],
+    "Iwajowa":          ["Iwere-Ile"],
+    "Kajola":           ["Okeho"],
+    "Lagelu":           ["Lagelu", "Iyana-Church"],
+    "Ogbomosho North":  ["Ogbomoso"],
+    "Ogbomosho South":  ["Ogbomoso"],
+    "Ogo Oluwa":        ["Ogo Oluwa"],
+    "Olorunsogo":       ["Olorunsogo"],
+    "Oluyole":          ["Ibadan", "Oluyole Estate", "Idi-Ayunre"],
+    "Ona Ara":          ["Ona Ara", "Akanran"],
+    "Orelope":          ["Orelope"],
+    "Ori Ire":          ["Ori Ire"],
+    "Oyo East":         ["Oyo"],
+    "Oyo West":         ["Oyo", "Owode"],
+    "Saki East":        ["Saki"],
+    "Saki West":        ["Saki"],
+    "Surulere":         ["Surulere (Oyo)"],
   },
+
   "Plateau": {
-    lgas: {
-      "Barkin Ladi": ["Barkin Ladi", "Jos", "Pankshin", "Shendam"],
-      "Bassa": ["Bassa", "Jos", "Pankshin", "Shendam"],
-      "Bokkos": ["Bokkos", "Jos", "Pankshin", "Shendam"],
-      "Jos East": ["Jos", "Rayfield", "Bukuru", "Vom"],
-      "Jos North": ["Jos", "Bauchi Road", "Terminus", "Farin Gada"],
-      "Jos South": ["Bukuru", "Rantya", "Gyel", "Kuru"],
-      "Kanam": ["Kanam", "Jos", "Pankshin", "Shendam"],
-      "Kanke": ["Kanke", "Jos", "Pankshin", "Shendam"],
-      "Langtang North": ["Langtang", "Jos", "Pankshin", "Shendam"],
-      "Langtang South": ["Langtang", "Jos", "Pankshin", "Shendam"],
-      "Mangu": ["Mangu", "Jos", "Pankshin", "Shendam"],
-      "Mikang": ["Mikang", "Jos", "Pankshin", "Shendam"],
-      "Pankshin": ["Pankshin", "Jos", "Shendam", "Bokkos"],
-      "Qua'an Pan": ["Qua'an Pan", "Jos", "Pankshin", "Shendam"],
-      "Riyom": ["Riyom", "Jos", "Pankshin", "Shendam"],
-      "Shendam": ["Shendam", "Jos", "Pankshin", "Kanam"],
-      "Wase": ["Wase", "Jos", "Pankshin", "Shendam"]
-    }
+    "Barikin Ladi":     ["Barikin Ladi"],
+    "Bassa":            ["Bassa"],
+    "Bokkos":           ["Bokkos"],
+    "Jos East":         ["Jos", "Barkin Ladi Road"],
+    "Jos North":        ["Jos", "Bauchi Road", "Terminus", "Farin Gada", "GRA"],
+    "Jos South":        ["Bukuru", "Rantya", "Gyel", "Kuru"],
+    "Kanam":            ["Kanam", "Shendam"],
+    "Kanke":            ["Kanke"],
+    "Langtang North":   ["Langtang"],
+    "Langtang South":   ["Langtang"],
+    "Mangu":            ["Mangu"],
+    "Mikang":           ["Mikang"],
+    "Pankshin":         ["Pankshin"],
+    "Qua'an Pan":       ["Shendam"],
+    "Riyom":            ["Riyom"],
+    "Shendam":          ["Shendam"],
+    "Wase":             ["Wase"],
   },
+
   "Rivers": {
-    lgas: {
-      "Abua/Odual": ["Abua", "Odual", "Port Harcourt", "Ahoada"],
-      "Ahoada East": ["Ahoada", "Port Harcourt", "Abua", "Odual"],
-      "Ahoada West": ["Ahoada", "Port Harcourt", "Abua", "Odual"],
-      "Akuku-Toru": ["Abonnema", "Port Harcourt", "Buguma", "Degema"],
-      "Andoni": ["Andoni", "Port Harcourt", "Bonny", "Opobo"],
-      "Asari-Toru": ["Buguma", "Port Harcourt", "Abonnema", "Degema"],
-      "Bonny": ["Bonny", "Port Harcourt", "Opobo", "Andoni"],
-      "Degema": ["Degema", "Port Harcourt", "Abonnema", "Buguma"],
-      "Eleme": ["Eleme", "Port Harcourt", "Obio-Akpor", "Okrika"],
-      "Emohua": ["Emohua", "Port Harcourt", "Ikwerre", "Etche"],
-      "Etche": ["Etche", "Port Harcourt", "Ikwerre", "Emohua"],
-      "Gokana": ["Gokana", "Port Harcourt", "Khana", "Ogoni"],
-      "Ikwerre": ["Ikwerre", "Port Harcourt", "Obio-Akpor", "Emohua"],
-      "Khana": ["Bori", "Port Harcourt", "Gokana", "Ogoni"],
-      "Obio/Akpor": ["Rumuola", "Port Harcourt", "Rumuokoro", "Rumuibekwe"],
-      "Ogba/Egbema/Ndoni": ["Omoku", "Port Harcourt", "Ahoada", "Abua"],
-      "Ogu/Bolo": ["Ogu", "Port Harcourt", "Okrika", "Eleme"],
-      "Okrika": ["Okrika", "Port Harcourt", "Eleme", "Ogu"],
-      "Omuma": ["Omuma", "Port Harcourt", "Ikwerre", "Etche"],
-      "Opobo/Nkoro": ["Opobo", "Port Harcourt", "Bonny", "Andoni"],
-      "Oyigbo": ["Oyigbo", "Port Harcourt", "Obio-Akpor", "Ikwerre"],
-      "Port Harcourt": ["Port Harcourt", "GRA", "Old GRA", "Rumuola", "Mile 3", "Creek Road"],
-      "Tai": ["Tai", "Port Harcourt", "Gokana", "Ogoni"]
-    }
+    "Abua/Odual":       ["Abua"],
+    "Ahoada East":      ["Ahoada"],
+    "Ahoada West":      ["Ahoada"],
+    "Akuku-Toru":       ["Abonnema"],
+    "Andoni":           ["Andoni"],
+    "Asari-Toru":       ["Buguma"],
+    "Bonny":            ["Bonny"],
+    "Degema":           ["Degema"],
+    "Eleme":            ["Eleme", "Ogale", "Aleto"],
+    "Emuoha":           ["Emuoha"],
+    "Etche":            ["Etche", "Okehi"],
+    "Gokana":           ["Kpor"],
+    "Ikwerre":          ["Ikwerre", "Rumuola"],
+    "Khana":            ["Bori"],
+    "Obio/Akpor":       ["Rumuola", "Rumuokoro", "Rukpokwu", "Eliozu", "Rumuibekwe"],
+    "Ogba/Egbema/Ndoni":["Omoku"],
+    "Ogu/Bolo":         ["Ogu"],
+    "Okrika":           ["Okrika"],
+    "Omuma":            ["Omuma"],
+    "Opobo/Nkoro":      ["Opobo"],
+    "Oyigbo":           ["Oyigbo"],
+    "Port Harcourt":    ["Port Harcourt", "GRA", "Old GRA", "Mile 3", "Trans-Amadi", "Diobu", "Creek Road"],
+    "Tai":              ["Tai"],
   },
+
   "Sokoto": {
-    lgas: {
-      "Binji": ["Binji", "Sokoto", "Wurno", "Illela"],
-      "Bodinga": ["Bodinga", "Sokoto", "Wurno", "Illela"],
-      "Dange Shuni": ["Dange Shuni", "Sokoto", "Wurno", "Illela"],
-      "Gada": ["Gada", "Sokoto", "Wurno", "Illela"],
-      "Goronyo": ["Goronyo", "Sokoto", "Wurno", "Illela"],
-      "Gudu": ["Gudu", "Sokoto", "Wurno", "Illela"],
-      "Gwadabawa": ["Gwadabawa", "Sokoto", "Wurno", "Illela"],
-      "Illela": ["Illela", "Sokoto", "Wurno", "Gwadabawa"],
-      "Isa": ["Isa", "Sokoto", "Wurno", "Illela"],
-      "Kebbe": ["Kebbe", "Sokoto", "Wurno", "Illela"],
-      "Kware": ["Kware", "Sokoto", "Wurno", "Illela"],
-      "Rabah": ["Rabah", "Sokoto", "Wurno", "Illela"],
-      "Sabon Birni": ["Sabon Birni", "Sokoto", "Wurno", "Illela"],
-      "Shagari": ["Shagari", "Sokoto", "Wurno", "Illela"],
-      "Silame": ["Silame", "Sokoto", "Wurno", "Illela"],
-      "Sokoto North": ["Sokoto", "Gawon Nama", "Mabera", "Runjin Sambo"],
-      "Sokoto South": ["Sokoto", "Gawon Nama", "Mabera", "Runjin Sambo"],
-      "Tambuwal": ["Tambuwal", "Sokoto", "Wurno", "Illela"],
-      "Tangaza": ["Tangaza", "Sokoto", "Wurno", "Illela"],
-      "Tureta": ["Tureta", "Sokoto", "Wurno", "Illela"],
-      "Wamako": ["Wamako", "Sokoto", "Wurno", "Illela"],
-      "Wurno": ["Wurno", "Sokoto", "Gwadabawa", "Illela"],
-      "Yabo": ["Yabo", "Sokoto", "Wurno", "Illela"]
-    }
+    "Binji":            ["Binji"],
+    "Bodinga":          ["Bodinga"],
+    "Dange Shuni":      ["Dange Shuni"],
+    "Gada":             ["Gada"],
+    "Goronyo":          ["Goronyo"],
+    "Gudu":             ["Gudu"],
+    "Gwadabawa":        ["Gwadabawa"],
+    "Illela":           ["Illela"],
+    "Isa":              ["Isa"],
+    "Kebbe":            ["Kebbe"],
+    "Kware":            ["Kware"],
+    "Rabah":            ["Rabah"],
+    "Sabon Birni":      ["Sabon Birni"],
+    "Shagari":          ["Shagari"],
+    "Silame":           ["Silame"],
+    "Sokoto North":     ["Sokoto", "Gawon Nama", "Mabera", "GRA"],
+    "Sokoto South":     ["Sokoto", "Arkilla", "Dundaye"],
+    "Tambuwal":         ["Tambuwal"],
+    "Tangaza":          ["Tangaza"],
+    "Tureta":           ["Tureta"],
+    "Wamako":           ["Wamako"],
+    "Wurno":            ["Wurno"],
+    "Yabo":             ["Yabo"],
   },
+
   "Taraba": {
-    lgas: {
-      "Ardo Kola": ["Ardo Kola", "Jalingo", "Yorro", "Zing"],
-      "Bali": ["Bali", "Jalingo", "Yorro", "Zing"],
-      "Donga": ["Donga", "Jalingo", "Yorro", "Zing"],
-      "Gashaka": ["Gashaka", "Jalingo", "Yorro", "Zing"],
-      "Gasso": ["Gasso", "Jalingo", "Yorro", "Zing"],
-      "Ibi": ["Ibi", "Jalingo", "Yorro", "Zing"],
-      "Jalingo": ["Jalingo", "Yorro", "Zing", "Donga"],
-      "Karim Lamido": ["Karim Lamido", "Jalingo", "Yorro", "Zing"],
-      "Kumi": ["Kumi", "Jalingo", "Yorro", "Zing"],
-      "Lau": ["Lau", "Jalingo", "Yorro", "Zing"],
-      "Sardauna": ["Sardauna", "Jalingo", "Yorro", "Zing"],
-      "Takum": ["Takum", "Jalingo", "Yorro", "Zing"],
-      "Ussa": ["Ussa", "Jalingo", "Yorro", "Zing"],
-      "Wukari": ["Wukari", "Jalingo", "Yorro", "Zing"],
-      "Yorro": ["Yorro", "Jalingo", "Zing", "Donga"],
-      "Zing": ["Zing", "Jalingo", "Yorro", "Donga"]
-    }
+    "Ardo Kola":        ["Ardo Kola"],
+    "Bali":             ["Bali"],
+    "Donga":            ["Donga"],
+    "Gashaka":          ["Gashaka"],
+    "Gassol":           ["Gassol"],
+    "Ibi":              ["Ibi"],
+    "Jalingo":          ["Jalingo", "GRA", "New Layout", "Barade"],
+    "Karim Lamido":     ["Karim Lamido"],
+    "Kumi":             ["Kumi"],
+    "Lau":              ["Lau"],
+    "Sardauna":         ["Sardauna", "Gembu"],
+    "Takum":            ["Takum"],
+    "Ussa":             ["Ussa"],
+    "Wukari":           ["Wukari"],
+    "Yorro":            ["Yorro"],
+    "Zing":             ["Zing"],
   },
+
   "Yobe": {
-    lgas: {
-      "Bade": ["Gashua", "Nguru", "Potiskum", "Damaturu"],
-      "Bursari": ["Bursari", "Damaturu", "Potiskum", "Nguru"],
-      "Damaturu": ["Damaturu", "Potiskum", "Nguru", "Gashua"],
-      "Fika": ["Fika", "Potiskum", "Damaturu", "Nguru"],
-      "Fune": ["Fune", "Damaturu", "Potiskum", "Nguru"],
-      "Geidam": ["Geidam", "Damaturu", "Potiskum", "Nguru"],
-      "Gujba": ["Gujba", "Damaturu", "Potiskum", "Nguru"],
-      "Gulani": ["Gulani", "Damaturu", "Potiskum", "Nguru"],
-      "Jakusko": ["Jakusko", "Damaturu", "Potiskum", "Nguru"],
-      "Karasuwa": ["Karasuwa", "Damaturu", "Potiskum", "Nguru"],
-      "Machina": ["Machina", "Damaturu", "Potiskum", "Nguru"],
-      "Nangere": ["Nangere", "Damaturu", "Potiskum", "Nguru"],
-      "Nguru": ["Nguru", "Damaturu", "Potiskum", "Gashua"],
-      "Potiskum": ["Potiskum", "Damaturu", "Nguru", "Gashua"],
-      "Tarmua": ["Tarmua", "Damaturu", "Potiskum", "Nguru"],
-      "Tarmuwa": ["Tarmuwa", "Damaturu", "Potiskum", "Nguru"],
-      "Yunusari": ["Yunusari", "Damaturu", "Potiskum", "Nguru"],
-      "Yusufari": ["Yusufari", "Damaturu", "Potiskum", "Nguru"]
-    }
+    "Bade":             ["Bade", "Gashua"],
+    "Bursari":          ["Bursari"],
+    "Damaturu":         ["Damaturu", "GRA", "Pompomari"],
+    "Fika":             ["Fika"],
+    "Fune":             ["Fune"],
+    "Geidam":           ["Geidam"],
+    "Gujba":            ["Gujba"],
+    "Gulani":           ["Gulani"],
+    "Jakusko":          ["Jakusko"],
+    "Karasuwa":         ["Karasuwa"],
+    "Machina":          ["Machina"],
+    "Nangere":          ["Nangere"],
+    "Nguru":            ["Nguru"],
+    "Potiskum":         ["Potiskum"],
+    "Tarmuwa":          ["Tarmuwa"],
+    "Yunusari":         ["Yunusari"],
+    "Yusufari":         ["Yusufari"],
   },
+
   "Zamfara": {
-    lgas: {
-      "Anka": ["Anka", "Gusau", "Talata Mafara", "Kaura Namoda"],
-      "Bakura": ["Bakura", "Gusau", "Talata Mafara", "Kaura Namoda"],
-      "Birnin Magaji/Kiyaw": ["Birnin Magaji", "Gusau", "Talata Mafara", "Kaura Namoda"],
-      "Bukkuyum": ["Bukkuyum", "Gusau", "Talata Mafara", "Kaura Namoda"],
-      "Bungudu": ["Bungudu", "Gusau", "Talata Mafara", "Kaura Namoda"],
-      "Gummi": ["Gummi", "Gusau", "Talata Mafara", "Kaura Namoda"],
-      "Gusau": ["Gusau", "Talata Mafara", "Kaura Namoda", "Anka"],
-      "Kaura Namoda": ["Kaura Namoda", "Gusau", "Talata Mafara", "Anka"],
-      "Maradun": ["Maradun", "Gusau", "Talata Mafara", "Kaura Namoda"],
-      "Maru": ["Maru", "Gusau", "Talata Mafara", "Kaura Namoda"],
-      "Shinkafi": ["Shinkafi", "Gusau", "Talata Mafara", "Kaura Namoda"],
-      "Talata Mafara": ["Talata Mafara", "Gusau", "Kaura Namoda", "Anka"],
-      "Tsafe": ["Tsafe", "Gusau", "Talata Mafara", "Kaura Namoda"],
-      "Zurmi": ["Zurmi", "Gusau", "Talata Mafara", "Kaura Namoda"]
-    }
-  }
+    "Anka":             ["Anka"],
+    "Bakura":           ["Bakura"],
+    "Birnin Magaji/Kiyaw":["Birnin Magaji"],
+    "Bukkuyum":         ["Bukkuyum"],
+    "Bungudu":          ["Bungudu"],
+    "Gummi":            ["Gummi"],
+    "Gusau":            ["Gusau", "GRA", "Sabon Gari", "Tudun Wada"],
+    "Kaura Namoda":     ["Kaura Namoda"],
+    "Maradun":          ["Maradun"],
+    "Maru":             ["Maru"],
+    "Shinkafi":         ["Shinkafi"],
+    "Talata Mafara":    ["Talata Mafara"],
+    "Tsafe":            ["Tsafe"],
+    "Wurno":            ["Wurno"],
+    "Zurmi":            ["Zurmi"],
+  },
 };
+
+// ── Exports ──────────────────────────────────────────────────
 
 export const STATES = Object.keys(NIGERIA_ADDRESS_DATA).sort();
 
 export function getLGAs(state) {
   if (!state || !NIGERIA_ADDRESS_DATA[state]) return [];
-  return Object.keys(NIGERIA_ADDRESS_DATA[state].lgas).sort();
+  return Object.keys(NIGERIA_ADDRESS_DATA[state]).sort();
 }
 
 export function getCities(state, lga) {
   if (!state || !lga) return [];
-  return NIGERIA_ADDRESS_DATA[state]?.lgas[lga] || [];
+  return NIGERIA_ADDRESS_DATA[state]?.[lga] || [];
 }
-// ============================================================
-// useNigeriaAddress.js — Custom hook for cascading address state
-// Usage: const { address, handlers, derived } = useNigeriaAddress(initialValues)
-// ============================================================
 
+// Towns are same as cities in this structure (cities ARE the towns within the LGA)
+// For street-level granularity the user types it in manually
+export function getTowns(state, lga, city) {
+  // Return empty — towns are already the leaf level (cities within LGAs)
+  return [];
+}
 import { useState, useCallback } from 'react';
 import { STATES, getLGAs, getCities } from '../data/nigeriaAddressData';
 
-/**
- * @param {Object} initial - Optional initial values { state, lga, city, street, landmark }
- */
 export function useNigeriaAddress(initial = {}) {
   const [address, setAddress] = useState({
     state:    initial.state    || '',
     lga:      initial.lga      || '',
     city:     initial.city     || '',
     street:   initial.street   || '',
+    street2:  initial.street2  || '',
     landmark: initial.landmark || '',
+    postcode: initial.postcode || '',
   });
 
-  // Cascading: changing state resets lga + city
   const handleStateChange = useCallback((e) => {
-    const value = e.target.value;
-    setAddress(prev => ({ ...prev, state: value, lga: '', city: '' }));
+    setAddress((p) => ({ ...p, state: e.target.value, lga: '', city: '' }));
   }, []);
 
-  // Cascading: changing lga resets city
   const handleLGAChange = useCallback((e) => {
-    const value = e.target.value;
-    setAddress(prev => ({ ...prev, lga: value, city: '' }));
+    setAddress((p) => ({ ...p, lga: e.target.value, city: '' }));
   }, []);
 
-  const handleCityChange = useCallback((e) => {
-    setAddress(prev => ({ ...prev, city: e.target.value }));
-  }, []);
+  const handleCityChange   = useCallback((e) => setAddress((p) => ({ ...p, city:     e.target.value })), []);
+  const handleStreetChange = useCallback((e) => setAddress((p) => ({ ...p, street:   e.target.value })), []);
+  const handleStreet2Change= useCallback((e) => setAddress((p) => ({ ...p, street2:  e.target.value })), []);
+  const handleLandmarkChange=useCallback((e) => setAddress((p) => ({ ...p, landmark: e.target.value })), []);
+  const handlePostcodeChange=useCallback((e) => setAddress((p) => ({ ...p, postcode: e.target.value })), []);
+  const resetAddress       = useCallback(() =>
+    setAddress({ state:'', lga:'', city:'', street:'', street2:'', landmark:'', postcode:'' }), []);
+  const setAddressValues   = useCallback((v) => setAddress((p) => ({ ...p, ...v })), []);
 
-  const handleStreetChange = useCallback((e) => {
-    setAddress(prev => ({ ...prev, street: e.target.value }));
-  }, []);
-
-  const handleLandmarkChange = useCallback((e) => {
-    setAddress(prev => ({ ...prev, landmark: e.target.value }));
-  }, []);
-
-  // Reset all fields
-  const resetAddress = useCallback(() => {
-    setAddress({ state: '', lga: '', city: '', street: '', landmark: '' });
-  }, []);
-
-  // Bulk set (e.g. when editing an existing record)
-  const setAddressValues = useCallback((values) => {
-    setAddress(prev => ({ ...prev, ...values }));
-  }, []);
-
-  // Derived lists (auto-update from current selections)
   const lgas   = getLGAs(address.state);
   const cities = getCities(address.state, address.lga);
 
-  // Formatted full address string (for display / submission)
   const fullAddress = [
     address.street,
+    address.street2,
     address.city,
     address.lga,
     address.state,
+    address.postcode,
     'Nigeria',
   ].filter(Boolean).join(', ');
 
-  // Validation helpers
-  const isStateValid = Boolean(address.state);
-  const isLGAValid   = Boolean(address.lga);
-  const isCityValid  = Boolean(address.city);
-  const isStreetValid = address.street.trim().length >= 3;
-  const isAddressComplete = isStateValid && isLGAValid && isCityValid && isStreetValid;
+  const isAddressComplete = Boolean(
+    address.state && address.lga && address.city && address.street.trim().length >= 3
+  );
 
   return {
     address,
     handlers: {
-      handleStateChange,
-      handleLGAChange,
-      handleCityChange,
-      handleStreetChange,
-      handleLandmarkChange,
-      resetAddress,
-      setAddressValues,
+      handleStateChange, handleLGAChange, handleCityChange,
+      handleStreetChange, handleStreet2Change, handleLandmarkChange,
+      handlePostcodeChange, resetAddress, setAddressValues,
     },
     derived: {
-      states:   STATES,
+      states: STATES,
       lgas,
       cities,
       fullAddress,
-      isStateValid,
-      isLGAValid,
-      isCityValid,
-      isStreetValid,
       isAddressComplete,
     },
   };
+}
+import { useEffect, useRef, useCallback } from "react";
+import { io } from "socket.io-client";
+
+const SOCKET_URL = import.meta.env.VITE_API_URL;
+let _socket = null;
+
+function getSocket() {
+  if (!_socket) {
+    _socket = io(SOCKET_URL, {
+      transports: ["websocket", "polling"],
+      reconnectionAttempts: 20,
+      reconnectionDelay: 1500,
+      timeout: 10000,
+    });
+    _socket.on("connect",       () => console.log("[socket] connected:", _socket.id));
+    _socket.on("disconnect",    (r) => console.log("[socket] disconnected:", r));
+    _socket.on("connect_error", (e) => console.warn("[socket] connect_error:", e.message));
+  }
+  return _socket;
+}
+
+export function useSocket(userId, callbacks = {}) {
+  const cbRef     = useRef(callbacks);
+  const idleTimer = useRef(null);
+
+  // Always keep latest callbacks — no stale closures ever
+  useEffect(() => { cbRef.current = callbacks; });
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const socket = getSocket();
+
+    // ── Join room exactly once per mount ────────────────────
+    // "connect" fires once on first connection.
+    // "reconnect" (manager event) fires on subsequent reconnections.
+    const doJoin = () => {
+      socket.emit("join", userId);
+      console.log("[socket] join →", userId);
+    };
+
+    if (socket.connected) {
+      doJoin();                          // already connected — join immediately
+    } else {
+      socket.once("connect", doJoin);    // wait for first connection
+    }
+
+    // Re-join only on REconnects (not the first connect — handled above)
+    const onReconnect = () => {
+      console.log("[socket] reconnect — re-joining:", userId);
+      doJoin();
+    };
+    socket.io.on("reconnect", onReconnect);   // manager-level event, fires only on re-connects
+
+    // ── Event handlers ──────────────────────────────────────
+    const onMessage   = (msg)  => cbRef.current.onMessage?.(msg);
+    const onStatus    = (data) => cbRef.current.onStatus?.(data);
+    const onPinged    = (data) => { console.log("[socket] pinged:", data); cbRef.current.onPinged?.(data); };
+    const onCleared   = ()     => cbRef.current.onChatCleared?.();
+
+    socket.on("newMessage",  onMessage);
+    socket.on("userStatus",  onStatus);
+    socket.on("pinged",      onPinged);
+    socket.on("chatCleared", onCleared);
+
+    // ── Idle detection ──────────────────────────────────────
+    const resetIdle = () => {
+      clearTimeout(idleTimer.current);
+      idleTimer.current = setTimeout(() => socket.emit("idle", userId), 3 * 60 * 1000);
+    };
+    window.addEventListener("mousemove", resetIdle);
+    window.addEventListener("keydown",   resetIdle);
+    resetIdle();
+
+    // ── Cleanup ─────────────────────────────────────────────
+    return () => {
+      socket.off("connect",     doJoin);
+      socket.io.off("reconnect", onReconnect);
+      socket.off("newMessage",  onMessage);
+      socket.off("userStatus",  onStatus);
+      socket.off("pinged",      onPinged);
+      socket.off("chatCleared", onCleared);
+      clearTimeout(idleTimer.current);
+      window.removeEventListener("mousemove", resetIdle);
+      window.removeEventListener("keydown",   resetIdle);
+    };
+  }, [userId]);
+
+  const pingUser = useCallback((targetId, adminName) => {
+    console.log("[socket] ping_user → targetId:", targetId);
+    getSocket().emit("ping_user", { targetId, adminName });
+  }, []);
+
+  return { pingUser };
 }
 const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -2748,11 +3193,10 @@ const handleResponse = async (res) => {
   return data;
 };
 
-
+// ── Auth ─────────────────────────────────────────────────────
 export const loginUser = async ({ email, password }) => {
   const res = await fetch(`${BASE_URL}/api/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
   return handleResponse(res);
@@ -2760,72 +3204,387 @@ export const loginUser = async ({ email, password }) => {
 
 export const registerUser = async ({ fullName, email, password, role }) => {
   const res = await fetch(`${BASE_URL}/api/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ fullName, email, password, role }),
   });
   return handleResponse(res);
 };
 
-
+// ── Records ──────────────────────────────────────────────────
 export const submitRecord = async (token, payload) => {
   const res = await fetch(`${BASE_URL}/api/records`, {
-    method: "POST",
-    headers: authHeaders(token),
+    method: "POST", headers: authHeaders(token),
     body: JSON.stringify(payload),
   });
   return handleResponse(res);
 };
 
+// ── Admin ────────────────────────────────────────────────────
+export const getAdminRecords = async (token) =>
+  handleResponse(await fetch(`${BASE_URL}/api/admin/records`, { headers: authHeaders(token) }));
 
-export const getAdminRecords = async (token) => {
-  const res = await fetch(`${BASE_URL}/api/admin/records`, {
-    headers: authHeaders(token),
-  });
-  return handleResponse(res);
-};
+export const getUsers = async (token) =>
+  handleResponse(await fetch(`${BASE_URL}/api/admin/users`, { headers: authHeaders(token) }));
 
-export const getUsers = async (token) => {
-  const res = await fetch(`${BASE_URL}/api/admin/users`, {
-    headers: authHeaders(token),
-  });
-  return handleResponse(res);
-};
+export const deleteUser = async (token, userId) =>
+  handleResponse(await fetch(`${BASE_URL}/api/admin/users/${userId}`, {
+    method: "DELETE", headers: authHeaders(token),
+  }));
 
-export const deleteUser = async (token, userId) => {
-  const res = await fetch(`${BASE_URL}/api/admin/users/${userId}`, {
-    method: "DELETE",
-    headers: authHeaders(token),
-  });
-  return handleResponse(res);
-};
-
-export const updateUserRole = async (token, userId, role) => {
-  const res = await fetch(`${BASE_URL}/api/admin/users/${userId}/role`, {
-    method: "PUT",
-    headers: authHeaders(token),
+export const updateUserRole = async (token, userId, role) =>
+  handleResponse(await fetch(`${BASE_URL}/api/admin/users/${userId}/role`, {
+    method: "PUT", headers: authHeaders(token),
     body: JSON.stringify({ role }),
-  });
-  return handleResponse(res);
-};
-
+  }));
 
 export const exportRecordsExcel = (token) => {
-  const link = document.createElement("a");
-  link.href = `${BASE_URL}/api/admin/records/export`;
-
-  fetch(`${BASE_URL}/api/admin/records/export`, {
-    headers: authHeaders(token),
-  })
+  fetch(`${BASE_URL}/api/admin/records/export`, { headers: authHeaders(token) })
     .then((res) => res.blob())
     .then((blob) => {
-      const url = URL.createObjectURL(blob);
+      const url  = URL.createObjectURL(blob);
+      const link = document.createElement("a");
       link.href = url;
       link.download = `BHF_Records_${Date.now()}.xlsx`;
       link.click();
       URL.revokeObjectURL(url);
     });
 };
+
+export const exportUsersExcel = (token) => {
+  fetch(`${BASE_URL}/api/admin/users/export`, { headers: authHeaders(token) })
+    .then((res) => res.blob())
+    .then((blob) => {
+      const url  = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `BHF_Users_${Date.now()}.xlsx`;
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+};
+
+// ── Chat ─────────────────────────────────────────────────────
+export const getMessages = async (token, userId) =>
+  handleResponse(await fetch(`${BASE_URL}/api/chat/messages/${userId}`, { headers: authHeaders(token) }));
+
+export const sendMessage = async (token, { receiverId, content, type = "message" }) =>
+  handleResponse(await fetch(`${BASE_URL}/api/chat/messages`, {
+    method: "POST", headers: authHeaders(token),
+    body: JSON.stringify({ receiverId, content, type }),
+  }));
+
+export const getUnreadCount = async (token) =>
+  handleResponse(await fetch(`${BASE_URL}/api/chat/messages/unread/count`, { headers: authHeaders(token) }));
+
+export const getAdminConversations = async (token) =>
+  handleResponse(await fetch(`${BASE_URL}/api/chat/admin/conversations`, { headers: authHeaders(token) }));
+
+export const getAdminId = async (token) =>
+  handleResponse(await fetch(`${BASE_URL}/api/chat/admin/id`, { headers: authHeaders(token) }));
+
+export const clearChat = async (token, userId) =>
+  handleResponse(await fetch(`${BASE_URL}/api/chat/messages/clear/${userId}`, {
+    method: "DELETE", headers: authHeaders(token),
+  }));
+
+export const updateStatus = async (token, status) =>
+  handleResponse(await fetch(`${BASE_URL}/api/chat/status`, {
+    method: "PUT", headers: authHeaders(token),
+    body: JSON.stringify({ status }),
+  }));
+
+export const saveCookieConsent = async (token, accepted) =>
+  handleResponse(await fetch(`${BASE_URL}/api/chat/cookie-consent`, {
+    method: "PUT", headers: authHeaders(token),
+    body: JSON.stringify({ accepted }),
+  }));
+  import { Routes, Route, Navigate } from "react-router-dom";
+import { useState } from "react";
+import LandingPage    from "./components/Home";
+import LoginPage      from "./components/LoginPage";
+import Dashboard      from "./components/Dashboard";
+import Step1          from "./components/Step1";
+import Step2          from "./components/Step2";
+import Success        from "./components/Success";
+import AdminDashboard from "./components/AdminDashboard";
+import NotFound       from "./pages/NotFound";
+import Icon           from "./components/Icon";
+import { useAuth }    from "./context/AuthContext";
+import { submitRecord } from "./services/api";
+import "./App.css";
+
+// ── Protected route wrappers ──────────────────────────────────
+function RequireAuth({ children }) {
+  const { user, ready } = useAuth();
+  if (!ready) return null;
+  if (!user) return <Navigate to="/login" replace />;
+  return children;
+}
+
+function RequireAdmin({ children }) {
+  const { user, ready } = useAuth();
+  if (!ready) return null;
+  if (!user || user.role !== "Administrator") return <NotFound />;
+  return children;
+}
+
+// ── i18n ──────────────────────────────────────────────────────
+const headerText = {
+  en: { badge: "DataGuardian", title: "Beneficiary Intake Form", sub: "Beyond Health Foundation — Secure, encrypted data collection for community health programs." },
+  ha: { badge: "DataGuardian", title: "Fom na Amfanin Masu Amfani", sub: "Gidauniyar Lafiya ta BHF — Tattara bayanai lafiya da sirri." },
+  yo: { badge: "DataGuardian", title: "Fọọmu Gbigba Oluranlọwọ", sub: "BHF — Gbigba data ti o ni aabo fun awọn eto ilera agbegbe." },
+  ig: { badge: "DataGuardian", title: "Ụdị Natarị Onye Ọrụ", sub: "BHF — Nchịkọta data nchekwa maka mmemme ahụike obodo." },
+  fr: { badge: "DataGuardian", title: "Formulaire d'Admission", sub: "BHF — Collecte de données sécurisée pour les programmes de santé communautaire." },
+  ar: { badge: "DataGuardian", title: "استمارة قبول المستفيد", sub: "مؤسسة BHF — جمع بيانات آمن ومشفر لبرامج الصحة المجتمعية." },
+};
+
+const navText = {
+  en: { next: "Next Step",        prev: "Previous",    submit: "Submit Record",    home: "Home",      logout: "Logout" },
+  ha: { next: "Mataki na Gaba",   prev: "Baya",         submit: "Aika Bayani",      home: "Gida",      logout: "Fita" },
+  yo: { next: "Igbesẹ Ti o Tẹle", prev: "Iṣaaju",      submit: "Firanṣẹ Igbasilẹ", home: "Ile",       logout: "Jade" },
+  ig: { next: "Nzọụkwụ Ọzọ",      prev: "Nazaghachi",   submit: "Zipu Ndekọ",       home: "Ulo",       logout: "Pụọ" },
+  fr: { next: "Étape Suivante",    prev: "Précédent",    submit: "Soumettre",        home: "Accueil",   logout: "Déconnexion" },
+  ar: { next: "الخطوة التالية",    prev: "السابق",       submit: "إرسال السجل",      home: "الرئيسية",  logout: "خروج" },
+};
+
+const emptyForm = {
+  firstName: "", lastName: "", gender: "", age: "",
+  phone: "", address: "", volunteerName: "",
+  bloodPressureSystolic: "", bloodPressureDiastolic: "",
+  bloodSugar: "", weight: "", height: "", bmi: "",
+};
+
+// ── Form page (Step 1 + 2) ────────────────────────────────────
+function FormPage({ lang, setLang }) {
+  const { user, logout } = useAuth();
+  const [currentStep,   setCurrentStep]   = useState(1);
+  const [conditions,    setConditions]    = useState([]);
+  const [dashboardOpen, setDashboardOpen] = useState(false);
+  const [formData,      setFormData]      = useState(emptyForm);
+  const [submitting,    setSubmitting]    = useState(false);
+  const [submitError,   setSubmitError]   = useState("");
+  const [done,          setDone]          = useState(false);
+
+  const h     = headerText[lang] || headerText.en;
+  const n     = navText[lang]    || navText.en;
+  const isRTL = lang === "ar";
+
+  const handleLogout = () => { logout(); window.location.href = "/"; };
+  const nextStep     = () => { setCurrentStep(2); setDashboardOpen(false); };
+  const prevStep     = () => { setCurrentStep(1); setDashboardOpen(false); };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitError("");
+    setSubmitting(true);
+    try {
+      await submitRecord(user?.token, {
+        ...formData, conditions, lang,
+        submittedAt: new Date().toISOString(),
+      });
+      setDone(true);
+      window.scrollTo({ top: 0 });
+    } catch (err) {
+      setSubmitError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (done) {
+    return (
+      <Success
+        setSubmitted={() => {
+          setDone(false);
+          setFormData(emptyForm);
+          setConditions([]);
+          setCurrentStep(1);
+        }}
+        lang={lang}
+      />
+    );
+  }
+
+  return (
+    <div className="container" dir={isRTL ? "rtl" : "ltr"}>
+      {dashboardOpen && (
+        <div className="dashboard-overlay" onClick={() => setDashboardOpen(false)} />
+      )}
+
+      <Dashboard
+        currentStep={currentStep}
+        setCurrentStep={(s) => { setCurrentStep(s); setDashboardOpen(false); }}
+        lang={lang}
+        setLang={setLang}
+        dashboardOpen={dashboardOpen}
+        setDashboardOpen={setDashboardOpen}
+        onBackToHome={() => { window.location.href = "/"; }}
+      />
+
+      <main className="main-content">
+        <div className="mobile-topbar">
+          <button className="hamburger" onClick={() => setDashboardOpen(true)}>
+            <Icon name="menu" size={20} />
+          </button>
+          <span className="mobile-brand">
+            <Icon name="shield-plus" size={16} />
+            BHF DataGuardian
+          </span>
+          <span className="mobile-step">{currentStep}/2</span>
+        </div>
+
+        <div className="form-top-row">
+          <button className="back-to-home" onClick={() => { window.location.href = "/"; }}>
+            <Icon name="arrow-left" size={15} />
+            {n.home}
+          </button>
+
+          {user && (
+            <div className="user-chip">
+              <div className="user-chip-avatar">
+                {user.fullName?.charAt(0).toUpperCase()}
+              </div>
+              <div className="user-chip-info">
+                <span className="user-chip-name">{user.fullName}</span>
+                <span className="user-chip-role">{user.role}</span>
+              </div>
+              <button className="user-chip-logout" onClick={handleLogout} title={n.logout}>
+                <Icon name="log-out" size={15} />
+              </button>
+            </div>
+          )}
+        </div>
+
+        <header className="form-header">
+          <div className="header-badge">{h.badge}</div>
+          <h1>{h.title}</h1>
+          <p className="subtitle">{h.sub}</p>
+        </header>
+
+        <form className="form-container" onSubmit={handleSubmit}>
+          {currentStep === 1 && (
+            <Step1 formData={formData} setFormData={setFormData} lang={lang} />
+          )}
+          {currentStep === 2 && (
+            <Step2
+              formData={formData}
+              setFormData={setFormData}
+              conditions={conditions}
+              setConditions={setConditions}
+              lang={lang}
+            />
+          )}
+
+          {submitError && (
+            <div className="submit-error">
+              <Icon name="x" size={14} />
+              {submitError}
+            </div>
+          )}
+
+          <div className="form-navigation">
+            {currentStep > 1 && (
+              <button type="button" className="btn btn-secondary" onClick={prevStep}>
+                <Icon name="arrow-left" size={18} className="btn-icon" />
+                {n.prev}
+              </button>
+            )}
+            {currentStep === 1 && (
+              <button type="button" className="btn btn-primary" onClick={nextStep}>
+                {n.next}
+                <Icon name="arrow-right" size={18} className="btn-icon" />
+              </button>
+            )}
+            {currentStep === 2 && (
+              <button type="submit" className="btn btn-success" disabled={submitting}>
+                {submitting
+                  ? <><span className="login-spinner" />Saving...</>
+                  : <>{n.submit} <Icon name="check" size={18} className="btn-icon" /></>
+                }
+              </button>
+            )}
+          </div>
+        </form>
+      </main>
+    </div>
+  );
+}
+
+// ── Root App with Routes ──────────────────────────────────────
+export default function App() {
+  const { user, ready } = useAuth();
+  const [lang, setLang] = useState("en");
+
+  if (!ready) return null;
+
+  return (
+    <Routes>
+      {/* Public */}
+      <Route path="/" element={
+        <LandingPage
+          onStart={() => {
+            if (!user) window.location.href = "/login";
+            else if (user.role === "Administrator") window.location.href = "/admin";
+            else window.location.href = "/dashboard";
+          }}
+          lang={lang}
+          setLang={setLang}
+        />
+      } />
+
+      <Route path="/login" element={
+        user
+          ? <Navigate to={user.role === "Administrator" ? "/admin" : "/dashboard"} replace />
+          : <LoginPage
+              onSuccess={(data) => {
+                window.location.href = data.role === "Administrator" ? "/admin" : "/dashboard";
+              }}
+              onBack={() => { window.location.href = "/"; }}
+              lang={lang}
+            />
+      } />
+
+      {/* Protected: logged-in users */}
+      <Route path="/dashboard" element={
+        <RequireAuth>
+          <FormPage lang={lang} setLang={setLang} />
+        </RequireAuth>
+      } />
+
+      {/* Protected: admins only */}
+      <Route path="/admin" element={
+        <RequireAdmin>
+          <AdminDashboard onBack={() => { window.location.href = "/"; }} />
+        </RequireAdmin>
+      } />
+
+      <Route path="*" element={
+        <NotFound onBack={() => { window.location.href = "/"; }} />
+      } />
+    </Routes>
+  );
+}
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import ServerWake from "./components/ServerWake";
+import FloatingChat from "./components/FloatingChat";
+import CookieBanner from "./components/CookieBanner";
+import App from "./App";
+import "./App.css";
+import "./index.css";
+
+createRoot(document.getElementById("root")).render(
+  <BrowserRouter>
+    <AuthProvider>
+      <ServerWake>
+        <App />
+        <FloatingChat />
+        <CookieBanner />
+      </ServerWake>
+    </AuthProvider>
+  </BrowserRouter>
+);
 
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap');
 
@@ -3509,289 +4268,303 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
   color: var(--text);
   font-weight: 500;
 }
-import { Routes, Route, Navigate } from "react-router-dom";
-import { useState } from "react";
-import LandingPage    from "./components/Home";
-import LoginPage      from "./components/LoginPage";
-import Dashboard      from "./components/Dashboard";
-import Step1          from "./components/Step1";
-import Step2          from "./components/Step2";
-import Success        from "./components/Success";
-import AdminDashboard from "./components/AdminDashboard";
-import NotFound       from "./pages/NotFound";
-import Icon           from "./components/Icon";
-import { useAuth }    from "./context/AuthContext";
-import { submitRecord } from "./services/api";
-import "./App.css";
+/* ============================================================
+   APPEND THIS ENTIRE BLOCK TO THE BOTTOM OF App.css
+   ============================================================ */
 
-// ── Protected route wrappers ──────────────────────────────────
-function RequireAuth({ children }) {
-  const { user, ready } = useAuth();
-  if (!ready) return null;
-  if (!user) return <Navigate to="/login" replace />;
-  return children;
+/* ── FLOATING CHAT ──────────────────────────────────────────── */
+.chat-fab {
+  position: fixed; bottom: 1.75rem; right: 1.75rem; z-index: 200;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: none; color: white; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 24px rgba(16,185,129,0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.chat-fab:hover { transform: scale(1.1); box-shadow: 0 8px 32px rgba(16,185,129,0.5); }
+.chat-fab-badge {
+  position: absolute; top: -4px; right: -4px;
+  background: #ef4444; color: white;
+  border-radius: 999px; font-size: 0.62rem; font-weight: 800;
+  padding: 0.1rem 0.35rem; border: 2px solid var(--bg);
+  min-width: 18px; text-align: center;
 }
 
-function RequireAdmin({ children }) {
-  const { user, ready } = useAuth();
-  if (!ready) return null;
-  if (!user || user.role !== "Administrator") return <NotFound />;
-  return children;
+.chat-window {
+  position: fixed; bottom: 5.5rem; right: 1.75rem; z-index: 199;
+  width: 320px; max-height: 480px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 1rem;
+  display: flex; flex-direction: column;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  animation: fadeUp 0.25s ease;
+}
+.chat-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.875rem 1rem; border-bottom: 1px solid var(--border);
+  border-radius: 1rem 1rem 0 0; background: var(--card-2);
+}
+.chat-header-info { display: flex; align-items: center; gap: 0.6rem; }
+.chat-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg,#10b981,#2563eb);
+  color: white; font-weight: 800; font-size: 0.8rem;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.chat-header-name  { font-size: 0.875rem; font-weight: 700; color: var(--text); }
+.chat-header-status{ font-size: 0.68rem; color: #10b981; }
+.chat-close { background: none; border: none; color: var(--text-3); cursor: pointer; padding: 0.2rem; line-height: 0; transition: var(--t); }
+.chat-close:hover { color: var(--text); }
+
+.chat-messages {
+  flex: 1; overflow-y: auto; padding: 0.875rem;
+  display: flex; flex-direction: column; gap: 0.5rem;
+  scroll-behavior: smooth;
+}
+.chat-empty {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 0.5rem; color: var(--text-3);
+  font-size: 0.82rem; text-align: center; padding: 2rem 0;
+}
+.chat-msg { display: flex; flex-direction: column; max-width: 80%; }
+.chat-msg.mine  { align-self: flex-end; align-items: flex-end; }
+.chat-msg.theirs{ align-self: flex-start; align-items: flex-start; }
+.chat-bubble {
+  padding: 0.55rem 0.875rem; border-radius: 1rem; font-size: 0.875rem; line-height: 1.45;
+  word-break: break-word;
+}
+.chat-msg.mine .chat-bubble  { background: var(--primary); color: white; border-bottom-right-radius: 0.25rem; }
+.chat-msg.theirs .chat-bubble{ background: var(--card-2); color: var(--text); border-bottom-left-radius: 0.25rem; border: 1px solid var(--border); }
+.chat-time  { font-size: 0.65rem; color: var(--text-3); margin-top: 0.2rem; padding: 0 0.25rem; }
+.chat-read  { color: #10b981; font-weight: 700; }
+
+.chat-input-row {
+  display: flex; gap: 0.5rem; padding: 0.75rem;
+  border-top: 1px solid var(--border); border-radius: 0 0 1rem 1rem;
+}
+.chat-input {
+  flex: 1; padding: 0.6rem 0.875rem; background: var(--input);
+  border: 1px solid var(--border); border-radius: 0.5rem;
+  color: var(--text); font-size: 0.875rem; font-family: inherit; outline: none;
+  transition: var(--t);
+}
+.chat-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+.chat-send {
+  width: 36px; height: 36px; border-radius: 0.5rem; border: none;
+  background: var(--primary); color: white; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--t); flex-shrink: 0; align-self: center;
+}
+.chat-send:hover:not(:disabled) { background: var(--primary-h); }
+.chat-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── ADMIN CHAT PANEL ───────────────────────────────────────── */
+.admin-chat-panel {
+  width: 340px; flex-shrink: 0;
+  background: var(--card); border: 1px solid var(--border); border-radius: 0.875rem;
+  display: flex; flex-direction: column; height: 560px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+.admin-chat-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.875rem 1rem; border-bottom: 1px solid var(--border);
+  background: var(--card-2); border-radius: 0.875rem 0.875rem 0 0;
+}
+.admin-chat-messages {
+  flex: 1; overflow-y: auto; padding: 0.875rem;
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+.ping-popup {
+  position: fixed; top: 1.25rem; right: 1.25rem; z-index: 300;
+  background: linear-gradient(135deg,#f59e0b,#d97706);
+  color: white; border-radius: 0.625rem;
+  padding: 0.75rem 1.125rem; font-size: 0.875rem; font-weight: 600;
+  display: flex; align-items: center; gap: 0.5rem;
+  box-shadow: 0 8px 24px rgba(245,158,11,0.4);
+  animation: fadeUp 0.3s ease, fadeOut 0.3s ease 4.7s forwards;
+}
+@keyframes fadeOut { to { opacity: 0; transform: translateY(-8px); } }
+
+/* ── COOKIE BANNER ──────────────────────────────────────────── */
+.cookie-banner {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 250;
+  background: var(--card); border-top: 1px solid var(--border);
+  padding: 0.875rem 1.5rem;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.3);
+  animation: slideUp 0.4s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.cookie-banner-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+}
+.cookie-icon { flex-shrink: 0; }
+.cookie-text { flex: 1; font-size: 0.85rem; color: var(--text-2); line-height: 1.5; min-width: 200px; }
+.cookie-link { color: var(--primary-l); text-decoration: underline; }
+.cookie-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+.cookie-btn {
+  padding: 0.45rem 1rem; border-radius: 0.375rem; font-size: 0.82rem;
+  font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: var(--t);
+}
+.cookie-accept  { background: var(--success); color: white; }
+.cookie-accept:hover  { background: var(--success-h); }
+.cookie-decline { background: transparent; color: var(--text-3); border: 1px solid var(--border); }
+.cookie-decline:hover { background: var(--input); color: var(--text); }
+.cookie-dismiss {
+  background: none; border: none; color: var(--text-3); cursor: pointer;
+  padding: 0.25rem; line-height: 0; flex-shrink: 0; transition: var(--t);
+}
+.cookie-dismiss:hover { color: var(--text); }
+ /* ============================================================
+   APPEND THIS ENTIRE BLOCK TO THE BOTTOM OF App.css
+   ============================================================ */
+
+/* ── FLOATING CHAT ──────────────────────────────────────────── */
+.chat-fab {
+  position: fixed; bottom: 1.75rem; right: 1.75rem; z-index: 200;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: none; color: white; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 24px rgba(16,185,129,0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.chat-fab:hover { transform: scale(1.1); box-shadow: 0 8px 32px rgba(16,185,129,0.5); }
+.chat-fab-badge {
+  position: absolute; top: -4px; right: -4px;
+  background: #ef4444; color: white;
+  border-radius: 999px; font-size: 0.62rem; font-weight: 800;
+  padding: 0.1rem 0.35rem; border: 2px solid var(--bg);
+  min-width: 18px; text-align: center;
 }
 
-// ── i18n ──────────────────────────────────────────────────────
-const headerText = {
-  en: { badge: "DataGuardian", title: "Beneficiary Intake Form", sub: "Beyond Health Foundation — Secure, encrypted data collection for community health programs." },
-  ha: { badge: "DataGuardian", title: "Fom na Amfanin Masu Amfani", sub: "Gidauniyar Lafiya ta BHF — Tattara bayanai lafiya da sirri." },
-  yo: { badge: "DataGuardian", title: "Fọọmu Gbigba Oluranlọwọ", sub: "BHF — Gbigba data ti o ni aabo fun awọn eto ilera agbegbe." },
-  ig: { badge: "DataGuardian", title: "Ụdị Natarị Onye Ọrụ", sub: "BHF — Nchịkọta data nchekwa maka mmemme ahụike obodo." },
-  fr: { badge: "DataGuardian", title: "Formulaire d'Admission", sub: "BHF — Collecte de données sécurisée pour les programmes de santé communautaire." },
-  ar: { badge: "DataGuardian", title: "استمارة قبول المستفيد", sub: "مؤسسة BHF — جمع بيانات آمن ومشفر لبرامج الصحة المجتمعية." },
-};
+.chat-window {
+  position: fixed; bottom: 5.5rem; right: 1.75rem; z-index: 199;
+  width: 320px; max-height: 480px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 1rem;
+  display: flex; flex-direction: column;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  animation: fadeUp 0.25s ease;
+}
+.chat-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.875rem 1rem; border-bottom: 1px solid var(--border);
+  border-radius: 1rem 1rem 0 0; background: var(--card-2);
+}
+.chat-header-info { display: flex; align-items: center; gap: 0.6rem; }
+.chat-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg,#10b981,#2563eb);
+  color: white; font-weight: 800; font-size: 0.8rem;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.chat-header-name  { font-size: 0.875rem; font-weight: 700; color: var(--text); }
+.chat-header-status{ font-size: 0.68rem; color: #10b981; }
+.chat-close { background: none; border: none; color: var(--text-3); cursor: pointer; padding: 0.2rem; line-height: 0; transition: var(--t); }
+.chat-close:hover { color: var(--text); }
 
-const navText = {
-  en: { next: "Next Step",        prev: "Previous",    submit: "Submit Record",    home: "Home",      logout: "Logout" },
-  ha: { next: "Mataki na Gaba",   prev: "Baya",         submit: "Aika Bayani",      home: "Gida",      logout: "Fita" },
-  yo: { next: "Igbesẹ Ti o Tẹle", prev: "Iṣaaju",      submit: "Firanṣẹ Igbasilẹ", home: "Ile",       logout: "Jade" },
-  ig: { next: "Nzọụkwụ Ọzọ",      prev: "Nazaghachi",   submit: "Zipu Ndekọ",       home: "Ulo",       logout: "Pụọ" },
-  fr: { next: "Étape Suivante",    prev: "Précédent",    submit: "Soumettre",        home: "Accueil",   logout: "Déconnexion" },
-  ar: { next: "الخطوة التالية",    prev: "السابق",       submit: "إرسال السجل",      home: "الرئيسية",  logout: "خروج" },
-};
+.chat-messages {
+  flex: 1; overflow-y: auto; padding: 0.875rem;
+  display: flex; flex-direction: column; gap: 0.5rem;
+  scroll-behavior: smooth;
+}
+.chat-empty {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 0.5rem; color: var(--text-3);
+  font-size: 0.82rem; text-align: center; padding: 2rem 0;
+}
+.chat-msg { display: flex; flex-direction: column; max-width: 80%; }
+.chat-msg.mine  { align-self: flex-end; align-items: flex-end; }
+.chat-msg.theirs{ align-self: flex-start; align-items: flex-start; }
+.chat-bubble {
+  padding: 0.55rem 0.875rem; border-radius: 1rem; font-size: 0.875rem; line-height: 1.45;
+  word-break: break-word;
+}
+.chat-msg.mine .chat-bubble  { background: var(--primary); color: white; border-bottom-right-radius: 0.25rem; }
+.chat-msg.theirs .chat-bubble{ background: var(--card-2); color: var(--text); border-bottom-left-radius: 0.25rem; border: 1px solid var(--border); }
+.chat-time  { font-size: 0.65rem; color: var(--text-3); margin-top: 0.2rem; padding: 0 0.25rem; }
+.chat-read  { color: #10b981; font-weight: 700; }
 
-const emptyForm = {
-  firstName: "", lastName: "", gender: "", age: "",
-  phone: "", address: "", volunteerName: "",
-  bloodPressureSystolic: "", bloodPressureDiastolic: "",
-  bloodSugar: "", weight: "", height: "", bmi: "",
-};
+.chat-input-row {
+  display: flex; gap: 0.5rem; padding: 0.75rem;
+  border-top: 1px solid var(--border); border-radius: 0 0 1rem 1rem;
+}
+.chat-input {
+  flex: 1; padding: 0.6rem 0.875rem; background: var(--input);
+  border: 1px solid var(--border); border-radius: 0.5rem;
+  color: var(--text); font-size: 0.875rem; font-family: inherit; outline: none;
+  transition: var(--t);
+}
+.chat-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+.chat-send {
+  width: 36px; height: 36px; border-radius: 0.5rem; border: none;
+  background: var(--primary); color: white; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--t); flex-shrink: 0; align-self: center;
+}
+.chat-send:hover:not(:disabled) { background: var(--primary-h); }
+.chat-send:disabled { opacity: 0.4; cursor: not-allowed; }
 
-// ── Form page (Step 1 + 2) ────────────────────────────────────
-function FormPage({ lang, setLang }) {
-  const { user, logout } = useAuth();
-  const [currentStep,   setCurrentStep]   = useState(1);
-  const [conditions,    setConditions]    = useState([]);
-  const [dashboardOpen, setDashboardOpen] = useState(false);
-  const [formData,      setFormData]      = useState(emptyForm);
-  const [submitting,    setSubmitting]    = useState(false);
-  const [submitError,   setSubmitError]   = useState("");
-  const [done,          setDone]          = useState(false);
-
-  const h     = headerText[lang] || headerText.en;
-  const n     = navText[lang]    || navText.en;
-  const isRTL = lang === "ar";
-
-  const handleLogout = () => { logout(); window.location.href = "/"; };
-  const nextStep     = () => { setCurrentStep(2); setDashboardOpen(false); };
-  const prevStep     = () => { setCurrentStep(1); setDashboardOpen(false); };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitError("");
-    setSubmitting(true);
-    try {
-      await submitRecord(user?.token, {
-        ...formData, conditions, lang,
-        submittedAt: new Date().toISOString(),
-      });
-      setDone(true);
-      window.scrollTo({ top: 0 });
-    } catch (err) {
-      setSubmitError(err.message);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  if (done) {
-    return (
-      <Success
-        setSubmitted={() => {
-          setDone(false);
-          setFormData(emptyForm);
-          setConditions([]);
-          setCurrentStep(1);
-        }}
-        lang={lang}
-      />
-    );
-  }
-
-  return (
-    <div className="container" dir={isRTL ? "rtl" : "ltr"}>
-      {dashboardOpen && (
-        <div className="dashboard-overlay" onClick={() => setDashboardOpen(false)} />
-      )}
-
-      <Dashboard
-        currentStep={currentStep}
-        setCurrentStep={(s) => { setCurrentStep(s); setDashboardOpen(false); }}
-        lang={lang}
-        setLang={setLang}
-        dashboardOpen={dashboardOpen}
-        setDashboardOpen={setDashboardOpen}
-        onBackToHome={() => { window.location.href = "/"; }}
-      />
-
-      <main className="main-content">
-        <div className="mobile-topbar">
-          <button className="hamburger" onClick={() => setDashboardOpen(true)}>
-            <Icon name="menu" size={20} />
-          </button>
-          <span className="mobile-brand">
-            <Icon name="shield-plus" size={16} />
-            BHF DataGuardian
-          </span>
-          <span className="mobile-step">{currentStep}/2</span>
-        </div>
-
-        <div className="form-top-row">
-          <button className="back-to-home" onClick={() => { window.location.href = "/"; }}>
-            <Icon name="arrow-left" size={15} />
-            {n.home}
-          </button>
-
-          {user && (
-            <div className="user-chip">
-              <div className="user-chip-avatar">
-                {user.fullName?.charAt(0).toUpperCase()}
-              </div>
-              <div className="user-chip-info">
-                <span className="user-chip-name">{user.fullName}</span>
-                <span className="user-chip-role">{user.role}</span>
-              </div>
-              <button className="user-chip-logout" onClick={handleLogout} title={n.logout}>
-                <Icon name="log-out" size={15} />
-              </button>
-            </div>
-          )}
-        </div>
-
-        <header className="form-header">
-          <div className="header-badge">{h.badge}</div>
-          <h1>{h.title}</h1>
-          <p className="subtitle">{h.sub}</p>
-        </header>
-
-        <form className="form-container" onSubmit={handleSubmit}>
-          {currentStep === 1 && (
-            <Step1 formData={formData} setFormData={setFormData} lang={lang} />
-          )}
-          {currentStep === 2 && (
-            <Step2
-              formData={formData}
-              setFormData={setFormData}
-              conditions={conditions}
-              setConditions={setConditions}
-              lang={lang}
-            />
-          )}
-
-          {submitError && (
-            <div className="submit-error">
-              <Icon name="x" size={14} />
-              {submitError}
-            </div>
-          )}
-
-          <div className="form-navigation">
-            {currentStep > 1 && (
-              <button type="button" className="btn btn-secondary" onClick={prevStep}>
-                <Icon name="arrow-left" size={18} className="btn-icon" />
-                {n.prev}
-              </button>
-            )}
-            {currentStep === 1 && (
-              <button type="button" className="btn btn-primary" onClick={nextStep}>
-                {n.next}
-                <Icon name="arrow-right" size={18} className="btn-icon" />
-              </button>
-            )}
-            {currentStep === 2 && (
-              <button type="submit" className="btn btn-success" disabled={submitting}>
-                {submitting
-                  ? <><span className="login-spinner" />Saving...</>
-                  : <>{n.submit} <Icon name="check" size={18} className="btn-icon" /></>
-                }
-              </button>
-            )}
-          </div>
-        </form>
-      </main>
-    </div>
-  );
+/* ── ADMIN CHAT PANEL ───────────────────────────────────────── */
+.admin-chat-panel {
+  width: 340px; flex-shrink: 0;
+  background: var(--card); border: 1px solid var(--border); border-radius: 0.875rem;
+  display: flex; flex-direction: column; height: 560px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+.admin-chat-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.875rem 1rem; border-bottom: 1px solid var(--border);
+  background: var(--card-2); border-radius: 0.875rem 0.875rem 0 0;
+}
+.admin-chat-messages {
+  flex: 1; overflow-y: auto; padding: 0.875rem;
+  display: flex; flex-direction: column; gap: 0.5rem;
 }
 
-// ── Root App with Routes ──────────────────────────────────────
-export default function App() {
-  const { user, ready } = useAuth();
-  const [lang, setLang] = useState("en");
-
-  if (!ready) return null;
-
-  return (
-    <Routes>
-      {/* Public */}
-      <Route path="/" element={
-        <LandingPage
-          onStart={() => {
-            if (!user) window.location.href = "/login";
-            else if (user.role === "Administrator") window.location.href = "/admin";
-            else window.location.href = "/dashboard";
-          }}
-          lang={lang}
-          setLang={setLang}
-        />
-      } />
-
-      <Route path="/login" element={
-        user
-          ? <Navigate to={user.role === "Administrator" ? "/admin" : "/dashboard"} replace />
-          : <LoginPage
-              onSuccess={(data) => {
-                window.location.href = data.role === "Administrator" ? "/admin" : "/dashboard";
-              }}
-              onBack={() => { window.location.href = "/"; }}
-              lang={lang}
-            />
-      } />
-
-      {/* Protected: logged-in users */}
-      <Route path="/dashboard" element={
-        <RequireAuth>
-          <FormPage lang={lang} setLang={setLang} />
-        </RequireAuth>
-      } />
-
-      {/* Protected: admins only */}
-      <Route path="/admin" element={
-        <RequireAdmin>
-          <AdminDashboard onBack={() => { window.location.href = "/"; }} />
-        </RequireAdmin>
-      } />
-
-      <Route path="*" element={
-        <NotFound onBack={() => { window.location.href = "/"; }} />
-      } />
-    </Routes>
-  );
+/* ── PING POPUP ─────────────────────────────────────────────── */
+.ping-popup {
+  position: fixed; top: 1.25rem; right: 1.25rem; z-index: 300;
+  background: linear-gradient(135deg,#f59e0b,#d97706);
+  color: white; border-radius: 0.625rem;
+  padding: 0.75rem 1.125rem; font-size: 0.875rem; font-weight: 600;
+  display: flex; align-items: center; gap: 0.5rem;
+  box-shadow: 0 8px 24px rgba(245,158,11,0.4);
+  animation: fadeUp 0.3s ease, fadeOut 0.3s ease 4.7s forwards;
 }
-// main.jsx
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import ServerWake from "./components/ServerWake";
-import App from "./App";
-import "./App.css";
+@keyframes fadeOut { to { opacity: 0; transform: translateY(-8px); } }
 
-createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <ServerWake>
-          <App />
-        </ServerWake>
-      </AuthProvider>
-    </BrowserRouter>
-  </StrictMode>
-);
+/* ── COOKIE BANNER ──────────────────────────────────────────── */
+.cookie-banner {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 250;
+  background: var(--card); border-top: 1px solid var(--border);
+  padding: 0.875rem 1.5rem;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.3);
+  animation: slideUp 0.4s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.cookie-banner-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+}
+.cookie-icon { flex-shrink: 0; }
+.cookie-text { flex: 1; font-size: 0.85rem; color: var(--text-2); line-height: 1.5; min-width: 200px; }
+.cookie-link { color: var(--primary-l); text-decoration: underline; }
+.cookie-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+.cookie-btn {
+  padding: 0.45rem 1rem; border-radius: 0.375rem; font-size: 0.82rem;
+  font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: var(--t);
+}
+.cookie-accept  { background: var(--success); color: white; }
+.cookie-accept:hover  { background: var(--success-h); }
+.cookie-decline { background: transparent; color: var(--text-3); border: 1px solid var(--border); }
+.cookie-decline:hover { background: var(--input); color: var(--text); }
+.cookie-dismiss {
+  background: none; border: none; color: var(--text-3); cursor: pointer;
+  padding: 0.25rem; line-height: 0; flex-shrink: 0; transition: var(--t);
+}
+.cookie-dismiss:hover { color: var(--text); }
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.7; transform: scale(1.15); }
+}

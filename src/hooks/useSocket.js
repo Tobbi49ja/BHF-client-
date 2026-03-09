@@ -23,7 +23,7 @@ export function useSocket(userId, callbacks = {}) {
   const cbRef     = useRef(callbacks);
   const idleTimer = useRef(null);
 
-  // Always keep latest callbacks — no stale closures ever
+  // Always keep the latest callbacks — no stale closures
   useEffect(() => { cbRef.current = callbacks; });
 
   useEffect(() => {
@@ -31,42 +31,47 @@ export function useSocket(userId, callbacks = {}) {
 
     const socket = getSocket();
 
-    // ── Join room exactly once per mount ────────────────────
-    // "connect" fires once on first connection.
-    // "reconnect" (manager event) fires on subsequent reconnections.
+    // ── Join room once per mount ────────────────────────────
     const doJoin = () => {
       socket.emit("join", userId);
       console.log("[socket] join →", userId);
     };
 
     if (socket.connected) {
-      doJoin();                          // already connected — join immediately
+      doJoin();
     } else {
-      socket.once("connect", doJoin);    // wait for first connection
+      socket.once("connect", doJoin);
     }
 
-    // Re-join only on REconnects (not the first connect — handled above)
+    // Re-join on reconnects only (not the initial connect handled above)
     const onReconnect = () => {
       console.log("[socket] reconnect — re-joining:", userId);
       doJoin();
     };
-    socket.io.on("reconnect", onReconnect);   // manager-level event, fires only on re-connects
+    socket.io.on("reconnect", onReconnect);
 
-    // ── Event handlers ──────────────────────────────────────
-    const onMessage   = (msg)  => cbRef.current.onMessage?.(msg);
-    const onStatus    = (data) => cbRef.current.onStatus?.(data);
-    const onPinged    = (data) => { console.log("[socket] pinged:", data); cbRef.current.onPinged?.(data); };
-    const onCleared   = ()     => cbRef.current.onChatCleared?.();
+    // ── Handlers ────────────────────────────────────────────
+    const onMessage      = (msg)  => cbRef.current.onMessage?.(msg);
+    const onStatus       = (data) => cbRef.current.onStatus?.(data);
+    const onPinged       = (data) => { console.log("[socket] pinged:", data); cbRef.current.onPinged?.(data); };
+    const onCleared      = (data) => cbRef.current.onChatCleared?.(data || {});
+    // messagesRead fires when the other party opens the conversation,
+    // triggering a ✓✓ update for all sent messages
+    const onMessagesRead = (data) => cbRef.current.onMessagesRead?.(data || {});
 
-    socket.on("newMessage",  onMessage);
-    socket.on("userStatus",  onStatus);
-    socket.on("pinged",      onPinged);
-    socket.on("chatCleared", onCleared);
+    socket.on("newMessage",   onMessage);
+    socket.on("userStatus",   onStatus);
+    socket.on("pinged",       onPinged);
+    socket.on("chatCleared",  onCleared);
+    socket.on("messagesRead", onMessagesRead);
 
     // ── Idle detection ──────────────────────────────────────
     const resetIdle = () => {
       clearTimeout(idleTimer.current);
-      idleTimer.current = setTimeout(() => socket.emit("idle", userId), 3 * 60 * 1000);
+      idleTimer.current = setTimeout(
+        () => socket.emit("idle", userId),
+        3 * 60 * 1000
+      );
     };
     window.addEventListener("mousemove", resetIdle);
     window.addEventListener("keydown",   resetIdle);
@@ -74,12 +79,13 @@ export function useSocket(userId, callbacks = {}) {
 
     // ── Cleanup ─────────────────────────────────────────────
     return () => {
-      socket.off("connect",     doJoin);
+      socket.off("connect",      doJoin);
       socket.io.off("reconnect", onReconnect);
-      socket.off("newMessage",  onMessage);
-      socket.off("userStatus",  onStatus);
-      socket.off("pinged",      onPinged);
-      socket.off("chatCleared", onCleared);
+      socket.off("newMessage",   onMessage);
+      socket.off("userStatus",   onStatus);
+      socket.off("pinged",       onPinged);
+      socket.off("chatCleared",  onCleared);
+      socket.off("messagesRead", onMessagesRead);
       clearTimeout(idleTimer.current);
       window.removeEventListener("mousemove", resetIdle);
       window.removeEventListener("keydown",   resetIdle);
